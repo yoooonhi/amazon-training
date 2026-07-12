@@ -42,7 +42,15 @@ function loadStartDate() {
 
 async function loadRemoteProgress() {
   loading.value = true
-  const { data, error } = await supabase.from('progress').select('lesson_id, completed, completed_at')
+  const { data: session } = await supabase.auth.getSession()
+  const userId = session.session?.user?.id
+  if (!userId) { loading.value = false; return }
+
+  // 只查自己的进度，导师也不会看到别人的
+  const { data, error } = await supabase
+    .from('progress')
+    .select('lesson_id, completed, completed_at')
+    .eq('user_id', userId)
   if (error) {
     console.error('读取进度失败:', error)
     loading.value = false
