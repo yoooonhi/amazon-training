@@ -129,7 +129,10 @@ export default defineConfig({
     },
 
     socialLinks: [],
-    footer: { message: '亚马逊运营入门 · 边学边实战', copyright: '' },
+    footer: {
+      message: '亚马逊运营入门 · 边学边实战 · 站长联系方式：yoonhi_@outlook.com',
+      copyright: ''
+    },
     outline: { level: [2, 3], label: '本课目录' },
     docFooter: { prev: '上一课', next: '下一课' },
     lastUpdatedText: '最后更新',
