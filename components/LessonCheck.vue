@@ -145,15 +145,12 @@ onMounted(() => {
 }
 .check-status {
   margin-left: auto;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   padding: 0.2rem 0.6rem;
   border-radius: 4px;
-  background: var(--vp-c-divider);
-  color: var(--vp-c-text-2);
-}
-.check-status.pass {
-  background: var(--vp-c-brand-1);
-  color: #fff;
+  background: var(--vp-c-brand-soft, rgba(52, 81, 178, 0.08));
+  color: var(--vp-c-brand-1);
+  font-weight: 600;
 }
 .saving-hint {
   font-size: 0.75rem;

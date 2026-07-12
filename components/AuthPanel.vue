@@ -164,12 +164,12 @@ function displayName() {
 
 /* 未登录按钮 */
 .nav-login-btn {
-  padding: 0.35rem 0.9rem;
-  border-radius: 6px;
-  border: 1px solid var(--vp-c-brand-1);
-  background: transparent;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  border: none;
+  background: var(--vp-c-brand-soft, rgba(52, 81, 178, 0.08));
   color: var(--vp-c-brand-1);
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
