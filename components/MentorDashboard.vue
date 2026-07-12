@@ -152,50 +152,61 @@ onMounted(async () => {
         </div>
       </div>
 
-      <table v-if="students.length > 0" class="student-table">
-        <thead>
-          <tr>
-            <th>学员</th>
-            <th>完成进度</th>
-            <th>完成率</th>
-            <th>打卡天数</th>
-            <th>连续</th>
-            <th>答题</th>
-            <th>最后学习</th>
-            <th>状态</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="s in sortedStudents" :key="s.profile.id" :class="{ stale: s.isStale }">
-            <td class="student-name">
+      <div v-if="students.length > 0" class="student-cards">
+        <div
+          v-for="s in sortedStudents"
+          :key="s.profile.id"
+          class="student-card"
+          :class="{ stale: s.isStale }"
+          @click="viewDetail(s)"
+        >
+          <!-- 卡片头部：名字+状态 -->
+          <div class="card-top">
+            <div class="card-name">
               <strong>{{ s.profile.nickname || s.profile.email }}</strong>
               <small>{{ new Date(s.profile.created_at).toLocaleDateString('zh-CN') }} 注册</small>
-            </td>
-            <td>{{ s.progressCount }}/{{ totalLessons }}</td>
-            <td>
-              <div class="mini-bar">
-                <div class="mini-bar-fill" :style="{ width: s.percent + '%' }"></div>
-                <span class="mini-bar-text">{{ s.percent }}%</span>
-              </div>
-            </td>
-            <td>{{ s.checkinDays }}</td>
-            <td>🔥 {{ s.streak }}</td>
-            <td>{{ s.quizCorrect }}/{{ s.quizTotal }}</td>
-            <td>
-              <span v-if="s.lastActive">{{ s.daysSinceActive === 0 ? '今天' : s.daysSinceActive + '天前' }}</span>
-              <span v-else class="never">未开始</span>
-            </td>
-            <td>
-              <span v-if="s.isStale" class="badge-warn">停滞</span>
-              <span v-else-if="s.percent === 0" class="badge-new">新</span>
-              <span v-else-if="s.percent === 100" class="badge-done">毕业</span>
-              <span v-else class="badge-active">活跃</span>
-            </td>
-            <td><button class="detail-btn" @click="viewDetail(s)">详情</button></td>
-          </tr>
-        </tbody>
-      </table>
+            </div>
+            <span v-if="s.isStale" class="badge-warn">停滞</span>
+            <span v-else-if="s.percent === 0" class="badge-new">新</span>
+            <span v-else-if="s.percent === 100" class="badge-done">毕业</span>
+            <span v-else class="badge-active">活跃</span>
+          </div>
+
+          <!-- 进度条 -->
+          <div class="card-progress">
+            <div class="card-bar">
+              <div class="card-bar-fill" :style="{ width: s.percent + '%' }"></div>
+            </div>
+            <span class="card-pct">{{ s.percent }}%</span>
+            <span class="card-count">{{ s.progressCount }}/{{ totalLessons }}课</span>
+          </div>
+
+          <!-- 数据行 -->
+          <div class="card-stats">
+            <div class="card-stat">
+              <span class="card-stat-num">🔥 {{ s.streak }}</span>
+              <span class="card-stat-label">连续打卡</span>
+            </div>
+            <div class="card-stat">
+              <span class="card-stat-num">{{ s.checkinDays }}</span>
+              <span class="card-stat-label">打卡天数</span>
+            </div>
+            <div class="card-stat">
+              <span class="card-stat-num">{{ s.quizCorrect }}/{{ s.quizTotal }}</span>
+              <span class="card-stat-label">答题正确</span>
+            </div>
+            <div class="card-stat">
+              <span class="card-stat-num" v-if="s.lastActive">{{ s.daysSinceActive === 0 ? '今天' : s.daysSinceActive + '天前' }}</span>
+              <span class="card-stat-num never" v-else>未开始</span>
+              <span class="card-stat-label">最后学习</span>
+            </div>
+          </div>
+
+          <div class="card-footer">
+            <span class="detail-link">查看详情 →</span>
+          </div>
+        </div>
+      </div>
 
       <div v-else class="empty-state">
         <p>还没有学员注册</p>
@@ -299,82 +310,108 @@ onMounted(async () => {
   font-size: 0.8rem;
   color: var(--vp-c-text-2);
 }
-.student-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.9rem;
+.student-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1rem;
 }
-.student-table th {
-  text-align: left;
-  padding: 0.9rem 0.8rem;
-  border-bottom: 2px solid var(--vp-c-divider);
-  color: var(--vp-c-text-2);
-  font-size: 0.82rem;
-  white-space: nowrap;
-}
-.student-table td {
-  padding: 0.85rem 0.8rem;
-  border-bottom: 1px solid var(--vp-c-divider);
-  vertical-align: middle;
-}
-.student-table tbody tr:hover {
+.student-card {
+  padding: 1.2rem;
+  border-radius: 12px;
   background: var(--vp-c-bg-soft);
+  border: 1px solid var(--vp-c-divider);
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
-.student-table tr.stale {
-  background: rgba(255, 153, 0, 0.05);
+.student-card:hover {
+  border-color: var(--vp-c-brand-1);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 }
-.student-name strong {
+.student-card.stale {
+  border-color: rgba(255, 153, 0, 0.4);
+  background: rgba(255, 153, 0, 0.04);
+}
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 0.9rem;
+}
+.card-name strong {
   display: block;
   color: var(--vp-c-text-1);
-  font-size: 0.95rem;
+  font-size: 1.05rem;
 }
-.student-name small {
+.card-name small {
   color: var(--vp-c-text-2);
   font-size: 0.75rem;
 }
-.mini-bar {
-  position: relative;
-  width: 80px;
-  height: 18px;
+.card-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+.card-bar {
+  flex: 1;
+  height: 8px;
   background: var(--vp-c-divider);
   border-radius: 4px;
   overflow: hidden;
 }
-.mini-bar-fill {
+.card-bar-fill {
   height: 100%;
   background: var(--vp-c-brand-1);
   border-radius: 4px;
+  transition: width 0.3s;
 }
-.mini-bar-text {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  text-align: center;
-  line-height: 18px;
-  font-size: 0.7rem;
-  color: #fff;
+.card-pct {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--vp-c-brand-1);
+  min-width: 2.5rem;
+}
+.card-count {
+  font-size: 0.78rem;
+  color: var(--vp-c-text-2);
+  white-space: nowrap;
+}
+.card-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+}
+.card-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.card-stat-num {
+  font-size: 0.95rem;
   font-weight: 600;
+  color: var(--vp-c-text-1);
+}
+.card-stat-label {
+  font-size: 0.72rem;
+  color: var(--vp-c-text-2);
+}
+.card-footer {
+  margin-top: 0.8rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--vp-c-divider);
+}
+.detail-link {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--vp-c-brand-1);
 }
 .never {
   color: var(--vp-c-text-2);
 }
-.badge-warn { color: #ff9900; font-weight: 600; }
-.badge-new { color: var(--vp-c-text-2); }
-.badge-done { color: #22c55e; font-weight: 600; }
-.badge-active { color: var(--vp-c-brand-1); }
-.detail-btn {
-  padding: 0.25rem 0.7rem;
-  border-radius: 4px;
-  border: 1px solid var(--vp-c-brand-1);
-  background: transparent;
-  color: var(--vp-c-brand-1);
-  cursor: pointer;
-  font-size: 0.8rem;
-}
-.detail-btn:hover {
-  background: var(--vp-c-brand-soft, rgba(52,81,178,0.06));
-}
+.badge-warn { color: #ff9900; font-weight: 600; font-size: 0.78rem; }
+.badge-new { color: var(--vp-c-text-2); font-size: 0.78rem; }
+.badge-done { color: #22c55e; font-weight: 600; font-size: 0.78rem; }
+.badge-active { color: var(--vp-c-brand-1); font-size: 0.78rem; }
 .empty-state {
   text-align: center;
   padding: 3rem;
