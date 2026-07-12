@@ -5,13 +5,13 @@ hero:
   name: "亚马逊运营入门"
   text: "从零开始，边学边实战"
   tagline: 6个能力模块 · 不设死线 · 学一个用一个
-  actions:
-    - theme: brand
-      text: 从模块1开始 →
-      link: /content/modules/m1-platform/01-what-is-ops
-    - theme: alt
-      text: 能力地图
-      link: /content/00-overview/overview
+    actions:
+      - theme: brand
+        text: 从模块1开始 →
+        link: /content/modules/m1-platform/00-amazon-basics
+      - theme: alt
+        text: 能力地图
+        link: /content/00-overview/overview
 ---
 
 <script setup>
@@ -62,5 +62,10 @@ import AuthPanel from './components/AuthPanel.vue'
 ## 三个绝不能犯的错
 
 1. **在没确认数据是否真实/新鲜的情况下就下决策**——Vine订单不是真实销量，过期数据不能用来调价
-2. **高不可逆操作（清仓/删货件/大改Listing）没跟老板确认就执行**
+2. **高不可逆操作（清仓/删货件/大改Listing）没确认就执行**
 3. **把不相关的决策混在一起做**——广告问题归广告、定价问题归定价，不要"一起调了吧"
+
+## 官方参考文档
+
+- 🇪🇺 [亚马逊欧洲站官方卖家帮助](https://sellercentral.amazon.de/help/hub/reference/external/2?locale=zh-CN)
+- 🇺🇸 [亚马逊美国站官方卖家帮助](https://sellercentral.amazon.com/help/hub/reference/external/2?locale=zh-CN)
