@@ -42,7 +42,12 @@ function loadStartDate() {
 
 async function loadRemoteProgress() {
   loading.value = true
-  const { data } = await supabase.from('progress').select('lesson_id, completed, completed_at')
+  const { data, error } = await supabase.from('progress').select('lesson_id, completed, completed_at')
+  if (error) {
+    console.error('读取进度失败:', error)
+    loading.value = false
+    return
+  }
   if (data) {
     const remote = {}
     data.forEach(r => {
