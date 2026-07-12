@@ -10,7 +10,7 @@ export default defineConfig({
   base: '/amazon-training/',
 
   head: [
-    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' }],
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/amazon-training/logo.svg' }],
   ],
 
   themeConfig: {
