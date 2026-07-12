@@ -104,27 +104,34 @@ async function saveNickname() {
     </div>
 
     <!-- 未登录 -->
-    <div v-else-if="!showLogin" class="auth-prompt">
+    <div v-else class="auth-prompt">
       <span class="prompt-text">登录后进度跨设备同步</span>
       <button class="login-btn" @click="showLogin = true">登录 / 注册</button>
     </div>
 
-    <!-- 登录表单 -->
-    <div v-else class="auth-form">
-      <div class="form-tabs">
-        <button :class="{ active: mode === 'signin' }" @click="mode = 'signin'">登录</button>
-        <button :class="{ active: mode === 'signup' }" @click="mode = 'signup'">注册</button>
-      </div>
-      <input v-model="email" type="email" placeholder="邮箱" class="form-input" />
-      <input v-model="password" type="password" placeholder="密码（至少6位）" class="form-input" />
-      <input v-if="mode === 'signup'" v-model="nickname" placeholder="昵称（选填，注册后可改）" class="form-input" />
-      <p v-if="errorMsg" class="form-error">{{ errorMsg }}</p>
-      <p v-if="infoMsg" class="form-info">{{ infoMsg }}</p>
-      <button class="submit-btn" :disabled="loading" @click="handleSubmit">
-        {{ loading ? '处理中...' : (mode === 'signup' ? '注册' : '登录') }}
-      </button>
-      <button class="cancel-btn" @click="showLogin = false">取消</button>
-    </div>
+    <!-- 登录弹窗 -->
+    <Teleport to="body">
+      <Transition name="modal">
+        <div v-if="showLogin && !currentUser" class="modal-overlay" @click.self="showLogin = false">
+          <div class="auth-form">
+            <button class="modal-close" @click="showLogin = false">✕</button>
+            <h3 class="modal-title">{{ mode === 'signup' ? '注册账号' : '登录' }}</h3>
+            <div class="form-tabs">
+              <button :class="{ active: mode === 'signin' }" @click="mode = 'signin'">登录</button>
+              <button :class="{ active: mode === 'signup' }" @click="mode = 'signup'">注册</button>
+            </div>
+            <input v-model="email" type="email" placeholder="邮箱" class="form-input" />
+            <input v-model="password" type="password" placeholder="密码（至少6位）" class="form-input" />
+            <input v-if="mode === 'signup'" v-model="nickname" placeholder="昵称（选填，注册后可改）" class="form-input" />
+            <p v-if="errorMsg" class="form-error">{{ errorMsg }}</p>
+            <p v-if="infoMsg" class="form-info">{{ infoMsg }}</p>
+            <button class="submit-btn" :disabled="loading" @click="handleSubmit">
+              {{ loading ? '处理中...' : (mode === 'signup' ? '注册' : '登录') }}
+            </button>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
@@ -250,14 +257,67 @@ async function saveNickname() {
   background: var(--vp-c-brand-soft, rgba(52,81,178,0.06));
 }
 .auth-form {
-  padding: 1.2rem;
-  background: var(--vp-c-bg-soft);
-  border-radius: 10px;
+  padding: 1.5rem 1.8rem;
+  background: var(--vp-c-bg);
+  border-radius: 14px;
   border: 1px solid var(--vp-c-divider);
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
-  max-width: 340px;
+  gap: 0.7rem;
+  width: 360px;
+  max-width: calc(100vw - 2rem);
+  position: relative;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+.modal-title {
+  margin: 0 0 0.3rem;
+  font-size: 1.15rem;
+  color: var(--vp-c-text-1);
+}
+.modal-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: var(--vp-c-bg-soft);
+  color: var(--vp-c-text-2);
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-close:hover {
+  background: var(--vp-c-divider);
+  color: var(--vp-c-text-1);
+}
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 1rem;
+}
+.modal-enter-active, .modal-leave-active {
+  transition: opacity 0.2s ease;
+}
+.modal-enter-active .auth-form,
+.modal-leave-active .auth-form {
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+.modal-enter-from, .modal-leave-to {
+  opacity: 0;
+}
+.modal-enter-from .auth-form,
+.modal-leave-to .auth-form {
+  transform: scale(0.95) translateY(-10px);
+  opacity: 0;
 }
 .form-tabs {
   display: flex;
@@ -320,14 +380,5 @@ async function saveNickname() {
 .submit-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-}
-.cancel-btn {
-  padding: 0.45rem;
-  border-radius: 6px;
-  border: 1px solid var(--vp-c-divider);
-  background: var(--vp-c-bg);
-  color: var(--vp-c-text-2);
-  font-size: 0.85rem;
-  cursor: pointer;
 }
 </style>
