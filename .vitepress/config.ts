@@ -6,6 +6,9 @@ export default defineConfig({
   lang: 'zh-CN',
   lastUpdated: true,
 
+  // GitHub Pages 部署在 /amazon-training/ 子路径下，需要配置 base
+  base: '/amazon-training/',
+
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' }],
   ],
