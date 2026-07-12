@@ -280,8 +280,8 @@ async function saveNickname() {
   border-color: var(--vp-c-brand-1);
 }
 .dark .form-tabs button.active {
-  background: #1a4fd1;
-  border-color: #1a4fd1;
+  background: #3e63dd;
+  border-color: #3e63dd;
 }
 .form-input {
   padding: 0.5rem 0.7rem;
@@ -315,7 +315,7 @@ async function saveNickname() {
   cursor: pointer;
 }
 .dark .submit-btn {
-  background: #1a4fd1;
+  background: #3e63dd;
 }
 .submit-btn:disabled {
   opacity: 0.6;
