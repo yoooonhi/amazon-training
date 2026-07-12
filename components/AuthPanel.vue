@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { supabase, authState } from '../lib/supabase'
 
 const isMounted = ref(false)
@@ -14,6 +14,15 @@ const nickname = ref('')
 const loading = ref(false)
 const errorMsg = ref('')
 const infoMsg = ref('')
+
+// 点击页面任意位置关闭下拉菜单（点菜单自身不关）
+function handleOutsideClick(e) {
+  if (!showUserMenu.value) return
+  const menu = document.querySelector('.nav-user')
+  if (menu && !menu.contains(e.target)) {
+    showUserMenu.value = false
+  }
+}
 
 onMounted(() => {
   isMounted.value = true
@@ -30,6 +39,11 @@ onMounted(() => {
         .then(({ data: p }) => { currentProfile.value = p })
     }
   })
+  document.addEventListener('click', handleOutsideClick)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleOutsideClick)
 })
 
 async function handleSubmit() {
