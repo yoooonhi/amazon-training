@@ -17,7 +17,6 @@ export default defineConfig({
     nav: [
       { text: '首页', link: '/' },
       { text: '总览', link: '/content/00-overview/overview' },
-      { text: '导师后台', link: '/dashboard' },
     ],
 
     sidebar: {
