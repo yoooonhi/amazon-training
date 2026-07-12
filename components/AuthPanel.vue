@@ -78,9 +78,8 @@ async function handleSubmit() {
 
 async function handleLogout() {
   await supabase.auth.signOut()
-  currentUser.value = null
-  currentProfile.value = null
-  showUserMenu.value = false
+  // 刷新页面，确保所有组件状态干净重置（进度清空）
+  window.location.reload()
 }
 
 async function saveNickname() {
