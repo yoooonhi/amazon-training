@@ -30,13 +30,15 @@ async function checkMentor() {
 
 async function loadData() {
   loading.value = true
+  errorMsg.value = ''
   // 拉 profiles
   const { data: profiles, error: pErr } = await supabase.from('profiles').select('*').eq('role', 'student').order('created_at', { ascending: false })
-  if (pErr) { errorMsg.value = pErr.message; loading.value = false; return }
+  if (pErr) { errorMsg.value = '读取学员失败: ' + pErr.message; loading.value = false; return }
   // 拉 progress
-  const { data: allProgress } = await supabase.from('progress').select('user_id, lesson_id, completed, completed_at')
+  const { data: allProgress, error: progErr } = await supabase.from('progress').select('user_id, lesson_id, completed, completed_at')
+  if (progErr) { errorMsg.value = '读取进度失败: ' + progErr.message; loading.value = false; return }
   // 拉 checkins
-  const { data: allCheckins } = await supabase.from('checkins').select('user_id, checkin_date')
+  const { data: allCheckins, error: checkErr } = await supabase.from('checkins').select('user_id, checkin_date')
   // 拉 quiz
   const { data: allQuiz } = await supabase.from('quiz_results').select('user_id, is_correct, lesson_id, question_index')
 
