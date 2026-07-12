@@ -5,13 +5,13 @@ hero:
   name: "亚马逊运营入门"
   text: "从零开始，边学边实战"
   tagline: 6个能力模块 · 不设死线 · 学一个用一个
-    actions:
-      - theme: brand
-        text: 从模块1开始 →
-        link: /content/modules/m1-platform/00-amazon-basics
-      - theme: alt
-        text: 能力地图
-        link: /content/00-overview/overview
+  actions:
+    - theme: brand
+      text: 从模块1开始 →
+      link: /content/modules/m1-platform/00-amazon-basics
+    - theme: alt
+      text: 能力地图
+      link: /content/00-overview/overview
 ---
 
 <script setup>
