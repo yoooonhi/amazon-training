@@ -130,7 +130,7 @@ export default defineConfig({
 
     socialLinks: [],
     footer: {
-      message: '亚马逊运营入门 · 边学边实战 · 站长联系方式：yoonhi_@outlook.com',
+      message: '亚马逊运营入门 · 边学边实战 · 联系站长：yoonhi_@outlook.com',
       copyright: ''
     },
     outline: { level: [2, 3], label: '本课目录' },
