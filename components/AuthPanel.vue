@@ -365,13 +365,10 @@ function displayName() {
   cursor: pointer;
 }
 .form-tabs button.active {
-  background: var(--vp-c-brand-1);
-  color: #fff;
-  border-color: var(--vp-c-brand-1);
-}
-.dark .form-tabs button.active {
-  background: #3e63dd;
-  border-color: #3e63dd;
+  background: var(--vp-c-brand-soft, rgba(52, 81, 178, 0.08));
+  color: var(--vp-c-brand-1);
+  border-color: var(--vp-c-brand-soft, rgba(52, 81, 178, 0.08));
+  font-weight: 600;
 }
 .form-input {
   padding: 0.5rem 0.7rem;
@@ -396,16 +393,13 @@ function displayName() {
 }
 .submit-btn {
   padding: 0.55rem;
-  border-radius: 6px;
+  border-radius: 4px;
   border: none;
-  background: var(--vp-c-brand-1);
-  color: #fff;
+  background: var(--vp-c-brand-soft, rgba(52, 81, 178, 0.08));
+  color: var(--vp-c-brand-1);
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-}
-.dark .submit-btn {
-  background: #3e63dd;
 }
 .submit-btn:disabled {
   opacity: 0.6;
