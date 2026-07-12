@@ -279,6 +279,10 @@ async function saveNickname() {
   color: #fff;
   border-color: var(--vp-c-brand-1);
 }
+.dark .form-tabs button.active {
+  background: #1a4fd1;
+  border-color: #1a4fd1;
+}
 .form-input {
   padding: 0.5rem 0.7rem;
   border-radius: 6px;
@@ -309,6 +313,9 @@ async function saveNickname() {
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
+}
+.dark .submit-btn {
+  background: #1a4fd1;
 }
 .submit-btn:disabled {
   opacity: 0.6;
