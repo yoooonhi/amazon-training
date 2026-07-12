@@ -7,12 +7,13 @@ import DailyGate from '../../components/DailyGate.vue'
 import LessonCheck from '../../components/LessonCheck.vue'
 import SelfTest from '../../components/SelfTest.vue'
 import AuthPanel from '../../components/AuthPanel.vue'
+import './custom.css'
 
 export default {
   extends: DefaultTheme,
   Layout: () => {
     return h(DefaultTheme.Layout, null, {
-      'nav-bar-content-before': () => h(AuthPanel),
+      'nav-bar-content-after': () => h(AuthPanel),
     })
   },
   enhanceApp({ app }) {
