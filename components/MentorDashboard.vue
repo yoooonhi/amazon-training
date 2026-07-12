@@ -251,7 +251,7 @@ onMounted(async () => {
 
 <style scoped>
 .dashboard {
-  max-width: 1000px;
+  max-width: 100%;
 }
 .error-box, .loading-box {
   padding: 2rem;
