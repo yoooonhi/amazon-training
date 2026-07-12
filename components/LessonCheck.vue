@@ -48,10 +48,8 @@ async function toggle(key) {
   // 更新本地 progress
   updateLocalProgress()
 
-  // 登录了就同步到云端
-  if (isLoggedIn.value) {
-    await syncToRemote()
-  }
+  // 直接检查 Supabase session 是否登录，不依赖 isLoggedIn 状态
+  await syncToRemote()
 }
 
 function updateLocalProgress() {
