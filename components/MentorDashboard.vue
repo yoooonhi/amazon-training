@@ -7,10 +7,14 @@ const isMounted = ref(false)
 const loading = ref(true)
 const errorMsg = ref('')
 const isMentor = ref(false)
-const students = ref([]) // [{ profile, progressCount, checkins, lastActive, quizCorrect, quizTotal }]
-const selectedStudent = ref(null) // for detail view
+const students = ref([])
+const selectedStudent = ref(null)
 const detailProgress = ref([])
 const detailQuiz = ref([])
+
+// 搜索和筛选
+const searchQuery = ref('')
+const filterStatus = ref('all') // all | active | stale | done | new
 
 async function checkMentor() {
   const { data: session } = await supabase.auth.getSession()
@@ -106,8 +110,30 @@ function lessonTitle(lessonId) {
   return lessonId
 }
 
-const sortedStudents = computed(() => {
-  return [...students.value].sort((a, b) => b.percent - a.percent)
+// 过滤 + 搜索 + 排序
+const filteredStudents = computed(() => {
+  let result = [...students.value]
+  // 搜索
+  if (searchQuery.value.trim()) {
+    const q = searchQuery.value.toLowerCase().trim()
+    result = result.filter(s => {
+      const name = (s.profile.nickname || '').toLowerCase()
+      const email = (s.profile.email || '').toLowerCase()
+      return name.includes(q) || email.includes(q)
+    })
+  }
+  // 状态筛选
+  if (filterStatus.value !== 'all') {
+    result = result.filter(s => {
+      if (filterStatus.value === 'stale') return s.isStale
+      if (filterStatus.value === 'done') return s.percent === 100
+      if (filterStatus.value === 'new') return s.percent === 0
+      if (filterStatus.value === 'active') return s.percent > 0 && s.percent < 100 && !s.isStale
+      return true
+    })
+  }
+  // 按完成率降序
+  return result.sort((a, b) => b.percent - a.percent)
 })
 
 onMounted(async () => {
@@ -152,60 +178,68 @@ onMounted(async () => {
         </div>
       </div>
 
-      <div v-if="students.length > 0" class="student-cards">
-        <div
-          v-for="s in sortedStudents"
-          :key="s.profile.id"
-          class="student-card"
-          :class="{ stale: s.isStale }"
-          @click="viewDetail(s)"
-        >
-          <!-- 卡片头部：名字+状态 -->
-          <div class="card-top">
-            <div class="card-name">
-              <strong>{{ s.profile.nickname || s.profile.email }}</strong>
-              <small>{{ new Date(s.profile.created_at).toLocaleDateString('zh-CN') }} 注册</small>
-            </div>
-            <span v-if="s.isStale" class="badge-warn">停滞</span>
-            <span v-else-if="s.percent === 0" class="badge-new">新</span>
-            <span v-else-if="s.percent === 100" class="badge-done">毕业</span>
-            <span v-else class="badge-active">活跃</span>
-          </div>
-
-          <!-- 进度条 -->
-          <div class="card-progress">
-            <div class="card-bar">
-              <div class="card-bar-fill" :style="{ width: s.percent + '%' }"></div>
-            </div>
-            <span class="card-pct">{{ s.percent }}%</span>
-            <span class="card-count">{{ s.progressCount }}/{{ totalLessons }}课</span>
-          </div>
-
-          <!-- 数据行 -->
-          <div class="card-stats">
-            <div class="card-stat">
-              <span class="card-stat-num">🔥 {{ s.streak }}</span>
-              <span class="card-stat-label">连续打卡</span>
-            </div>
-            <div class="card-stat">
-              <span class="card-stat-num">{{ s.checkinDays }}</span>
-              <span class="card-stat-label">打卡天数</span>
-            </div>
-            <div class="card-stat">
-              <span class="card-stat-num">{{ s.quizCorrect }}/{{ s.quizTotal }}</span>
-              <span class="card-stat-label">答题正确</span>
-            </div>
-            <div class="card-stat">
-              <span class="card-stat-num" v-if="s.lastActive">{{ s.daysSinceActive === 0 ? '今天' : s.daysSinceActive + '天前' }}</span>
-              <span class="card-stat-num never" v-else>未开始</span>
-              <span class="card-stat-label">最后学习</span>
-            </div>
-          </div>
-
-          <div class="card-footer">
-            <span class="detail-link">查看详情 →</span>
-          </div>
+      <!-- 搜索和筛选栏 -->
+      <div v-if="students.length > 0" class="filter-bar">
+        <input
+          v-model="searchQuery"
+          class="search-input"
+          placeholder="🔍 搜索学员昵称或邮箱..."
+        />
+        <div class="filter-tabs">
+          <button :class="{ active: filterStatus === 'all' }" @click="filterStatus = 'all'">全部</button>
+          <button :class="{ active: filterStatus === 'active' }" @click="filterStatus = 'active'">活跃</button>
+          <button :class="{ active: filterStatus === 'stale' }" @click="filterStatus = 'stale'">停滞</button>
+          <button :class="{ active: filterStatus === 'new' }" @click="filterStatus = 'new'">未开始</button>
+          <button :class="{ active: filterStatus === 'done' }" @click="filterStatus = 'done'">毕业</button>
         </div>
+      </div>
+
+      <!-- 学员表格 -->
+      <div v-if="students.length > 0" class="table-wrap">
+        <table class="student-table">
+          <thead>
+            <tr>
+              <th>学员</th>
+              <th>完成进度</th>
+              <th>打卡</th>
+              <th>答题</th>
+              <th>最后学习</th>
+              <th>状态</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="s in filteredStudents" :key="s.profile.id" :class="{ stale: s.isStale }" @click="viewDetail(s)">
+              <td class="col-name">
+                <strong>{{ s.profile.nickname || s.profile.email }}</strong>
+                <small>{{ new Date(s.profile.created_at).toLocaleDateString('zh-CN') }} 注册</small>
+              </td>
+              <td class="col-progress">
+                <div class="tbl-bar">
+                  <div class="tbl-bar-fill" :style="{ width: s.percent + '%' }"></div>
+                </div>
+                <span class="tbl-pct">{{ s.percent }}%</span>
+                <span class="tbl-count">{{ s.progressCount }}/{{ totalLessons }}</span>
+              </td>
+              <td class="col-streak"><span class="streak-tag">🔥 {{ s.streak }}</span> <small>{{ s.checkinDays }}天</small></td>
+              <td>{{ s.quizCorrect }}/{{ s.quizTotal }}</td>
+              <td>
+                <span v-if="s.lastActive">{{ s.daysSinceActive === 0 ? '今天' : s.daysSinceActive + '天前' }}</span>
+                <span v-else class="never">未开始</span>
+              </td>
+              <td>
+                <span v-if="s.isStale" class="badge-warn">停滞</span>
+                <span v-else-if="s.percent === 0" class="badge-new">新</span>
+                <span v-else-if="s.percent === 100" class="badge-done">毕业</span>
+                <span v-else class="badge-active">活跃</span>
+              </td>
+              <td><span class="detail-link">详情 →</span></td>
+            </tr>
+            <tr v-if="filteredStudents.length === 0">
+              <td colspan="7" class="no-result">没有匹配的学员</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
       <div v-else class="empty-state">
@@ -310,100 +344,132 @@ onMounted(async () => {
   font-size: 0.8rem;
   color: var(--vp-c-text-2);
 }
-.student-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 1rem;
-}
-.student-card {
-  padding: 1.2rem;
-  border-radius: 12px;
-  background: var(--vp-c-bg-soft);
-  border: 1px solid var(--vp-c-divider);
-  cursor: pointer;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-.student-card:hover {
-  border-color: var(--vp-c-brand-1);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-}
-.student-card.stale {
-  border-color: rgba(255, 153, 0, 0.4);
-  background: rgba(255, 153, 0, 0.04);
-}
-.card-top {
+/* 搜索筛选栏 */
+.filter-bar {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  margin-bottom: 0.9rem;
-}
-.card-name strong {
-  display: block;
-  color: var(--vp-c-text-1);
-  font-size: 1.05rem;
-}
-.card-name small {
-  color: var(--vp-c-text-2);
-  font-size: 0.75rem;
-}
-.card-progress {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
+  gap: 0.8rem;
   margin-bottom: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
 }
-.card-bar {
+.search-input {
   flex: 1;
-  height: 8px;
-  background: var(--vp-c-divider);
-  border-radius: 4px;
-  overflow: hidden;
+  min-width: 200px;
+  padding: 0.5rem 0.8rem;
+  border-radius: 8px;
+  border: 1px solid var(--vp-c-divider);
+  background: var(--vp-c-bg);
+  font-size: 0.88rem;
+  color: var(--vp-c-text-1);
 }
-.card-bar-fill {
-  height: 100%;
-  background: var(--vp-c-brand-1);
-  border-radius: 4px;
-  transition: width 0.3s;
+.search-input:focus {
+  outline: none;
+  border-color: var(--vp-c-brand-1);
 }
-.card-pct {
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--vp-c-brand-1);
-  min-width: 2.5rem;
+.filter-tabs {
+  display: flex;
+  gap: 0.3rem;
 }
-.card-count {
-  font-size: 0.78rem;
+.filter-tabs button {
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  border: 1px solid var(--vp-c-divider);
+  background: var(--vp-c-bg);
   color: var(--vp-c-text-2);
+  font-size: 0.82rem;
+  cursor: pointer;
   white-space: nowrap;
 }
-.card-stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.6rem;
-}
-.card-stat {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-}
-.card-stat-num {
-  font-size: 0.95rem;
+.filter-tabs button.active {
+  background: var(--vp-c-brand-soft, rgba(52, 81, 178, 0.08));
+  color: var(--vp-c-brand-1);
+  border-color: var(--vp-c-brand-soft, rgba(52, 81, 178, 0.08));
   font-weight: 600;
-  color: var(--vp-c-text-1);
 }
-.card-stat-label {
-  font-size: 0.72rem;
+/* 表格 */
+.table-wrap {
+  overflow-x: auto;
+}
+.student-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+.student-table th {
+  text-align: left;
+  padding: 0.7rem 0.6rem;
+  border-bottom: 2px solid var(--vp-c-divider);
   color: var(--vp-c-text-2);
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
 }
-.card-footer {
-  margin-top: 0.8rem;
-  padding-top: 0.7rem;
-  border-top: 1px solid var(--vp-c-divider);
+.student-table td {
+  padding: 0.7rem 0.6rem;
+  border-bottom: 1px solid var(--vp-c-divider);
+  vertical-align: middle;
 }
-.detail-link {
-  font-size: 0.82rem;
+.student-table tbody tr {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.student-table tbody tr:hover {
+  background: var(--vp-c-bg-soft);
+}
+.student-table tr.stale td {
+  background: rgba(255, 153, 0, 0.04);
+}
+.col-name strong {
+  display: block;
+  color: var(--vp-c-text-1);
+  font-size: 0.92rem;
+}
+.col-name small {
+  color: var(--vp-c-text-2);
+  font-size: 0.72rem;
+}
+.col-progress {
+  white-space: nowrap;
+}
+.tbl-bar {
+  display: inline-block;
+  width: 60px;
+  height: 6px;
+  background: var(--vp-c-divider);
+  border-radius: 3px;
+  overflow: hidden;
+  vertical-align: middle;
+  margin-right: 0.4rem;
+}
+.tbl-bar-fill {
+  height: 100%;
+  background: var(--vp-c-brand-1);
+  border-radius: 3px;
+}
+.tbl-pct {
   font-weight: 600;
   color: var(--vp-c-brand-1);
+  margin-right: 0.3rem;
+}
+.tbl-count {
+  font-size: 0.75rem;
+  color: var(--vp-c-text-2);
+}
+.col-streak {
+  white-space: nowrap;
+}
+.streak-tag {
+  font-size: 0.82rem;
+}
+.col-streak small {
+  color: var(--vp-c-text-2);
+  font-size: 0.72rem;
+  margin-left: 0.2rem;
+}
+.no-result {
+  text-align: center;
+  color: var(--vp-c-text-2);
+  padding: 2rem !important;
 }
 .never {
   color: var(--vp-c-text-2);
@@ -412,6 +478,12 @@ onMounted(async () => {
 .badge-new { color: var(--vp-c-text-2); font-size: 0.78rem; }
 .badge-done { color: #22c55e; font-weight: 600; font-size: 0.78rem; }
 .badge-active { color: var(--vp-c-brand-1); font-size: 0.78rem; }
+.detail-link {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--vp-c-brand-1);
+  white-space: nowrap;
+}
 .empty-state {
   text-align: center;
   padding: 3rem;
