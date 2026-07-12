@@ -20,15 +20,18 @@ function selectAnswer(qIndex, optIndex) {
 async function reveal(qIndex) {
   if (answers.value[qIndex] === undefined) return
   revealed.value[qIndex] = true
-  if (isLoggedIn.value) {
-    const isCorrect = answers.value[qIndex] === props.questions[qIndex].answer
-    await supabase.from('quiz_results').upsert({
-      lesson_id: props.lessonId,
-      question_index: qIndex,
-      selected_answer: answers.value[qIndex],
-      is_correct: isCorrect,
-    }, { onConflict: 'user_id,lesson_id,question_index' })
-  }
+  const { data: session } = await supabase.auth.getSession()
+  if (!session.session?.user) return
+  const userId = session.session.user.id
+  const isCorrect = answers.value[qIndex] === props.questions[qIndex].answer
+  const { error } = await supabase.from('quiz_results').upsert({
+    user_id: userId,
+    lesson_id: props.lessonId,
+    question_index: qIndex,
+    selected_answer: answers.value[qIndex],
+    is_correct: isCorrect,
+  }, { onConflict: 'user_id,lesson_id,question_index' })
+  if (error) console.error('写入答题失败:', error.message)
 }
 
 function isCorrect(qIndex) {

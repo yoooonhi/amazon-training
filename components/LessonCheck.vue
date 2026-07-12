@@ -68,11 +68,16 @@ async function syncToRemote() {
   const { data: session } = await supabase.auth.getSession()
   if (!session.session?.user) { saving.value = false; return }
 
-  await supabase.from('progress').upsert({
+  const userId = session.session.user.id
+  const { error } = await supabase.from('progress').upsert({
+    user_id: userId,
     lesson_id: props.lessonId,
     completed: allChecked.value,
     completed_at: allChecked.value ? new Date().toISOString() : null,
   }, { onConflict: 'user_id,lesson_id' })
+  if (error) {
+    console.error('写入进度失败:', error.message)
+  }
   saving.value = false
 }
 
