@@ -302,18 +302,23 @@ onMounted(async () => {
 .student-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
 }
 .student-table th {
   text-align: left;
-  padding: 0.6rem 0.5rem;
+  padding: 0.9rem 0.8rem;
   border-bottom: 2px solid var(--vp-c-divider);
   color: var(--vp-c-text-2);
-  font-size: 0.8rem;
+  font-size: 0.82rem;
+  white-space: nowrap;
 }
 .student-table td {
-  padding: 0.6rem 0.5rem;
+  padding: 0.85rem 0.8rem;
   border-bottom: 1px solid var(--vp-c-divider);
+  vertical-align: middle;
+}
+.student-table tbody tr:hover {
+  background: var(--vp-c-bg-soft);
 }
 .student-table tr.stale {
   background: rgba(255, 153, 0, 0.05);
@@ -321,10 +326,11 @@ onMounted(async () => {
 .student-name strong {
   display: block;
   color: var(--vp-c-text-1);
+  font-size: 0.95rem;
 }
 .student-name small {
   color: var(--vp-c-text-2);
-  font-size: 0.72rem;
+  font-size: 0.75rem;
 }
 .mini-bar {
   position: relative;
