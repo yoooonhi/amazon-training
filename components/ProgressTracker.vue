@@ -85,7 +85,8 @@ onMounted(() => {
       await loadRemoteProgress()
       await migrateLocalToRemote()
     } else {
-      loadLocalProgress()
+      // 退出登录后清空进度显示
+      progress.value = {}
     }
   })
   // 检查当前 session
@@ -94,7 +95,8 @@ onMounted(() => {
     if (data.session?.user) {
       await loadRemoteProgress()
     } else {
-      loadLocalProgress()
+      // 未登录，进度清空（必须登录才显示进度）
+      progress.value = {}
     }
   })
 })
@@ -102,6 +104,13 @@ onMounted(() => {
 
 <template>
   <div v-if="isMounted" class="progress-tracker">
+    <!-- 未登录提示 -->
+    <div v-if="!isLoggedIn" class="login-prompt">
+      <span class="login-prompt-icon">🔒</span>
+      <span>登录后查看你的学习进度</span>
+    </div>
+
+    <template v-else>
     <div v-if="loading" class="loading">加载进度中...</div>
     <div class="overall">
       <div class="overall-info">
@@ -139,6 +148,7 @@ onMounted(() => {
         </div>
       </div>
     </div>
+    </template>
   </div>
 </template>
 
@@ -149,6 +159,18 @@ onMounted(() => {
   background: var(--vp-c-bg-soft);
   border-radius: 12px;
   border: 1px solid var(--vp-c-divider);
+}
+.login-prompt {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+  padding: 1rem;
+  color: var(--vp-c-text-2);
+  font-size: 0.9rem;
+}
+.login-prompt-icon {
+  font-size: 1.2rem;
 }
 .loading {
   text-align: center;
