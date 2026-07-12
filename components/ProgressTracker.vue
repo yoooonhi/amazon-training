@@ -1,27 +1,19 @@
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { supabase, authState } from '../lib/supabase'
+import { curriculum, totalLessons } from '../lib/curriculum'
 
-const STORAGE_KEY = 'amazon-training-progress'
 const START_KEY = 'amazon-training-start-date'
+const LOCAL_PROGRESS_KEY = 'amazon-training-progress'
 
-// 7 modules, ability-based
-const curriculum = [
-  { week: 1, title: '平台认知与账号安全', lessons: ['m1-00','m1-01','m1-02','m1-03','m1-04','m1-05','m1-06','m1-07'] },
-  { week: 2, title: '选品与采购', lessons: ['m7-01','m7-02','m7-03','m7-04','m7-05','m7-06'] },
-  { week: 3, title: 'Listing搭建基本功', lessons: ['m2-00','m2-01','m2-02','m2-03','m2-03b','m2-04','m2-05','m2-06','m2-07','m2-08','m2-09','m2-10'] },
-  { week: 4, title: '库存与FBA物流', lessons: ['m3-01','m3-02','m3-03','m3-04','m3-05','m3-06','m3-07'] },
-  { week: 5, title: '广告体系', lessons: ['m4-01','m4-02','m4-03','m4-04','m4-05','m4-06','m4-07','m4-08','m4-09','m4-10','m4-11'] },
-  { week: 6, title: '定价与利润', lessons: ['m5-01','m5-02','m5-03','m5-04','m5-05'] },
-  { week: 7, title: '日常运营与判断力', lessons: ['m6-01','m6-02','m6-03','m6-04','m6-05','m6-06','m6-07'] },
-]
-
-const progress = ref({})
+const progress = ref({}) // { lessonId: { completed, completedAt } }
 const startDate = ref(null)
 const isMounted = ref(false)
+const isLoggedIn = ref(false)
+const loading = ref(false)
 
-const totalLessons = computed(() => curriculum.reduce((sum, w) => sum + w.lessons.length, 0))
 const completedCount = computed(() => Object.values(progress.value).filter(v => v.completed).length)
-const overallPercent = computed(() => Math.round((completedCount.value / totalLessons.value) * 100))
+const overallPercent = computed(() => Math.round((completedCount.value / totalLessons) * 100))
 
 function weekPercent(weekLessons) {
   const done = weekLessons.filter(l => progress.value[l]?.completed).length
@@ -31,42 +23,86 @@ function weekPercent(weekLessons) {
 function trainingDay() {
   if (!startDate.value) return 0
   const diff = Math.floor((Date.now() - startDate.value) / 86400000) + 1
-  return Math.max(1, Math.min(diff, 56)) // 8 weeks = 56 days
+  return Math.max(1, Math.min(diff, 56))
 }
 
 function currentWeek() {
-  const day = trainingDay()
-  return Math.min(Math.ceil(day / 7), 8)
+  return Math.min(Math.ceil(trainingDay() / 7), 8)
 }
 
-function loadProgress() {
+function loadStartDate() {
+  const sd = localStorage.getItem(START_KEY)
+  if (sd) {
+    startDate.value = parseInt(sd)
+  } else {
+    startDate.value = Date.now()
+    localStorage.setItem(START_KEY, String(startDate.value))
+  }
+}
+
+async function loadRemoteProgress() {
+  loading.value = true
+  const { data } = await supabase.from('progress').select('lesson_id, completed, completed_at')
+  if (data) {
+    const remote = {}
+    data.forEach(r => {
+      if (r.completed) remote[r.lesson_id] = { completed: true, completedAt: r.completed_at }
+    })
+    progress.value = remote
+  }
+  loading.value = false
+}
+
+function loadLocalProgress() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
+    const raw = localStorage.getItem(LOCAL_PROGRESS_KEY)
     if (raw) progress.value = JSON.parse(raw)
-    const sd = localStorage.getItem(START_KEY)
-    if (sd) {
-      startDate.value = parseInt(sd)
-    } else {
-      startDate.value = Date.now()
-      localStorage.setItem(START_KEY, String(startDate.value))
-    }
   } catch (e) {
     progress.value = {}
   }
-  isMounted.value = true
 }
 
-watch(progress, (val) => {
-  if (isMounted.value) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(val))
-  }
-}, { deep: true })
+// 登录后把本地进度迁移到云端
+async function migrateLocalToRemote() {
+  const localRaw = localStorage.getItem(LOCAL_PROGRESS_KEY)
+  if (!localRaw) return
+  const local = JSON.parse(localRaw)
+  const remoteIds = Object.keys(progress.value)
+  const toMigrate = Object.entries(local).filter(([id, v]) => v.completed && !remoteIds.includes(id))
+  if (toMigrate.length === 0) return
+  const rows = toMigrate.map(([id, v]) => ({
+    lesson_id: id, completed: true, completed_at: new Date(v.completedAt || Date.now()).toISOString(),
+  }))
+  await supabase.from('progress').upsert(rows, { onConflict: 'user_id,lesson_id' })
+}
 
-onMounted(loadProgress)
+onMounted(() => {
+  loadStartDate()
+  isMounted.value = true
+  authState.onChange(async (user) => {
+    isLoggedIn.value = !!user
+    if (user) {
+      await loadRemoteProgress()
+      await migrateLocalToRemote()
+    } else {
+      loadLocalProgress()
+    }
+  })
+  // 检查当前 session
+  supabase.auth.getSession().then(async ({ data }) => {
+    isLoggedIn.value = !!data.session?.user
+    if (data.session?.user) {
+      await loadRemoteProgress()
+    } else {
+      loadLocalProgress()
+    }
+  })
+})
 </script>
 
 <template>
   <div v-if="isMounted" class="progress-tracker">
+    <div v-if="loading" class="loading">加载进度中...</div>
     <div class="overall">
       <div class="overall-info">
         <span class="big-num">{{ completedCount }}</span>
@@ -85,7 +121,7 @@ onMounted(loadProgress)
     <div class="week-list">
       <div v-for="w in curriculum" :key="w.week" class="week-item" :class="{ active: currentWeek() === w.week }">
         <div class="week-header">
-          <span class="week-label">第 {{ w.week }} 周</span>
+          <span class="week-label">第 {{ w.week }} 模块</span>
           <span class="week-title">{{ w.title }}</span>
           <span class="week-pct">{{ weekPercent(w.lessons) }}%</span>
         </div>
@@ -113,6 +149,12 @@ onMounted(loadProgress)
   background: var(--vp-c-bg-soft);
   border-radius: 12px;
   border: 1px solid var(--vp-c-divider);
+}
+.loading {
+  text-align: center;
+  color: var(--vp-c-text-2);
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
 }
 .overall {
   display: flex;
@@ -182,7 +224,7 @@ onMounted(loadProgress)
   font-weight: 700;
   font-size: 0.85rem;
   color: var(--vp-c-brand-1);
-  min-width: 3.5rem;
+  min-width: 4rem;
 }
 .week-title {
   flex: 1;

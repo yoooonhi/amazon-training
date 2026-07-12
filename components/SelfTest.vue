@@ -1,31 +1,51 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { supabase, authState } from '../lib/supabase'
 
 const props = defineProps({
   lessonId: { type: String, required: true },
   questions: { type: Array, required: true }
-  // Each question: { q: '题目', type: 'truefalse'|'single', options: ['A','B','C','D'], answer: 0 (index), explain: '解析' }
 })
 
-const answers = ref({}) // { qIndex: selectedIndex }
-const revealed = ref({}) // { qIndex: true }
+const answers = ref({})
+const revealed = ref({})
 const isMounted = ref(false)
+const isLoggedIn = ref(false)
 
 function selectAnswer(qIndex, optIndex) {
   if (revealed.value[qIndex]) return
   answers.value[qIndex] = optIndex
 }
 
-function reveal(qIndex) {
+async function reveal(qIndex) {
   if (answers.value[qIndex] === undefined) return
   revealed.value[qIndex] = true
+  if (isLoggedIn.value) {
+    const isCorrect = answers.value[qIndex] === props.questions[qIndex].answer
+    await supabase.from('quiz_results').upsert({
+      lesson_id: props.lessonId,
+      question_index: qIndex,
+      selected_answer: answers.value[qIndex],
+      is_correct: isCorrect,
+    }, { onConflict: 'user_id,lesson_id,question_index' })
+  }
 }
 
 function isCorrect(qIndex) {
   return answers.value[qIndex] === props.questions[qIndex].answer
 }
 
-onMounted(() => { isMounted.value = true })
+const correctCount = computed(() =>
+  Object.keys(revealed.value).filter(k => isCorrect(Number(k))).length
+)
+
+onMounted(() => {
+  isMounted.value = true
+  authState.onChange((user) => { isLoggedIn.value = !!user })
+  supabase.auth.getSession().then(({ data }) => {
+    isLoggedIn.value = !!data.session?.user
+  })
+})
 </script>
 
 <template>
@@ -33,6 +53,9 @@ onMounted(() => { isMounted.value = true })
     <div class="test-header">
       <span class="test-icon">📝</span>
       <span class="test-title">自测题</span>
+      <span v-if="Object.keys(revealed).length > 0" class="score-badge">
+        {{ correctCount }}/{{ Object.keys(revealed).length }} 正确
+      </span>
     </div>
     <div v-for="(question, qi) in questions" :key="qi" class="question-block">
       <div class="question-text">
@@ -94,6 +117,15 @@ onMounted(() => { isMounted.value = true })
   font-weight: 700;
   font-size: 1.05rem;
   color: var(--vp-c-text-1);
+}
+.score-badge {
+  margin-left: auto;
+  font-size: 0.8rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  background: var(--vp-c-brand-soft, rgba(52, 81, 178, 0.08));
+  color: var(--vp-c-brand-1);
+  font-weight: 600;
 }
 .question-block {
   margin-bottom: 1.5rem;

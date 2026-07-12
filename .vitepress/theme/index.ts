@@ -6,6 +6,7 @@ import ProgressTracker from '../../components/ProgressTracker.vue'
 import DailyGate from '../../components/DailyGate.vue'
 import LessonCheck from '../../components/LessonCheck.vue'
 import SelfTest from '../../components/SelfTest.vue'
+import AuthPanel from '../../components/AuthPanel.vue'
 
 export default {
   extends: DefaultTheme,
@@ -20,5 +21,6 @@ export default {
     app.component('DailyGate', DailyGate)
     app.component('LessonCheck', LessonCheck)
     app.component('SelfTest', SelfTest)
+    app.component('AuthPanel', AuthPanel)
   },
 } satisfies Theme

@@ -1,49 +1,95 @@
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { supabase, authState } from '../lib/supabase'
 
 const props = defineProps({
   lessonId: { type: String, required: true },
-  items: { type: Array, required: true } // ['我能做到XX', '我能做到YY', ...]
+  items: { type: Array, required: true }
 })
 
-const STORAGE_KEY = 'amazon-training-checks'
+const LOCAL_CHECKS_KEY = 'amazon-training-checks'
+const LOCAL_PROGRESS_KEY = 'amazon-training-progress'
+
 const checks = ref({})
 const isMounted = ref(false)
+const isLoggedIn = ref(false)
+const saving = ref(false)
 
 const allChecked = computed(() => props.items.every((_, i) => checks.value[`${props.lessonId}-${i}`]))
 
 function loadChecks() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
+    const raw = localStorage.getItem(LOCAL_CHECKS_KEY)
     if (raw) checks.value = JSON.parse(raw)
   } catch (e) {
     checks.value = {}
   }
-  isMounted.value = true
 }
 
-function toggle(key) {
-  checks.value[key] = !checks.value[key]
-}
-
-// When all checked, also update the progress tracker
-watch(allChecked, (val) => {
-  if (!isMounted.value) return
-  // Save checks
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(checks.value))
-  // Update progress
-  const progressRaw = localStorage.getItem('amazon-training-progress')
-  let progress = {}
-  try { progress = JSON.parse(progressRaw) || {} } catch(e) {}
-  if (val) {
-    progress[props.lessonId] = { completed: true, completedAt: Date.now() }
-  } else {
-    delete progress[props.lessonId]
+async function loadRemoteChecks() {
+  const { data: session } = await supabase.auth.getSession()
+  if (!session.session?.user) return
+  // 拉这节课的进度看是否完成（验收清单明细也存云端）
+  const { data } = await supabase.from('progress')
+    .select('completed')
+    .eq('lesson_id', props.lessonId)
+    .single()
+  if (data?.completed) {
+    // 如果远程标记完成，本地全勾上
+    props.items.forEach((_, i) => { checks.value[`${props.lessonId}-${i}`] = true })
   }
-  localStorage.setItem('amazon-training-progress', JSON.stringify(progress))
-})
+}
 
-onMounted(loadChecks)
+async function toggle(key) {
+  checks.value[key] = !checks.value[key]
+  // 始终同步到本地（游客也能用）
+  localStorage.setItem(LOCAL_CHECKS_KEY, JSON.stringify(checks.value))
+
+  // 更新本地 progress
+  updateLocalProgress()
+
+  // 登录了就同步到云端
+  if (isLoggedIn.value) {
+    await syncToRemote()
+  }
+}
+
+function updateLocalProgress() {
+  let localProgress = {}
+  try { localProgress = JSON.parse(localStorage.getItem(LOCAL_PROGRESS_KEY) || '{}') } catch(e) {}
+  if (allChecked.value) {
+    localProgress[props.lessonId] = { completed: true, completedAt: Date.now() }
+  } else {
+    delete localProgress[props.lessonId]
+  }
+  localStorage.setItem(LOCAL_PROGRESS_KEY, JSON.stringify(localProgress))
+}
+
+async function syncToRemote() {
+  saving.value = true
+  const { data: session } = await supabase.auth.getSession()
+  if (!session.session?.user) { saving.value = false; return }
+
+  await supabase.from('progress').upsert({
+    lesson_id: props.lessonId,
+    completed: allChecked.value,
+    completed_at: allChecked.value ? new Date().toISOString() : null,
+  }, { onConflict: 'user_id,lesson_id' })
+  saving.value = false
+}
+
+onMounted(() => {
+  loadChecks()
+  isMounted.value = true
+  authState.onChange(async (user) => {
+    isLoggedIn.value = !!user
+    if (user) await loadRemoteChecks()
+  })
+  supabase.auth.getSession().then(async ({ data }) => {
+    isLoggedIn.value = !!data.session?.user
+    if (data.session?.user) await loadRemoteChecks()
+  })
+})
 </script>
 
 <template>
@@ -54,6 +100,7 @@ onMounted(loadChecks)
       <span class="check-status" :class="{ pass: allChecked }">
         {{ allChecked ? '全部通过' : `${items.filter((_, i) => checks[`${lessonId}-${i}`]).length}/${items.length}` }}
       </span>
+      <span v-if="saving" class="saving-hint">同步中...</span>
     </div>
     <div class="check-list">
       <label
@@ -71,7 +118,7 @@ onMounted(loadChecks)
       </label>
     </div>
     <div v-if="allChecked" class="check-celebrate">
-      🎉 本课验收通过！进度已自动记录。
+      🎉 本课验收通过！{{ isLoggedIn ? '进度已同步到云端。' : '进度已记录（登录可跨设备同步）。' }}
     </div>
   </div>
 </template>
@@ -109,6 +156,10 @@ onMounted(loadChecks)
 .check-status.pass {
   background: var(--vp-c-brand-1);
   color: #fff;
+}
+.saving-hint {
+  font-size: 0.75rem;
+  color: var(--vp-c-text-2);
 }
 .check-list {
   display: flex;
