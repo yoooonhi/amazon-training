@@ -16,10 +16,8 @@ hero:
 
 <script setup>
 import ProgressTracker from './components/ProgressTracker.vue'
-import AuthPanel from './components/AuthPanel.vue'
 </script>
 
-<AuthPanel />
 <ProgressTracker />
 
 ## 怎么用这个站

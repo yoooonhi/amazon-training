@@ -12,11 +12,10 @@ export default {
   extends: DefaultTheme,
   Layout: () => {
     return h(DefaultTheme.Layout, null, {
-      // Could inject global slots here if needed
+      'nav-bar-content-before': () => h(AuthPanel),
     })
   },
   enhanceApp({ app }) {
-    // Register components globally so they can be used in any .md file
     app.component('ProgressTracker', ProgressTracker)
     app.component('DailyGate', DailyGate)
     app.component('LessonCheck', LessonCheck)

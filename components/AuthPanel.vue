@@ -6,7 +6,8 @@ const isMounted = ref(false)
 const currentUser = ref(null)
 const currentProfile = ref(null)
 const showLogin = ref(false)
-const mode = ref('signin') // signin | signup
+const showUserMenu = ref(false)
+const mode = ref('signin')
 const email = ref('')
 const password = ref('')
 const nickname = ref('')
@@ -20,8 +21,8 @@ onMounted(() => {
     currentUser.value = user
     currentProfile.value = profile
     showLogin.value = false
+    showUserMenu.value = false
   })
-  // 检查已有 session
   supabase.auth.getSession().then(({ data }) => {
     if (data.session?.user) {
       currentUser.value = data.session.user
@@ -35,26 +36,22 @@ async function handleSubmit() {
   loading.value = true
   errorMsg.value = ''
   infoMsg.value = ''
-
   try {
     if (mode.value === 'signup') {
       const { data, error } = await supabase.auth.signUp({
-        email: email.value,
-        password: password.value,
+        email: email.value, password: password.value,
       })
       if (error) throw error
       if (data.user && !data.session) {
         infoMsg.value = '注册成功！请去邮箱点击确认链接，然后回来登录。'
       } else if (data.session) {
-        // 直接登录了（邮箱确认关闭的情况）
         if (nickname.value) {
           await supabase.from('profiles').update({ nickname: nickname.value }).eq('id', data.user.id)
         }
       }
     } else {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.value,
-        password: password.value,
+      const { error } = await supabase.auth.signInWithPassword({
+        email: email.value, password: password.value,
       })
       if (error) throw error
     }
@@ -69,6 +66,7 @@ async function handleLogout() {
   await supabase.auth.signOut()
   currentUser.value = null
   currentProfile.value = null
+  showUserMenu.value = false
 }
 
 async function saveNickname() {
@@ -80,33 +78,43 @@ async function saveNickname() {
     nickname.value = ''
   }
 }
+
+function displayName() {
+  if (currentProfile.value?.nickname) return currentProfile.value.nickname
+  if (currentUser.value?.email) return currentUser.value.email.split('@')[0]
+  return '用户'
+}
 </script>
 
 <template>
-  <div v-if="isMounted" class="auth-panel">
-    <!-- 已登录 -->
-    <div v-if="currentUser" class="auth-user">
-      <div class="user-info">
-        <span class="user-avatar">👤</span>
-        <div class="user-detail">
-          <span class="user-name">{{ currentProfile?.nickname || currentUser.email }}</span>
-          <span v-if="currentProfile?.role === 'mentor'" class="role-badge">导师</span>
+  <div v-if="isMounted" class="nav-auth">
+    <!-- 已登录：右上角用户菜单 -->
+    <div v-if="currentUser" class="nav-user" @click="showUserMenu = !showUserMenu">
+      <span class="nav-avatar">👤</span>
+      <span class="nav-username">{{ displayName() }}</span>
+      <span v-if="currentProfile?.role === 'mentor'" class="nav-role">导师</span>
+
+      <!-- 下拉菜单 -->
+      <Transition name="dropdown">
+        <div v-if="showUserMenu" class="user-dropdown" @click.stop>
+          <div class="dropdown-header">
+            <span class="dropdown-email">{{ currentUser.email }}</span>
+          </div>
+          <a v-if="currentProfile?.role === 'mentor'" href="/dashboard" class="dropdown-item">
+            📊 导师后台
+          </a>
+          <div v-if="!currentProfile?.nickname" class="dropdown-item nickname-row">
+            <input v-model="nickname" placeholder="设置昵称" class="dropdown-input" @keyup.enter="saveNickname" />
+            <button @click="saveNickname" class="dropdown-btn">保存</button>
+          </div>
+          <button class="dropdown-item dropdown-logout" @click="handleLogout">退出登录</button>
         </div>
-      </div>
-      <div class="user-actions">
-        <a v-if="currentProfile?.role === 'mentor'" href="/dashboard" class="dashboard-link">📊 导师后台</a>
-        <button class="logout-btn" @click="handleLogout">退出</button>
-      </div>
-      <div v-if="!currentProfile?.nickname" class="nickname-set">
-        <input v-model="nickname" placeholder="设置你的昵称" class="nickname-input" />
-        <button @click="saveNickname" class="nickname-btn">保存</button>
-      </div>
+      </Transition>
     </div>
 
-    <!-- 未登录 -->
-    <div v-else class="auth-prompt">
-      <span class="prompt-text">登录后进度跨设备同步</span>
-      <button class="login-btn" @click="showLogin = true">登录 / 注册</button>
+    <!-- 未登录：登录按钮 -->
+    <div v-else class="nav-login-btn" @click="showLogin = true">
+      登录 / 注册
     </div>
 
     <!-- 登录弹窗 -->
@@ -136,126 +144,139 @@ async function saveNickname() {
 </template>
 
 <style scoped>
-.auth-panel {
-  margin: 1rem 0;
-}
-.auth-user {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-  padding: 0.75rem 1.2rem;
-  background: var(--vp-c-brand-soft, rgba(52,81,178,0.06));
-  border-radius: 10px;
-  border: 1px solid var(--vp-c-brand-1);
-}
-.user-info {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-}
-.user-avatar {
-  font-size: 1.4rem;
-}
-.user-detail {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-}
-.user-name {
-  font-weight: 600;
-  font-size: 0.95rem;
-  color: var(--vp-c-text-1);
-}
-.role-badge {
-  font-size: 0.7rem;
-  padding: 0.1rem 0.4rem;
-  border-radius: 3px;
-  background: #ff9900;
-  color: #fff;
-  font-weight: 600;
-  width: fit-content;
-}
-.user-actions {
-  margin-left: auto;
-  display: flex;
-  gap: 0.5rem;
+.nav-auth {
+  display: inline-flex;
   align-items: center;
 }
-.dashboard-link {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--vp-c-brand-1);
-  text-decoration: none;
-  padding: 0.3rem 0.7rem;
-  border-radius: 6px;
-  background: var(--vp-c-bg);
-  border: 1px solid var(--vp-c-brand-1);
-}
-.dashboard-link:hover {
-  opacity: 0.85;
-}
-.logout-btn {
-  padding: 0.3rem 0.8rem;
-  border-radius: 6px;
-  border: 1px solid var(--vp-c-divider);
-  background: var(--vp-c-bg);
-  color: var(--vp-c-text-2);
-  font-size: 0.85rem;
-  cursor: pointer;
-}
-.logout-btn:hover {
-  border-color: var(--vp-c-text-2);
-}
-.nickname-set {
-  display: flex;
-  gap: 0.4rem;
-  width: 100%;
-  margin-top: 0.5rem;
-}
-.nickname-input {
-  flex: 1;
-  padding: 0.4rem 0.6rem;
-  border-radius: 6px;
-  border: 1px solid var(--vp-c-divider);
-  font-size: 0.85rem;
-}
-.nickname-btn {
-  padding: 0.4rem 0.8rem;
-  border-radius: 6px;
-  border: none;
-  background: var(--vp-c-brand-1);
-  color: #fff;
-  font-size: 0.85rem;
-  cursor: pointer;
-}
-.auth-prompt {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.6rem 1.2rem;
-  background: var(--vp-c-bg-soft);
-  border-radius: 10px;
-  border: 1px solid var(--vp-c-divider);
-}
-.prompt-text {
-  font-size: 0.85rem;
-  color: var(--vp-c-text-2);
-}
-.login-btn {
-  margin-left: auto;
-  padding: 0.35rem 1rem;
+
+/* 未登录按钮 */
+.nav-login-btn {
+  padding: 0.35rem 0.9rem;
   border-radius: 6px;
   border: 1px solid var(--vp-c-brand-1);
   background: transparent;
   color: var(--vp-c-brand-1);
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
 }
-.login-btn:hover {
+.nav-login-btn:hover {
   background: var(--vp-c-brand-soft, rgba(52,81,178,0.06));
 }
+
+/* 已登录用户区 */
+.nav-user {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.15s;
+}
+.nav-user:hover {
+  background: var(--vp-c-bg-soft);
+}
+.nav-avatar {
+  font-size: 1.1rem;
+}
+.nav-username {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--vp-c-text-1);
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.nav-role {
+  font-size: 0.65rem;
+  padding: 0.05rem 0.35rem;
+  border-radius: 3px;
+  background: #ff9900;
+  color: #fff;
+  font-weight: 600;
+}
+
+/* 下拉菜单 */
+.user-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 200px;
+  background: var(--vp-c-bg);
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  padding: 0.4rem;
+  z-index: 1000;
+}
+.dropdown-header {
+  padding: 0.5rem 0.6rem;
+  border-bottom: 1px solid var(--vp-c-divider);
+  margin-bottom: 0.3rem;
+}
+.dropdown-email {
+  font-size: 0.75rem;
+  color: var(--vp-c-text-2);
+}
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: var(--vp-c-text-1);
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+}
+.dropdown-item:hover {
+  background: var(--vp-c-bg-soft);
+}
+.dropdown-logout {
+  color: #ef4444;
+  border-top: 1px solid var(--vp-c-divider);
+  margin-top: 0.3rem;
+  border-radius: 0 0 6px 6px;
+}
+.nickname-row {
+  flex-direction: row;
+  gap: 0.3rem;
+}
+.dropdown-input {
+  flex: 1;
+  padding: 0.3rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid var(--vp-c-divider);
+  font-size: 0.8rem;
+  background: var(--vp-c-bg);
+}
+.dropdown-btn {
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  border: none;
+  background: var(--vp-c-brand-1);
+  color: #fff;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+.dropdown-enter-active, .dropdown-leave-active {
+  transition: opacity 0.15s, transform 0.15s;
+}
+.dropdown-enter-from, .dropdown-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+
+/* 弹窗 */
 .auth-form {
   padding: 1.5rem 1.8rem;
   background: var(--vp-c-bg);
@@ -267,7 +288,7 @@ async function saveNickname() {
   width: 360px;
   max-width: calc(100vw - 2rem);
   position: relative;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.12);
 }
 .modal-title {
   margin: 0 0 0.3rem;
@@ -297,7 +318,7 @@ async function saveNickname() {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0,0,0,0.5);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -307,15 +328,11 @@ async function saveNickname() {
 .modal-enter-active, .modal-leave-active {
   transition: opacity 0.2s ease;
 }
-.modal-enter-active .auth-form,
-.modal-leave-active .auth-form {
+.modal-enter-active .auth-form, .modal-leave-active .auth-form {
   transition: transform 0.2s ease, opacity 0.2s ease;
 }
-.modal-enter-from, .modal-leave-to {
-  opacity: 0;
-}
-.modal-enter-from .auth-form,
-.modal-leave-to .auth-form {
+.modal-enter-from, .modal-leave-to { opacity: 0; }
+.modal-enter-from .auth-form, .modal-leave-to .auth-form {
   transform: scale(0.95) translateY(-10px);
   opacity: 0;
 }
