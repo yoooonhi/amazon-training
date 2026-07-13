@@ -16,6 +16,9 @@ const detailQuiz = ref([])
 const searchQuery = ref('')
 const filterStatus = ref('all') // all | active | stale | done | new
 
+// 网站访问统计
+const visits = ref([])
+
 async function checkMentor() {
   const { data: session } = await supabase.auth.getSession()
   if (!session.session?.user) {
@@ -86,6 +89,13 @@ async function loadData() {
       isStale: daysSinceActive !== null && daysSinceActive >= 3,
     }
   })
+  // 拉网站访问统计（仅管理员能读，RLS 保证）
+  const { data: visitData } = await supabase.from('site_visits')
+    .select('path, page_type, is_logged_in, created_at')
+    .order('created_at', { ascending: false })
+    .limit(5000)
+  visits.value = visitData || []
+
   loading.value = false
 }
 
@@ -136,6 +146,62 @@ const filteredStudents = computed(() => {
   return result.sort((a, b) => b.percent - a.percent)
 })
 
+// ---------------- 网站访问统计派生 ----------------
+const todayStr = (() => {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
+})()
+
+// 总访问数
+const totalVisits = computed(() => visits.value.length)
+// 今日访问数
+const todayVisits = computed(() => visits.value.filter(v => v.created_at.startsWith(todayStr)).length)
+// 独立访客数（按 visitor_id 去重 —— 注意这里没存 visitor_id，用 path 聚合不准确；
+//   实际独立访客需在 select 里加 visitor_id，下面 trending/topPages 已覆盖核心维度）
+
+// 近 14 天趋势
+const visitTrend = computed(() => {
+  const days = []
+  for (let i = 13; i >= 0; i--) {
+    const d = new Date()
+    d.setDate(d.getDate() - i)
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
+    const count = visits.value.filter(v => v.created_at.startsWith(key)).length
+    days.push({ key: `${d.getMonth()+1}/${d.getDate()}`, count })
+  }
+  return days
+})
+const maxTrendCount = computed(() => Math.max(1, ...visitTrend.value.map(d => d.count)))
+
+// 热门页面 Top 5
+const topPages = computed(() => {
+  const counts = {}
+  visits.value.forEach(v => {
+    const label = pageTypeLabel(v.page_type)
+    counts[label] = (counts[label] || 0) + 1
+  })
+  return Object.entries(counts)
+    .map(([label, count]) => ({ label, count }))
+    .sort((a, b) => b.count - a.count)
+})
+function pageTypeLabel(t) {
+  return { home: '首页', lesson: '课程页', overview: '总览', dashboard: '导师后台', other: '其他' }[t] || t
+}
+const maxTopCount = computed(() => Math.max(1, ...topPages.value.map(p => p.count)))
+
+// 登录/游客占比
+const loginRatio = computed(() => {
+  const total = visits.value.length
+  if (total === 0) return { logged: 0, guest: 0, loggedPct: 0, guestPct: 0 }
+  const logged = visits.value.filter(v => v.is_logged_in).length
+  return {
+    logged,
+    guest: total - logged,
+    loggedPct: Math.round((logged / total) * 100),
+    guestPct: Math.round(((total - logged) / total) * 100),
+  }
+})
+
 onMounted(async () => {
   isMounted.value = true
   await checkMentor()
@@ -175,6 +241,65 @@ onMounted(async () => {
         <div class="stat-card warn">
           <span class="stat-num">{{ students.filter(s => s.isStale).length }}</span>
           <span class="stat-label">停滞预警(3天+)</span>
+        </div>
+        <div class="stat-card accent">
+          <span class="stat-num">{{ totalVisits }}</span>
+          <span class="stat-label">网站访问 · 今日 {{ todayVisits }}</span>
+        </div>
+      </div>
+
+      <!-- 网站访问统计详情 -->
+      <div class="visits-section">
+        <h3 class="section-title">📈 网站访问</h3>
+
+        <!-- 近14天趋势 -->
+        <div class="trend-chart">
+          <div class="trend-bars">
+            <div
+              v-for="d in visitTrend"
+              :key="d.key"
+              class="trend-bar"
+              :title="`${d.key}: ${d.count} 次`"
+            >
+              <div class="bar-fill" :style="{ height: (d.count / maxTrendCount * 100) + '%' }"></div>
+              <span class="bar-count" v-if="d.count > 0">{{ d.count }}</span>
+              <span class="bar-label">{{ d.key }}</span>
+            </div>
+          </div>
+          <div class="trend-legend">近 14 天访问趋势</div>
+        </div>
+
+        <div class="visits-grid">
+          <!-- 热门页面 -->
+          <div class="visits-card">
+            <div class="vc-title">🔥 热门页面</div>
+            <div v-if="topPages.length === 0" class="vc-empty">暂无数据</div>
+            <div v-else class="vc-list">
+              <div v-for="p in topPages.slice(0, 5)" :key="p.label" class="vc-row">
+                <span class="vc-label">{{ p.label }}</span>
+                <div class="vc-bar">
+                  <div class="vc-bar-fill" :style="{ width: (p.count / maxTopCount * 100) + '%' }"></div>
+                </div>
+                <span class="vc-count">{{ p.count }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 登录/游客占比 -->
+          <div class="visits-card">
+            <div class="vc-title">👤 登录 / 游客</div>
+            <div v-if="totalVisits === 0" class="vc-empty">暂无数据</div>
+            <template v-else>
+              <div class="ratio-bar">
+                <div class="ratio-logged" :style="{ width: loginRatio.loggedPct + '%' }"></div>
+                <div class="ratio-guest" :style="{ width: loginRatio.guestPct + '%' }"></div>
+              </div>
+              <div class="ratio-legend">
+                <span class="rl-item"><span class="dot logged"></span>登录 {{ loginRatio.logged }} ({{ loginRatio.loggedPct }}%)</span>
+                <span class="rl-item"><span class="dot guest"></span>游客 {{ loginRatio.guest }} ({{ loginRatio.guestPct }}%)</span>
+              </div>
+            </template>
+          </div>
         </div>
       </div>
 
@@ -563,4 +688,171 @@ h3 {
   margin: 1.5rem 0 0.75rem;
   color: var(--vp-c-text-1);
 }
+
+/* 第4张统计卡用强调色 */
+.stat-card.accent .stat-num {
+  color: var(--vp-c-brand-1);
+}
+
+/* 网站访问区块 */
+.visits-section {
+  margin: 1.5rem 0;
+  padding: 1.25rem;
+  background: var(--vp-c-bg-soft);
+  border-radius: 12px;
+  border: 1px solid var(--vp-c-divider);
+}
+.section-title {
+  margin: 0 0 1rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+/* 趋势柱状图 */
+.trend-chart {
+  margin-bottom: 1.25rem;
+}
+.trend-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 100px;
+}
+.trend-bar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  min-width: 0;
+  position: relative;
+}
+.bar-fill {
+  width: 100%;
+  min-height: 2px;
+  background: var(--vp-c-brand-1);
+  border-radius: 3px 3px 0 0;
+  opacity: 0.85;
+  transition: opacity 0.15s;
+}
+.trend-bar:hover .bar-fill { opacity: 1; }
+.bar-count {
+  position: absolute;
+  top: -1.1rem;
+  font-size: 0.68rem;
+  color: var(--vp-c-text-2);
+  font-weight: 600;
+}
+.bar-label {
+  font-size: 0.62rem;
+  color: var(--vp-c-text-3);
+  margin-top: 0.25rem;
+  white-space: nowrap;
+}
+.trend-legend {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--vp-c-text-2);
+  text-align: center;
+}
+
+/* 双栏：热门页面 + 登录占比 */
+.visits-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+@media (max-width: 640px) {
+  .visits-grid { grid-template-columns: 1fr; }
+}
+.visits-card {
+  padding: 0.85rem;
+  background: var(--vp-c-bg);
+  border-radius: 8px;
+  border: 1px solid var(--vp-c-divider);
+}
+.vc-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  margin-bottom: 0.6rem;
+  color: var(--vp-c-text-1);
+}
+.vc-empty {
+  font-size: 0.8rem;
+  color: var(--vp-c-text-3);
+  text-align: center;
+  padding: 0.75rem 0;
+}
+.vc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.vc-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+}
+.vc-label {
+  width: 4rem;
+  flex-shrink: 0;
+  color: var(--vp-c-text-2);
+}
+.vc-bar {
+  flex: 1;
+  height: 8px;
+  background: var(--vp-c-divider);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.vc-bar-fill {
+  height: 100%;
+  background: var(--vp-c-brand-1);
+  border-radius: 4px;
+}
+.vc-count {
+  font-weight: 700;
+  color: var(--vp-c-text-1);
+  min-width: 1.5rem;
+  text-align: right;
+}
+
+/* 登录/游客占比条 */
+.ratio-bar {
+  display: flex;
+  height: 24px;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+.ratio-logged {
+  background: var(--vp-c-brand-1);
+  transition: width 0.3s;
+}
+.ratio-guest {
+  background: var(--vp-c-divider);
+  transition: width 0.3s;
+}
+.ratio-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.78rem;
+  color: var(--vp-c-text-2);
+}
+.rl-item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.dot.logged { background: var(--vp-c-brand-1); }
+.dot.guest { background: var(--vp-c-divider); }
 </style>
