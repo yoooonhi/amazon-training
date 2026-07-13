@@ -377,7 +377,7 @@ watch(lessonId, async (id) => {
     <div v-else-if="errorMsg" class="state-box error">{{ errorMsg }}</div>
     <!-- 空态 -->
     <div v-else-if="totalCount === 0" class="empty-state">
-      还没有讨论。成为第一个提问的人吧 👇
+      还没有讨论。成为第一个提问的人吧 👆
     </div>
 
     <!-- 评论列表 -->
