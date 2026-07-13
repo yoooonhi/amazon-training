@@ -41,7 +41,13 @@ create policy "visits read mentor"
   on site_visits for select
   using (exists (select 1 from profiles where id = auth.uid() and role in ('mentor','admin')));
 
+-- 删除：仅管理员（用于清理测试数据/异常数据）
+drop policy if exists "visits delete mentor" on site_visits;
+create policy "visits delete mentor"
+  on site_visits for delete
+  using (exists (select 1 from profiles where id = auth.uid() and role in ('mentor','admin')));
+
 -- 说明：
--- 1. 没有 update / delete 策略 —— 访问记录只增不改，防止篡改统计。
--- 2. 即便有人拿 anon key 狂刷写入，也只能造成数据膨胀，看不到别人的记录（读被 RLS 拦）。
+-- 1. 没有 update 策略 —— 访问记录只增不改，防止篡改统计。
+-- 2. 即便有人拿 anon key 狂刷写入，也只能造成数据膨胀，看不到/删不掉别人的记录。
 -- 3. 前端靠 24h 合并 + visitor_id 去重控制频次，正常情况下不会刷出大量数据。
