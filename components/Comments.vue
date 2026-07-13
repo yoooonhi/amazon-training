@@ -21,7 +21,7 @@ const lessonId = computed(() => {
 const isMounted = ref(false)
 const currentUser = ref(null)
 const profile = ref(null)
-const isMentor = computed(() => profile.value?.role === 'mentor')
+const isMentor = computed(() => profile.value?.role === 'mentor' || profile.value?.role === 'admin')
 
 const comments = ref([])        // 全部评论（主+回复）
 const myLikes = ref(new Set())  // 当前用户点过赞的 comment_id
@@ -107,13 +107,18 @@ const repliesByParent = computed(() => {
 
 const sortedTopLevel = computed(() => {
   let list = [...topLevel.value]
-  // 置顶永远在最前
-  list.sort((a, b) => (b.is_pinned ? 1 : 0) - (a.is_pinned ? 1 : 0))
-  if (sortMode.value === 'hot') {
-    list.sort((a, b) => (likeCounts.value[b.id] || 0) - (likeCounts.value[a.id] || 0))
-  } else {
-    list.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-  }
+  // 单次排序：置顶为主键（永远在最前），时间/热度为次键
+  list.sort((a, b) => {
+    // 置顶优先
+    const pa = a.is_pinned ? 1 : 0
+    const pb = b.is_pinned ? 1 : 0
+    if (pa !== pb) return pb - pa
+    // 同置顶级别下，按热度或时间
+    if (sortMode.value === 'hot') {
+      return (likeCounts.value[b.id] || 0) - (likeCounts.value[a.id] || 0)
+    }
+    return new Date(b.created_at) - new Date(a.created_at)
+  })
   return list
 })
 
@@ -244,7 +249,7 @@ async function deleteComment(commentId) {
 }
 
 // --------------------------------------------------------
-// 9. 导师：置顶 / 精选
+// 9. 管理员：置顶 / 精选
 // --------------------------------------------------------
 async function togglePinned(comment) {
   try {
@@ -391,12 +396,12 @@ watch(lessonId, async (id) => {
         <!-- 主评论 -->
         <div class="comment-main">
           <div class="comment-meta">
-            <span v-if="c.is_pinned" class="pin-badge" title="导师置顶">📌 置顶</span>
-            <span class="comment-author" :class="{ mentor: c.profiles?.role === 'mentor' }">
+            <span v-if="c.is_pinned" class="pin-badge" title="管理员置顶">📌 置顶</span>
+            <span class="comment-author" :class="{ admin: c.profiles?.role === 'mentor' || c.profiles?.role === 'admin' }">
               {{ displayName(c) }}
             </span>
-            <span v-if="c.profiles?.role === 'mentor'" class="role-badge">导师</span>
-            <span v-if="c.is_featured" class="featured-badge" title="导师标记优质/已解决">⭐ 精选</span>
+            <span v-if="c.profiles?.role === 'mentor' || c.profiles?.role === 'admin'" class="role-badge">管理员</span>
+            <span v-if="c.is_featured" class="featured-badge" title="管理员标记优质/已解决">⭐ 精选</span>
             <span class="comment-time">{{ timeAgo(c.created_at) }}</span>
           </div>
           <div class="comment-content" v-html="renderMarkdown(c.content)"></div>
@@ -417,7 +422,7 @@ watch(lessonId, async (id) => {
               class="action-btn danger"
               @click="deleteComment(c.id)"
             >删除</button>
-            <!-- 导师专属 -->
+            <!-- 管理员专属 -->
             <button v-if="isMentor" class="action-btn mentor" @click="togglePinned(c)">
               {{ c.is_pinned ? '取消置顶' : '置顶' }}
             </button>
@@ -431,10 +436,10 @@ watch(lessonId, async (id) => {
         <div class="reply-list" v-if="repliesByParent[c.id]?.length">
           <div v-for="r in repliesByParent[c.id]" :key="r.id" class="reply-item">
             <div class="comment-meta">
-              <span class="comment-author" :class="{ mentor: r.profiles?.role === 'mentor' }">
+              <span class="comment-author" :class="{ admin: r.profiles?.role === 'mentor' || r.profiles?.role === 'admin' }">
                 {{ displayName(r) }}
               </span>
-              <span v-if="r.profiles?.role === 'mentor'" class="role-badge">导师</span>
+              <span v-if="r.profiles?.role === 'mentor' || r.profiles?.role === 'admin'" class="role-badge">管理员</span>
               <span v-if="r.is_featured" class="featured-badge">⭐ 精选</span>
               <span class="comment-time">{{ timeAgo(r.created_at) }}</span>
             </div>
@@ -644,7 +649,7 @@ watch(lessonId, async (id) => {
   font-size: 0.88rem;
   color: var(--vp-c-text-1);
 }
-.comment-author.mentor {
+.comment-author.admin {
   color: var(--vp-c-brand-1);
 }
 .role-badge {
