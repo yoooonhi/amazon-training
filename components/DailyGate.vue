@@ -183,195 +183,143 @@ onMounted(() => {
 
 <template>
   <div v-if="isMounted" class="daily-gate">
-    <div class="gate-row">
-      <div class="gate-day">
-        <span class="day-label">训练第</span>
-        <span class="day-num">{{ trainingDay }}</span>
-        <span class="day-label">天</span>
-      </div>
-      <div class="gate-week">
-        <span class="week-badge">第 {{ currentWeek }} 周</span>
-        <span class="week-theme">{{ currentTheme }}</span>
+    <!-- 左侧：核心信息 -->
+    <div class="gate-main">
+      <div class="gate-headline">
+        <span class="hl-num">第 {{ trainingDay }} 天</span>
+        <span class="hl-sep">·</span>
+        <span class="hl-week">第{{ currentWeek }}周 {{ currentTheme }}</span>
       </div>
       <div class="gate-stats">
-        <div class="stat-item">
-          <span class="stat-num">🔥 {{ streak }}</span>
-          <span class="stat-label">连续打卡</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-num">📅 {{ totalCheckins }}</span>
-          <span class="stat-label">累计打卡</span>
-        </div>
+        <span class="stat">🔥 连续 <b>{{ streak }}</b></span>
+        <span class="stat-sep">·</span>
+        <span class="stat">📅 累计 <b>{{ totalCheckins }}</b></span>
       </div>
+      <!-- 紧凑热力图 -->
+      <div class="heatmap" aria-label="近14天打卡">
+        <div
+          v-for="d in recentDays"
+          :key="d.key"
+          class="heat-cell"
+          :class="{ checked: d.checked, today: d.isToday }"
+          :title="d.key + (d.checked ? ' 已打卡' : '')"
+        ></div>
+      </div>
+      <div v-if="!isLoggedIn" class="sync-hint">⚠️ 未登录，打卡仅存本机</div>
     </div>
 
-    <!-- 近 14 天打卡热力图 -->
-    <div class="heatmap">
-      <div
-        v-for="d in recentDays"
-        :key="d.key"
-        class="heat-cell"
-        :class="{ checked: d.checked, today: d.isToday }"
-        :title="d.key + (d.checked ? ' 已打卡' : '')"
-      >
-        <span class="heat-day">{{ d.day }}</span>
-      </div>
-    </div>
-
+    <!-- 右侧：打卡按钮 -->
     <div class="gate-action">
-      <a v-if="!checkedInToday" href="/content/modules/m1-platform/00-amazon-basics.html" class="lesson-link">
-        📖 开始今天的学习 →
-      </a>
-      <span v-else class="checked-badge">✅ 今日已打卡</span>
+      <span v-if="checkedInToday" class="checked-badge">✅ 今日已打卡</span>
       <button
-        v-if="!checkedInToday"
+        v-else
         class="checkin-btn"
         :disabled="syncing"
         @click="checkin"
       >
-        {{ syncing ? '同步中…' : '标记今日完成' }}
+        {{ syncing ? '…' : '打卡' }}
       </button>
-    </div>
-    <div v-if="!isLoggedIn" class="sync-hint">
-      ⚠️ 未登录，打卡仅保存在本机。登录后可跨设备同步。
     </div>
   </div>
 </template>
 
 <style scoped>
 .daily-gate {
-  margin: 1rem 0 1.5rem;
-  padding: 1.5rem;
-  background: linear-gradient(135deg, var(--vp-c-brand-soft, rgba(52,81,178,0.06)), var(--vp-c-bg-soft));
-  border-radius: 12px;
-  border: 1px solid var(--vp-c-brand-1);
-}
-.gate-row {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
-  flex-wrap: wrap;
-  margin-bottom: 1rem;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 1rem 0 1.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--vp-c-bg-soft);
+  border-radius: 10px;
+  border: 1px solid var(--vp-c-divider);
 }
-.gate-day {
-  display: flex;
-  align-items: baseline;
-  gap: 0.25rem;
-}
-.day-label {
-  font-size: 0.9rem;
-  color: var(--vp-c-text-2);
-}
-.day-num {
-  font-size: 2.5rem;
-  font-weight: 800;
-  color: var(--vp-c-brand-1);
-  line-height: 1;
-}
-.gate-week {
+.gate-main {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.35rem;
+  min-width: 0;
 }
-.week-badge {
-  font-size: 0.8rem;
+.gate-headline {
+  font-size: 0.92rem;
+  color: var(--vp-c-text-1);
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+.hl-num {
   font-weight: 700;
   color: var(--vp-c-brand-1);
 }
-.week-theme {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--vp-c-text-1);
+.hl-sep {
+  color: var(--vp-c-text-3);
 }
-.gate-stats {
-  margin-left: auto;
-  display: flex;
-  gap: 1.5rem;
-}
-.stat-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.stat-num {
-  font-size: 1.3rem;
-  font-weight: 800;
-  color: var(--vp-c-brand-1);
-}
-.stat-label {
-  font-size: 0.72rem;
+.hl-week {
+  font-size: 0.82rem;
   color: var(--vp-c-text-2);
 }
-
-/* 打卡热力图 */
-.heatmap {
-  display: flex;
-  gap: 4px;
-  margin-bottom: 1rem;
-}
-.heat-cell {
-  flex: 1;
-  aspect-ratio: 1;
-  min-width: 0;
-  border-radius: 4px;
-  background: var(--vp-c-divider);
+.gate-stats {
+  font-size: 0.78rem;
+  color: var(--vp-c-text-2);
   display: flex;
   align-items: center;
-  justify-content: center;
-  transition: all 0.15s;
+  gap: 0.4rem;
+}
+.gate-stats b {
+  color: var(--vp-c-brand-1);
+  font-weight: 700;
+}
+.stat-sep {
+  color: var(--vp-c-text-3);
+}
+
+/* 紧凑热力图：14 个小方块横排 */
+.heatmap {
+  display: flex;
+  gap: 3px;
+  margin-top: 0.15rem;
+}
+.heat-cell {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  background: var(--vp-c-divider);
+  transition: background 0.15s;
 }
 .heat-cell.checked {
   background: var(--vp-c-brand-1);
 }
 .heat-cell.today {
-  outline: 2px solid var(--vp-c-brand-1);
-  outline-offset: 1px;
-}
-.heat-cell.checked.today {
-  outline-color: var(--vp-c-brand-2);
-}
-.heat-day {
-  font-size: 0.68rem;
-  color: var(--vp-c-text-2);
-  font-weight: 600;
-}
-.heat-cell.checked .heat-day {
-  color: #fff;
+  box-shadow: 0 0 0 1.5px var(--vp-c-brand-1);
 }
 
+/* 右侧按钮 */
 .gate-action {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-.lesson-link {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--vp-c-brand-1);
-  text-decoration: none;
-}
-.lesson-link:hover { text-decoration: underline; }
-.checked-badge {
-  font-size: 0.9rem;
-  color: #22c55e;
-  font-weight: 600;
+  flex-shrink: 0;
 }
 .checkin-btn {
-  margin-left: auto;
-  padding: 0.5rem 1.2rem;
+  padding: 0.45rem 1.1rem;
   border-radius: 8px;
   border: none;
   background: var(--vp-c-brand-1);
   color: #fff;
-  font-size: 0.88rem;
+  font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
+  white-space: nowrap;
 }
 .checkin-btn:hover:not(:disabled) { opacity: 0.9; }
 .checkin-btn:disabled { opacity: 0.6; cursor: default; }
+.checked-badge {
+  font-size: 0.85rem;
+  color: #22c55e;
+  font-weight: 600;
+  white-space: nowrap;
+}
 .sync-hint {
-  margin-top: 0.6rem;
-  font-size: 0.75rem;
-  color: var(--vp-c-text-2);
+  font-size: 0.7rem;
+  color: var(--vp-c-text-3);
 }
 </style>
