@@ -369,6 +369,17 @@ watch(lessonId, async (id) => {
           @click="submitComment"
         >{{ submitting ? '发布中…' : '发布' }}</button>
       </div>
+      <details class="md-hint">
+        <summary>📝 支持的 Markdown 格式</summary>
+        <ul class="md-hint-list">
+          <li><code>**加粗**</code> → <strong>加粗</strong></li>
+          <li><code>*斜体*</code> → <em>斜体</em></li>
+          <li><code>- 项目</code> → 无序列表（<b>列表前后需空一行</b>）</li>
+          <li><code>`代码`</code> → <code>行内代码</code></li>
+          <li><code>&gt; 引用</code> → 引用块</li>
+          <li>空行分段，回车换行</li>
+        </ul>
+      </details>
       <div v-if="submitError" class="submit-error">{{ submitError }}</div>
     </div>
     <!-- 未登录提示 -->
@@ -593,6 +604,37 @@ watch(lessonId, async (id) => {
   margin-top: 0.5rem;
   font-size: 0.8rem;
   color: #ef4444;
+}
+.md-hint {
+  margin-top: 0.6rem;
+  font-size: 0.78rem;
+  color: var(--vp-c-text-2);
+}
+.md-hint summary {
+  cursor: pointer;
+  user-select: none;
+  padding: 0.2rem 0;
+  color: var(--vp-c-text-2);
+}
+.md-hint summary:hover {
+  color: var(--vp-c-text-1);
+}
+.md-hint[open] summary {
+  margin-bottom: 0.4rem;
+}
+.md-hint-list {
+  margin: 0;
+  padding-left: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  line-height: 1.7;
+}
+.md-hint-list code {
+  padding: 0.1rem 0.3rem;
+  border-radius: 3px;
+  background: var(--vp-c-bg-soft);
+  font-size: 0.82em;
 }
 
 .login-hint {
