@@ -15,9 +15,11 @@ hero:
 ---
 
 <script setup>
+import DailyGate from './components/DailyGate.vue'
 import ProgressTracker from './components/ProgressTracker.vue'
 </script>
 
+<DailyGate />
 <ProgressTracker />
 
 ## 怎么用这个站
