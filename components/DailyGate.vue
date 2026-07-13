@@ -161,13 +161,8 @@ onMounted(() => {
       await loadRemoteCheckins()
       await migrateLocalToRemote()
     } else {
-      // 退出登录：回退到本地数据
-      try {
-        const raw = localStorage.getItem(CHECKIN_KEY)
-        checkins.value = raw ? JSON.parse(raw) : {}
-      } catch (e) {
-        checkins.value = {}
-      }
+      // 退出登录：清空打卡显示（打卡为登录专属功能）
+      checkins.value = {}
     }
   })
   // 兜底：直接查一次 session
@@ -182,7 +177,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div v-if="isMounted" class="daily-gate">
+  <div v-if="isMounted && isLoggedIn" class="daily-gate">
     <!-- 左侧：核心信息 -->
     <div class="gate-main">
       <div class="gate-headline">
