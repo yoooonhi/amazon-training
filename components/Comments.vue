@@ -711,6 +711,16 @@ watch(lessonId, async (id) => {
 .comment-content :deep(ul), .comment-content :deep(ol) {
   margin: 0.4rem 0;
   padding-left: 1.5rem;
+  list-style-position: outside;
+}
+.comment-content :deep(ul) { list-style-type: disc; }
+.comment-content :deep(ol) { list-style-type: decimal; }
+.comment-content :deep(li) {
+  margin: 0.2rem 0;
+}
+/* li 内的 p 不要额外加间距，避免列表项间距过大 */
+.comment-content :deep(li > p) {
+  margin: 0;
 }
 .comment-actions {
   display: flex;
