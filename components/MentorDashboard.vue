@@ -147,27 +147,37 @@ const filteredStudents = computed(() => {
 })
 
 // ---------------- 网站访问统计派生 ----------------
-const todayStr = (() => {
-  const d = new Date()
+// 时区修正：created_at 存的是 UTC，聚合时必须转成本地日期，否则跨天会算错
+function toLocalDateStr(ts) {
+  const d = new Date(ts)
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
-})()
+}
+function localDayKey(offsetDays = 0) {
+  const d = new Date()
+  d.setDate(d.getDate() - offsetDays)
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
+}
+function localDayLabel(offsetDays = 0) {
+  const d = new Date()
+  d.setDate(d.getDate() - offsetDays)
+  return `${d.getMonth()+1}/${d.getDate()}`
+}
 
 // 总访问数
 const totalVisits = computed(() => visits.value.length)
-// 今日访问数
-const todayVisits = computed(() => visits.value.filter(v => v.created_at.startsWith(todayStr)).length)
-// 独立访客数（按 visitor_id 去重 —— 注意这里没存 visitor_id，用 path 聚合不准确；
-//   实际独立访客需在 select 里加 visitor_id，下面 trending/topPages 已覆盖核心维度）
+// 今日访问数（本地时区）
+const todayVisits = computed(() => visits.value.filter(v => toLocalDateStr(v.created_at) === localDayKey(0)).length)
 
-// 近 14 天趋势
+// 近 14 天趋势（本地时区）
 const visitTrend = computed(() => {
+  const countsByKey = {}
+  visits.value.forEach(v => {
+    const k = toLocalDateStr(v.created_at)
+    countsByKey[k] = (countsByKey[k] || 0) + 1
+  })
   const days = []
   for (let i = 13; i >= 0; i--) {
-    const d = new Date()
-    d.setDate(d.getDate() - i)
-    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
-    const count = visits.value.filter(v => v.created_at.startsWith(key)).length
-    days.push({ key: `${d.getMonth()+1}/${d.getDate()}`, count })
+    days.push({ key: localDayLabel(i), count: countsByKey[localDayKey(i)] || 0 })
   }
   return days
 })
