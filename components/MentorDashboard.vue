@@ -524,9 +524,13 @@ onMounted(async () => {
 /* 表格 */
 .table-wrap {
   overflow-x: auto;
-}
-.student-table {
   width: 100%;
+}
+/* 关键:覆盖 VitePress 全局 .vp-doc table{display:block} —— 它让表格按内容收缩 */
+.student-table {
+  display: table !important;
+  width: 100% !important;
+  table-layout: auto;
   border-collapse: collapse;
   font-size: 0.88rem;
 }
