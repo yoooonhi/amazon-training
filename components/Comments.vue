@@ -2,27 +2,17 @@
 import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useData } from 'vitepress'
 import { supabase, authState } from '../lib/supabase'
-import { allLessons } from '../lib/curriculum'
+import { getLessonIdByPath } from '../lib/curriculum'
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
 
 // --------------------------------------------------------
 // 1. 路径 → lessonId 推导（零侵入注入的核心）
+//    用显式映射表，不靠字符串推导（各模块 lessonId 规则不统一）
 // --------------------------------------------------------
 const { page } = useData()
 const lessonId = computed(() => {
-  if (!page.value?.relativePath) return null
-  const path = page.value.relativePath // 如 content/modules/m4-ads/04-be-acos.md
-  if (!path.startsWith('content/modules/')) return null
-  // 文件名去掉 .md：04-be-acos
-  const file = path.split('/').pop().replace(/\.md$/, '')
-  // 课程目录名：m4-ads → m4
-  const dir = path.split('/')[2]
-  const moduleNum = dir.match(/^m(\d+)/)?.[1]
-  if (!moduleNum) return null
-  const candidate = `m${moduleNum}-${file}`
-  // 对照课程清单校验：不在清单里的页不渲染评论区
-  return allLessons.includes(candidate) ? candidate : null
+  return getLessonIdByPath(page.value?.relativePath || '')
 })
 
 // --------------------------------------------------------
@@ -57,27 +47,42 @@ async function loadComments() {
   loading.value = true
   errorMsg.value = ''
   try {
-    const [{ data, error }, { data: likes }] = await Promise.all([
-      supabase
-        .from('comments')
-        .select(`
-          id, lesson_id, user_id, parent_id, content,
-          is_pinned, is_featured, created_at,
-          profiles:user_id ( nickname, role )
-        `)
-        .eq('lesson_id', lessonId.value)
-        .order('created_at', { ascending: true }),
-      currentUser.value
-        ? supabase.from('comment_likes').select('comment_id').in(
-            'comment_id',
-            (await supabase.from('comments').select('id').eq('lesson_id', lessonId.value)).data?.map(c => c.id) || []
-          )
-        : Promise.resolve({ data: [] }),
-    ])
+    // 1. 查这节课的全部评论（不 join profiles —— 避免 schema cache 关系问题）
+    const { data: rawComments, error } = await supabase
+      .from('comments')
+      .select('id, lesson_id, user_id, parent_id, content, is_pinned, is_featured, created_at')
+      .eq('lesson_id', lessonId.value)
+      .order('created_at', { ascending: true })
     if (error) throw error
-    comments.value = data || []
-    // 点赞数：在前端聚合（避免建 view/触发器）
-    myLikes.value = new Set((likes || []).map(l => l.comment_id))
+    const list = rawComments || []
+    // 2. 批量查涉及的 profiles（昵称、角色），前端组装
+    const userIds = [...new Set(list.map(c => c.user_id))]
+    const profileMap = {}
+    if (userIds.length > 0) {
+      const { data: profilesData } = await supabase
+        .from('profiles')
+        .select('id, nickname, role')
+        .in('id', userIds)
+      ;(profilesData || []).forEach(p => { profileMap[p.id] = p })
+    }
+    // 3. 点赞数 + 我是否点过赞
+    const likeCountsMap = {}
+    const myLikesSet = new Set()
+    if (list.length > 0) {
+      const ids = list.map(c => c.id)
+      const { data: likesData } = await supabase
+        .from('comment_likes')
+        .select('comment_id, user_id')
+        .in('comment_id', ids)
+      ;(likesData || []).forEach(l => {
+        likeCountsMap[l.comment_id] = (likeCountsMap[l.comment_id] || 0) + 1
+        if (currentUser.value && l.user_id === currentUser.value.id) myLikesSet.add(l.comment_id)
+      })
+    }
+    // 组装最终数据
+    comments.value = list.map(c => ({ ...c, profiles: profileMap[c.user_id] || { nickname: null, role: null } }))
+    likeCounts.value = likeCountsMap
+    myLikes.value = myLikesSet
   } catch (e) {
     errorMsg.value = '评论加载失败：' + (e.message || e)
   } finally {
@@ -85,21 +90,7 @@ async function loadComments() {
   }
 }
 
-// 点赞数：前端按 comment_id 计数（从全表数据统计更可靠，不依赖额外查询）
 const likeCounts = ref({})
-async function loadLikeCounts() {
-  if (!lessonId.value) return
-  // 拉这节课所有评论的点赞（comment_likes 不带 lesson_id，需先拿 comment id 列表）
-  const ids = comments.value.map(c => c.id)
-  if (ids.length === 0) return
-  const { data } = await supabase
-    .from('comment_likes')
-    .select('comment_id')
-    .in('comment_id', ids)
-  const counts = {}
-  ;(data || []).forEach(l => { counts[l.comment_id] = (counts[l.comment_id] || 0) + 1 })
-  likeCounts.value = counts
-}
 
 // --------------------------------------------------------
 // 4. 派生：主评论 + 回复分组 + 排序
@@ -147,11 +138,10 @@ async function submitComment() {
         user_id: currentUser.value.id,
         content: text,
       })
-      .select(`id, lesson_id, user_id, parent_id, content, is_pinned, is_featured, created_at,
-              profiles:user_id ( nickname, role )`)
+      .select('id, lesson_id, user_id, parent_id, content, is_pinned, is_featured, created_at')
       .single()
     if (error) throw error
-    comments.value.push(data)
+    comments.value.push({ ...data, profiles: { nickname: profile.value?.nickname, role: profile.value?.role } })
     newComment.value = ''
   } catch (e) {
     submitError.value = '发布失败：' + (e.message || e) + '（若刚建表，请检查是否已在 Supabase 执行建表 SQL）'
@@ -188,11 +178,10 @@ async function submitReply(parentId) {
         parent_id: parentId,
         content: text,
       })
-      .select(`id, lesson_id, user_id, parent_id, content, is_pinned, is_featured, created_at,
-              profiles:user_id ( nickname, role )`)
+      .select('id, lesson_id, user_id, parent_id, content, is_pinned, is_featured, created_at')
       .single()
     if (error) throw error
-    comments.value.push(data)
+    comments.value.push({ ...data, profiles: { nickname: profile.value?.nickname, role: profile.value?.role } })
     cancelReply()
   } catch (e) {
     submitError.value = '回复失败：' + (e.message || e)
@@ -226,10 +215,14 @@ async function toggleLike(commentId) {
       })
     }
   } catch (e) {
-    // 回滚
-    if (liked) myLikes.value.add(commentId)
-    else myLikes.value.delete(commentId)
-    loadLikeCounts()
+    // 回滚：恢复点赞状态和计数
+    if (liked) {
+      myLikes.value.add(commentId)
+      likeCounts.value[commentId] = (likeCounts.value[commentId] || 0) + 1
+    } else {
+      myLikes.value.delete(commentId)
+      likeCounts.value[commentId] = Math.max(0, (likeCounts.value[commentId] || 1) - 1)
+    }
   }
 }
 
@@ -328,7 +321,6 @@ onMounted(() => {
 watch(lessonId, async (id) => {
   if (id) {
     await loadComments()
-    await loadLikeCounts()
   }
 }, { immediate: true })
 </script>
