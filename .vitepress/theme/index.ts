@@ -8,6 +8,7 @@ import LessonCheck from '../../components/LessonCheck.vue'
 import SelfTest from '../../components/SelfTest.vue'
 import AuthPanel from '../../components/AuthPanel.vue'
 import Comments from '../../components/Comments.vue'
+import ProfitCalculator from '../../components/ProfitCalculator.vue'
 import { recordVisit } from '../../lib/visitTracker'
 import './custom.css'
 
@@ -25,6 +26,7 @@ export default {
     app.component('LessonCheck', LessonCheck)
     app.component('SelfTest', SelfTest)
     app.component('AuthPanel', AuthPanel)
+    app.component('ProfitCalculator', ProfitCalculator)
 
     // 网站访问埋点：首次加载记一次 + SPA 路由切换时按 24h 合并规则记录
     // onAfterRouteChanged 在每次页面切换时触发，但 recordVisit 内部会判断
