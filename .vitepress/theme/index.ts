@@ -9,6 +9,7 @@ import SelfTest from '../../components/SelfTest.vue'
 import AuthPanel from '../../components/AuthPanel.vue'
 import Comments from '../../components/Comments.vue'
 import ProfitCalculator from '../../components/ProfitCalculator.vue'
+import ModalDialog from '../../components/ModalDialog.vue'
 import { recordVisit } from '../../lib/visitTracker'
 import './custom.css'
 
@@ -18,6 +19,7 @@ export default {
     return h(DefaultTheme.Layout, null, {
       'nav-bar-content-after': () => h(AuthPanel),
       'doc-after': () => h(Comments),
+      'layout-bottom': () => h(ModalDialog),
     })
   },
   enhanceApp({ app, router }) {

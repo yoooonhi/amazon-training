@@ -2,6 +2,7 @@
 import { ref, computed, reactive, onMounted } from 'vue'
 import { supabase, authState } from '../lib/supabase'
 import { curriculum, totalLessons } from '../lib/curriculum'
+import { modalConfirm, modalAlert } from '../lib/modal'
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
 
@@ -316,9 +317,10 @@ const filteredComments = computed(() => {
 
 // 评论操作（从 Comments.vue 移植）
 async function cmDelete(comment) {
-  if (!confirm('确定删除这条评论？其下的回复也会一并删除。')) return
+  const ok = await modalConfirm('其下的回复也会一并删除，确定吗？', '删除评论')
+  if (!ok) return
   const { error } = await supabase.from('comments').delete().eq('id', comment.id)
-  if (error) { alert('删除失败：' + error.message); return }
+  if (error) { await modalAlert('删除失败：' + error.message, '出错了'); return }
   // 本地移除该条 + 它的回复
   allComments.value = allComments.value.filter(
     c => c.id !== comment.id && c.parent_id !== comment.id
@@ -327,13 +329,13 @@ async function cmDelete(comment) {
 async function cmTogglePinned(comment) {
   const { error } = await supabase.from('comments')
     .update({ is_pinned: !comment.is_pinned }).eq('id', comment.id)
-  if (error) { alert('操作失败：' + error.message); return }
+  if (error) { await modalAlert('操作失败：' + error.message, '出错了'); return }
   comment.is_pinned = !comment.is_pinned
 }
 async function cmToggleFeatured(comment) {
   const { error } = await supabase.from('comments')
     .update({ is_featured: !comment.is_featured }).eq('id', comment.id)
-  if (error) { alert('操作失败：' + error.message); return }
+  if (error) { await modalAlert('操作失败：' + error.message, '出错了'); return }
   comment.is_featured = !comment.is_featured
 }
 

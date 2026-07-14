@@ -3,6 +3,7 @@ import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useData } from 'vitepress'
 import { supabase, authState } from '../lib/supabase'
 import { getLessonIdByPath } from '../lib/curriculum'
+import { modalConfirm, modalAlert } from '../lib/modal'
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
 
@@ -235,7 +236,8 @@ async function toggleLike(commentId) {
 // 8. 删除
 // --------------------------------------------------------
 async function deleteComment(commentId) {
-  if (!confirm('确定删除？删除后其下的回复也会一并清除。')) return
+  const ok = await modalConfirm('删除后其下的回复也会一并清除，确定吗？', '删除评论')
+  if (!ok) return
   try {
     const { error } = await supabase.from('comments').delete().eq('id', commentId)
     if (error) throw error
@@ -244,7 +246,7 @@ async function deleteComment(commentId) {
       c => c.id !== commentId && c.parent_id !== commentId
     )
   } catch (e) {
-    alert('删除失败：' + (e.message || e))
+    await modalAlert('删除失败：' + (e.message || e), '出错了')
   }
 }
 
@@ -258,7 +260,7 @@ async function togglePinned(comment) {
       .eq('id', comment.id)
     if (error) throw error
     comment.is_pinned = !comment.is_pinned
-  } catch (e) { alert('操作失败：' + (e.message || e)) }
+  } catch (e) { await modalAlert('操作失败：' + (e.message || e), '出错了') }
 }
 async function toggleFeatured(comment) {
   try {
@@ -267,7 +269,7 @@ async function toggleFeatured(comment) {
       .eq('id', comment.id)
     if (error) throw error
     comment.is_featured = !comment.is_featured
-  } catch (e) { alert('操作失败：' + (e.message || e)) }
+  } catch (e) { await modalAlert('操作失败：' + (e.message || e), '出错了') }
 }
 
 // --------------------------------------------------------
