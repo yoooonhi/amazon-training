@@ -1,7 +1,11 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, reactive, onMounted } from 'vue'
 import { supabase, authState } from '../lib/supabase'
 import { curriculum, totalLessons } from '../lib/curriculum'
+import { marked } from 'marked'
+import DOMPurify from 'dompurify'
+
+marked.setOptions({ breaks: true, gfm: true })
 
 const isMounted = ref(false)
 const loading = ref(true)
@@ -16,6 +20,9 @@ const detailQuiz = ref([])
 const searchQuery = ref('')
 const filterStatus = ref('all') // all | active | stale | done | new
 
+// 评论管理
+const allComments = ref([])
+
 // 网站访问统计
 const visits = ref([])
 
@@ -27,8 +34,8 @@ async function checkMentor() {
     return
   }
   const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.session.user.id).single()
-  if (!profile || profile.role !== 'mentor') {
-    errorMsg.value = '你不是导师账号，无法查看后台'
+  if (!profile || (profile.role !== 'mentor' && profile.role !== 'admin')) {
+    errorMsg.value = '你不是管理员账号，无法查看后台'
     loading.value = false
     return
   }
@@ -95,6 +102,45 @@ async function loadData() {
     .order('created_at', { ascending: false })
     .limit(5000)
   visits.value = visitData || []
+
+  // 拉全部评论（管理员可读全部，RLS 保证）+ 组装作者信息 + 点赞数
+  const { data: rawComments } = await supabase.from('comments')
+    .select('id, lesson_id, user_id, parent_id, content, is_pinned, is_featured, created_at')
+    .order('created_at', { ascending: false })
+    .limit(1000)
+  const commentList = rawComments || []
+  // 批量查评论作者的 profiles（可能包含非 student 的管理员评论）
+  const commentUserIds = [...new Set(commentList.map(c => c.user_id))]
+  const commentProfileMap = {}
+  if (commentUserIds.length > 0) {
+    const { data: cp } = await supabase.from('profiles')
+      .select('id, nickname, role').in('id', commentUserIds)
+    ;(cp || []).forEach(p => { commentProfileMap[p.id] = p })
+  }
+  // 聚合点赞数
+  const commentIds = commentList.map(c => c.id)
+  const commentLikeMap = {}
+  if (commentIds.length > 0) {
+    const { data: cl } = await supabase.from('comment_likes')
+      .select('comment_id').in('comment_id', commentIds)
+    ;(cl || []).forEach(l => { commentLikeMap[l.comment_id] = (commentLikeMap[l.comment_id] || 0) + 1 })
+  }
+  // 组装：加 authorName/authorRole/likeCount/lessonLabel/parentAuthor
+  const commentById = {}
+  commentList.forEach(c => { commentById[c.id] = c })
+  allComments.value = commentList.map(c => {
+    const p = commentProfileMap[c.user_id] || {}
+    const parent = c.parent_id ? commentById[c.parent_id] : null
+    const parentAuthor = parent ? (commentProfileMap[parent.user_id]?.nickname || '同学') : null
+    return {
+      ...c,
+      authorName: p.nickname || '同学',
+      authorRole: p.role || null,
+      likeCount: commentLikeMap[c.id] || 0,
+      lessonLabel: lessonTitle(c.lesson_id),
+      parentAuthor,
+    }
+  })
 
   loading.value = false
 }
@@ -212,6 +258,110 @@ const loginRatio = computed(() => {
   }
 })
 
+// ---------------- 评论管理 ----------------
+// 统计：总评论数、今日新增
+const totalComments = computed(() => allComments.value.length)
+const todayComments = computed(() =>
+  allComments.value.filter(c => {
+    const d = new Date(c.created_at)
+    const now = new Date()
+    return d.getFullYear() === now.getFullYear() &&
+           d.getMonth() === now.getMonth() && d.getDate() === now.getDate()
+  }).length
+)
+
+// 课程下拉选项：从评论里动态提取出现过的课程
+const commentLessons = computed(() => {
+  const map = {}
+  allComments.value.forEach(c => { if (!map[c.lesson_id]) map[c.lesson_id] = c.lessonLabel })
+  return Object.entries(map).map(([id, label]) => ({ id, label }))
+})
+
+// 筛选状态
+const cmFilter = reactive({
+  lesson: 'all',
+  status: 'all',
+  type: 'all',
+  time: 'all',
+})
+function resetCmFilter() {
+  cmFilter.lesson = 'all'; cmFilter.status = 'all'; cmFilter.type = 'all'; cmFilter.time = 'all'
+}
+
+const filteredComments = computed(() => {
+  return allComments.value
+    .filter(c => cmFilter.lesson === 'all' || c.lesson_id === cmFilter.lesson)
+    .filter(c => {
+      if (cmFilter.status === 'pinned') return c.is_pinned
+      if (cmFilter.status === 'featured') return c.is_featured
+      if (cmFilter.status === 'normal') return !c.is_pinned && !c.is_featured
+      return true
+    })
+    .filter(c => {
+      if (cmFilter.type === 'main') return !c.parent_id
+      if (cmFilter.type === 'reply') return !!c.parent_id
+      return true
+    })
+    .filter(c => {
+      if (cmFilter.time === 'today') {
+        const d = new Date(c.created_at); const now = new Date()
+        return d.toDateString() === now.toDateString()
+      }
+      if (cmFilter.time === 'week') {
+        return (Date.now() - new Date(c.created_at).getTime()) < 7 * 86400000
+      }
+      return true
+    })
+})
+
+// 评论操作（从 Comments.vue 移植）
+async function cmDelete(comment) {
+  if (!confirm('确定删除这条评论？其下的回复也会一并删除。')) return
+  const { error } = await supabase.from('comments').delete().eq('id', comment.id)
+  if (error) { alert('删除失败：' + error.message); return }
+  // 本地移除该条 + 它的回复
+  allComments.value = allComments.value.filter(
+    c => c.id !== comment.id && c.parent_id !== comment.id
+  )
+}
+async function cmTogglePinned(comment) {
+  const { error } = await supabase.from('comments')
+    .update({ is_pinned: !comment.is_pinned }).eq('id', comment.id)
+  if (error) { alert('操作失败：' + error.message); return }
+  comment.is_pinned = !comment.is_pinned
+}
+async function cmToggleFeatured(comment) {
+  const { error } = await supabase.from('comments')
+    .update({ is_featured: !comment.is_featured }).eq('id', comment.id)
+  if (error) { alert('操作失败：' + error.message); return }
+  comment.is_featured = !comment.is_featured
+}
+
+// 渲染 Markdown（复用 Comments.vue 的净化配置）
+function renderCommentMd(md) {
+  if (!md) return ''
+  const raw = marked.parse(md)
+  return DOMPurify.sanitize(raw, {
+    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'code', 'pre', 'ul', 'ol', 'li',
+      'blockquote', 'a', 'h1', 'h2', 'h3', 'h4', 'del', 'hr', 'span'],
+    ALLOWED_ATTR: ['href', 'title'],
+  })
+}
+function commentTimeAgo(iso) {
+  const diff = Date.now() - new Date(iso).getTime()
+  const min = Math.floor(diff / 60000)
+  if (min < 1) return '刚刚'
+  if (min < 60) return `${min} 分钟前`
+  const hr = Math.floor(min / 60)
+  if (hr < 24) return `${hr} 小时前`
+  const day = Math.floor(hr / 24)
+  if (day < 30) return `${day} 天前`
+  return new Date(iso).toLocaleDateString('zh-CN')
+}
+function isAdminAuthor(c) {
+  return c.authorRole === 'mentor' || c.authorRole === 'admin'
+}
+
 onMounted(async () => {
   isMounted.value = true
   await checkMentor()
@@ -255,6 +405,10 @@ onMounted(async () => {
         <div class="stat-card accent">
           <span class="stat-num">{{ totalVisits }}</span>
           <span class="stat-label">网站访问 · 今日 {{ todayVisits }}</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num">💬 {{ totalComments }}</span>
+          <span class="stat-label">评论 · 今日 {{ todayComments }}</span>
         </div>
       </div>
 
@@ -309,6 +463,76 @@ onMounted(async () => {
                 <span class="rl-item"><span class="dot guest"></span>游客 {{ loginRatio.guest }} ({{ loginRatio.guestPct }}%)</span>
               </div>
             </template>
+          </div>
+        </div>
+      </div>
+
+      <!-- 评论管理 -->
+      <div class="comments-section">
+        <div class="cm-head">
+          <h3 class="section-title">💬 评论管理</h3>
+          <span class="cm-count" v-if="allComments.length > 0">
+            共 {{ allComments.length }} 条 · 当前显示 {{ filteredComments.length }}
+          </span>
+        </div>
+
+        <!-- 筛选栏 -->
+        <div class="cm-filters" v-if="allComments.length > 0">
+          <select v-model="cmFilter.lesson" class="cm-select">
+            <option value="all">全部课程</option>
+            <option v-for="l in commentLessons" :key="l.id" :value="l.id">{{ l.label }}</option>
+          </select>
+          <select v-model="cmFilter.status" class="cm-select">
+            <option value="all">全部状态</option>
+            <option value="pinned">📌 已置顶</option>
+            <option value="featured">⭐ 已加精</option>
+            <option value="normal">普通</option>
+          </select>
+          <select v-model="cmFilter.type" class="cm-select">
+            <option value="all">全部类型</option>
+            <option value="main">主评论(提问)</option>
+            <option value="reply">回复(回答)</option>
+          </select>
+          <select v-model="cmFilter.time" class="cm-select">
+            <option value="all">全部时间</option>
+            <option value="today">今日</option>
+            <option value="week">近 7 天</option>
+          </select>
+          <button class="cm-reset" @click="resetCmFilter">重置</button>
+        </div>
+
+        <!-- 评论列表 -->
+        <div v-if="filteredComments.length === 0" class="cm-empty">
+          {{ allComments.length === 0 ? '还没有任何评论' : '没有匹配的评论' }}
+        </div>
+        <div v-else class="cm-list">
+          <div
+            v-for="c in filteredComments"
+            :key="c.id"
+            class="cm-item"
+            :class="{ pinned: c.is_pinned, reply: c.parent_id }"
+          >
+            <div class="cm-meta">
+              <span class="cm-lesson">{{ c.lessonLabel }}</span>
+              <span v-if="c.is_pinned" class="cm-tag pin">📌 置顶</span>
+              <span v-if="c.is_featured" class="cm-tag feat">⭐ 精选</span>
+              <span class="cm-author" :class="{ admin: isAdminAuthor(c) }">
+                {{ c.parentAuthor ? `↪ ${c.authorName} 回复 ${c.parentAuthor}` : c.authorName }}
+              </span>
+              <span v-if="isAdminAuthor(c)" class="cm-role">管理员</span>
+              <span class="cm-time">{{ commentTimeAgo(c.created_at) }}</span>
+            </div>
+            <div class="cm-content" v-html="renderCommentMd(c.content)"></div>
+            <div class="cm-actions">
+              <span class="cm-likes">❤ {{ c.likeCount }}</span>
+              <button class="cm-btn" @click="cmTogglePinned(c)">
+                {{ c.is_pinned ? '取消置顶' : '置顶' }}
+              </button>
+              <button class="cm-btn" @click="cmToggleFeatured(c)">
+                {{ c.is_featured ? '取消精选' : '精选' }}
+              </button>
+              <button class="cm-btn danger" @click="cmDelete(c)">删除</button>
+            </div>
           </div>
         </div>
       </div>
@@ -869,4 +1093,156 @@ h3 {
 }
 .dot.logged { background: var(--vp-c-brand-1); }
 .dot.guest { background: var(--vp-c-divider); }
+
+/* 评论管理区块 */
+.comments-section {
+  margin: 1.5rem 0;
+  padding: 1.25rem;
+  background: var(--vp-c-bg-soft);
+  border-radius: 12px;
+  border: 1px solid var(--vp-c-divider);
+}
+.cm-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+.cm-head .section-title { margin: 0; }
+.cm-count {
+  font-size: 0.78rem;
+  color: var(--vp-c-text-2);
+}
+.cm-filters {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.cm-select {
+  padding: 0.35rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid var(--vp-c-divider);
+  background: var(--vp-c-bg);
+  color: var(--vp-c-text-1);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.cm-select:focus { outline: none; border-color: var(--vp-c-brand-2); }
+.cm-reset {
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid var(--vp-c-divider);
+  background: var(--vp-c-bg);
+  color: var(--vp-c-text-2);
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+.cm-reset:hover { color: var(--vp-c-text-1); }
+
+.cm-empty {
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--vp-c-text-3);
+  font-size: 0.85rem;
+}
+.cm-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.cm-item {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  background: var(--vp-c-bg);
+  border: 1px solid var(--vp-c-divider);
+  border-left: 3px solid transparent;
+}
+.cm-item.pinned {
+  border-color: var(--vp-c-brand-2);
+  border-left-color: var(--vp-c-brand-1);
+  background: var(--vp-c-brand-soft, rgba(52,81,178,0.04));
+}
+.cm-item.reply {
+  border-left-color: var(--vp-c-divider);
+}
+.cm-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.35rem;
+  font-size: 0.78rem;
+}
+.cm-lesson {
+  font-weight: 600;
+  color: var(--vp-c-brand-1);
+}
+.cm-tag {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.05rem 0.35rem;
+  border-radius: 3px;
+}
+.cm-tag.pin { color: var(--vp-c-brand-1); }
+.cm-tag.feat { color: #d97706; }
+.cm-author {
+  font-weight: 600;
+  color: var(--vp-c-text-1);
+}
+.cm-author.admin { color: var(--vp-c-brand-1); }
+.cm-role {
+  font-size: 0.68rem;
+  padding: 0.05rem 0.35rem;
+  border-radius: 3px;
+  background: var(--vp-c-brand-soft, rgba(52,81,178,0.12));
+  color: var(--vp-c-brand-1);
+  font-weight: 600;
+}
+.cm-time {
+  font-size: 0.72rem;
+  color: var(--vp-c-text-3);
+  margin-left: auto;
+}
+.cm-content {
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--vp-c-text-1);
+  margin-bottom: 0.4rem;
+}
+.cm-content :deep(p) { margin: 0.25rem 0; }
+.cm-content :deep(p:first-child) { margin-top: 0; }
+.cm-content :deep(p:last-child) { margin-bottom: 0; }
+.cm-content :deep(pre) {
+  padding: 0.5rem; margin: 0.4rem 0; border-radius: 5px;
+  background: var(--vp-c-bg-soft); overflow-x: auto; font-size: 0.8rem;
+}
+.cm-content :deep(code) {
+  padding: 0.1rem 0.3rem; border-radius: 3px;
+  background: var(--vp-c-bg-soft); font-size: 0.85em;
+}
+.cm-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.cm-likes {
+  font-size: 0.75rem;
+  color: var(--vp-c-text-2);
+  margin-right: auto;
+}
+.cm-btn {
+  padding: 0.25rem 0.7rem;
+  border-radius: 5px;
+  border: 1px solid var(--vp-c-divider);
+  background: var(--vp-c-bg);
+  color: var(--vp-c-text-2);
+  font-size: 0.76rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.cm-btn:hover { color: var(--vp-c-text-1); border-color: var(--vp-c-brand-2); }
+.cm-btn.danger:hover { color: #ef4444; border-color: #ef4444; background: rgba(239,68,68,0.06); }
 </style>
