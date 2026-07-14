@@ -134,7 +134,7 @@ function reset() {
             <span class="pc-prefix">$</span>
             <input v-model="shipping" type="number" step="0.01" placeholder="如 1.4" />
           </div>
-          <small class="pc-help">重量 × ¥20/公斤 ÷ 汇率</small>
+          <small class="pc-help">计费重量(实重与体积重取大) × 单位运费 ÷ 汇率 ÷ 每箱数量</small>
         </div>
 
         <div class="pc-advanced">
