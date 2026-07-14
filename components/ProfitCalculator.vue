@@ -116,7 +116,7 @@ function reset() {
             <span class="pc-prefix">$</span>
             <input v-model="cost" type="number" step="0.01" placeholder="如 8" />
           </div>
-          <small class="pc-help">1688 进货价 × 汇率</small>
+          <small class="pc-help">1688 进货价(人民币) ÷ 汇率</small>
         </div>
 
         <div class="pc-field">
