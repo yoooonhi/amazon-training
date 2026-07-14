@@ -190,7 +190,6 @@ function reset() {
       <div class="pc-col result">
         <div class="pc-col-title">
           ⚡ 自动计算
-          <button class="pc-reset" @click="reset">重置</button>
         </div>
 
         <div class="pc-row" :class="{ placeholder: !hasInput }">
@@ -250,6 +249,10 @@ function reset() {
           {{ c.text }}
         </li>
       </ul>
+    </div>
+
+    <div class="pc-footer">
+      <button class="pc-reset" @click="reset">↻ 重置</button>
     </div>
   </div>
 </template>
@@ -407,15 +410,18 @@ function reset() {
   flex-wrap: wrap;
 }
 
+.pc-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
 .pc-reset {
-  margin-left: auto;
-  padding: 0.3rem 0.8rem;
+  padding: 0.35rem 0.9rem;
   border-radius: 6px;
   border: 1px solid var(--vp-c-divider);
   background: var(--vp-c-bg);
   color: var(--vp-c-text-2);
-  font-size: 0.75rem;
-  font-weight: 400;
+  font-size: 0.78rem;
   cursor: pointer;
 }
 .pc-reset:hover { color: var(--vp-c-text-1); border-color: var(--vp-c-brand-2); }
