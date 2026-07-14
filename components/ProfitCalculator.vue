@@ -1,9 +1,16 @@
 <script setup>
 import { ref, computed } from 'vue'
 
-// 用户录入项（5 个）
-const price = ref(null)     // 1. 市场参考售价
-const cost = ref(null)      // 2. 进货成本（美元）
+// 站点切换：美国 / 欧洲
+const region = ref('US') // US | EU
+const currency = computed(() => region.value === 'US' ? '$' : '€')
+const minPrice = computed(() => region.value === 'US' ? 15 : 15) // 美/欧最低售价门槛都是 15（单位不同）
+// 欧洲默认 VAT 19%（德国），可调
+const vatRate = ref(19)
+
+// 用户录入项
+const price = ref(null)     // 1. 市场参考售价（含税价）
+const cost = ref(null)      // 2. 进货成本（换算成站点货币）
 const fbaFee = ref(null)    // 4. FBA 配送费
 const shipping = ref(null)  // 5. 头程运费
 const returnRate = ref(5)   // 退货率（%，默认 5）
@@ -22,16 +29,22 @@ const ratio = computed(() => {
   if (!n(cost.value)) return 0
   return n(price.value) / n(cost.value)
 })
-// 6. 佣金
+// 欧洲特有：VAT 税额（从含税售价里拆出）
+// 增值税 = 含税价 × 税率 ÷ (1 + 税率)
+const vat = computed(() => {
+  if (region.value !== 'EU') return 0
+  return n(price.value) * n(vatRate.value) / (100 + n(vatRate.value))
+})
+// 6. 佣金（按含税售价算）
 const commission = computed(() => n(price.value) * n(commissionRate.value) / 100)
 // 7. 退货分摊（成本 × 退货率）
 const returns = computed(() => n(cost.value) * n(returnRate.value) / 100)
 // 8. 广告分摊（售价 × ACOS）
 const ads = computed(() => n(price.value) * n(adRate.value) / 100)
-// 9. 净利润 = 售价 − 成本 − FBA − 头程 − 佣金 − 退货 − 广告
+// 9. 净利润 = 售价 − 成本 − FBA − 头程 − 佣金 − 退货 − 广告 − VAT(欧洲)
 const profit = computed(() =>
   n(price.value) - n(cost.value) - n(fbaFee.value) - n(shipping.value)
-  - commission.value - returns.value - ads.value
+  - commission.value - returns.value - ads.value - vat.value
 )
 // 10. 净利率
 const margin = computed(() => {
@@ -53,10 +66,10 @@ const verdict = computed(() => {
     checks.push({ ok: true, text: `售价是成本的 ${ratio.value.toFixed(1)} 倍，过 3 倍线` })
   }
   // 最低售价
-  if (n(price.value) < 15) {
-    checks.push({ ok: false, text: `售价 $${n(price.value).toFixed(2)} 低于 $15，FBA + 佣金会吃光利润` })
+  if (n(price.value) < minPrice.value) {
+    checks.push({ ok: false, text: `售价 ${currency.value}${n(price.value).toFixed(2)} 低于 ${currency.value}${minPrice.value}，FBA + 佣金会吃光利润` })
   } else {
-    checks.push({ ok: true, text: `售价 $${n(price.value).toFixed(2)} ≥ $15，过最低售价线` })
+    checks.push({ ok: true, text: `售价 ${currency.value}${n(price.value).toFixed(2)} ≥ ${currency.value}${minPrice.value}，过最低售价线` })
   }
   // 净利率
   if (margin.value >= 25) {
@@ -64,7 +77,7 @@ const verdict = computed(() => {
   } else if (margin.value >= 0) {
     checks.push({ ok: false, text: `净利率仅 ${margin.value.toFixed(1)}%，低于 25% 安全线，波动即亏` })
   } else {
-    checks.push({ ok: false, text: `净利率 ${margin.value.toFixed(1)}%，每卖一单亏 $${Math.abs(profit.value).toFixed(2)}` })
+    checks.push({ ok: false, text: `净利率 ${margin.value.toFixed(1)}%，每卖一单亏 ${currency.value}${Math.abs(profit.value).toFixed(2)}` })
   }
   const allOk = checks.every(c => c.ok)
   return {
@@ -74,10 +87,10 @@ const verdict = computed(() => {
   }
 })
 
-// 货币格式
-const fmt = (v) => '$' + (isNaN(v) ? '0.00' : Number(v).toFixed(2))
+// 货币格式（跟随站点）
+const fmt = (v) => currency.value + (isNaN(v) ? '0.00' : Number(v).toFixed(2))
 
-// 重置
+// 重置（保留站点选择）
 function reset() {
   price.value = null
   cost.value = null
@@ -86,6 +99,7 @@ function reset() {
   returnRate.value = 5
   adRate.value = 15
   commissionRate.value = 15
+  vatRate.value = 19
 }
 </script>
 
@@ -94,7 +108,10 @@ function reset() {
     <div class="pc-header">
       <span class="pc-icon">🧮</span>
       <span class="pc-title">利润预筛计算器</span>
-      <span class="pc-hint">填入你查到的数据，其余自动算</span>
+      <div class="pc-region-switch">
+        <button :class="{ active: region === 'US' }" @click="region = 'US'">🇺🇸 美国</button>
+        <button :class="{ active: region === 'EU' }" @click="region = 'EU'">🇪🇺 欧洲</button>
+      </div>
     </div>
 
     <div class="pc-grid">
@@ -103,17 +120,17 @@ function reset() {
         <div class="pc-col-title">✏️ 手动录入</div>
 
         <div class="pc-field">
-          <label>1. 市场参考售价</label>
+          <label>1. 市场参考售价<span class="pc-note">{{ region === 'EU' ? '（含 VAT）' : '' }}</span></label>
           <div class="pc-input-wrap">
-            <span class="pc-prefix">$</span>
+            <span class="pc-prefix">{{ currency }}</span>
             <input v-model="price" type="number" step="0.01" placeholder="如 24.99" />
           </div>
         </div>
 
         <div class="pc-field">
-          <label>2. 进货成本（美元）</label>
+          <label>2. 进货成本（{{ region === 'US' ? '美元' : '欧元' }}）</label>
           <div class="pc-input-wrap">
-            <span class="pc-prefix">$</span>
+            <span class="pc-prefix">{{ currency }}</span>
             <input v-model="cost" type="number" step="0.01" placeholder="如 8" />
           </div>
           <small class="pc-help">1688 进货价(人民币) ÷ 汇率</small>
@@ -122,7 +139,7 @@ function reset() {
         <div class="pc-field">
           <label>4. FBA 配送费</label>
           <div class="pc-input-wrap">
-            <span class="pc-prefix">$</span>
+            <span class="pc-prefix">{{ currency }}</span>
             <input v-model="fbaFee" type="number" step="0.01" placeholder="如 4.2" />
           </div>
           <small class="pc-help">用官方 Revenue Calculator 查（包装后尺寸）</small>
@@ -131,10 +148,10 @@ function reset() {
         <div class="pc-field">
           <label>5. 头程运费 / 件</label>
           <div class="pc-input-wrap">
-            <span class="pc-prefix">$</span>
+            <span class="pc-prefix">{{ currency }}</span>
             <input v-model="shipping" type="number" step="0.01" placeholder="如 1.4" />
           </div>
-          <small class="pc-help">计费重量(实重与体积重取大) × 单位运费 ÷ 汇率 ÷ 每箱数量</small>
+          <small class="pc-help">单箱计费重量(实重与体积重取大) × 单位运费 ÷ 汇率 ÷ 每箱数量</small>
         </div>
 
         <div class="pc-advanced">
@@ -159,14 +176,22 @@ function reset() {
               <span class="pc-suffix">%</span>
             </div>
           </div>
+          <div v-if="region === 'EU'" class="pc-field inline">
+            <label>VAT 税率</label>
+            <div class="pc-input-wrap small">
+              <input v-model="vatRate" type="number" step="1" />
+              <span class="pc-suffix">%</span>
+            </div>
+          </div>
         </div>
-
-        <button class="pc-reset" @click="reset">重置</button>
       </div>
 
       <!-- 右栏：自动计算结果 -->
       <div class="pc-col result">
-        <div class="pc-col-title">⚡ 自动计算</div>
+        <div class="pc-col-title">
+          ⚡ 自动计算
+          <button class="pc-reset" @click="reset">重置</button>
+        </div>
 
         <div class="pc-row" :class="{ placeholder: !hasInput }">
           <span class="pc-label">3. 售价 ÷ 成本</span>
@@ -189,6 +214,11 @@ function reset() {
         <div class="pc-row" :class="{ placeholder: !hasInput }">
           <span class="pc-label">8. 广告分摊（售价 × {{ adRate }}%）</span>
           <span class="pc-value">{{ hasInput ? fmt(ads) : '—' }}</span>
+        </div>
+
+        <div v-if="region === 'EU'" class="pc-row" :class="{ placeholder: !hasInput }">
+          <span class="pc-label">VAT 税额（{{ vatRate }}%）</span>
+          <span class="pc-value">{{ hasInput ? fmt(vat) : '—' }}</span>
         </div>
 
         <div class="pc-divider"></div>
@@ -249,6 +279,34 @@ function reset() {
   font-size: 0.78rem;
   color: var(--vp-c-text-2);
   margin-left: auto;
+}
+.pc-region-switch {
+  margin-left: auto;
+  display: flex;
+  gap: 0.3rem;
+}
+.pc-region-switch button {
+  padding: 0.3rem 0.7rem;
+  font-size: 0.78rem;
+  border-radius: 6px;
+  border: 1px solid var(--vp-c-divider);
+  background: var(--vp-c-bg);
+  color: var(--vp-c-text-2);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.pc-region-switch button:hover { color: var(--vp-c-text-1); }
+.pc-region-switch button.active {
+  border-color: var(--vp-c-brand-1);
+  background: var(--vp-c-brand-soft, rgba(52,81,178,0.08));
+  color: var(--vp-c-brand-1);
+  font-weight: 600;
+}
+.pc-note {
+  font-size: 0.72rem;
+  color: var(--vp-c-text-3);
+  font-weight: 400;
+  margin-left: 0.3rem;
 }
 
 .pc-grid {
@@ -350,16 +408,17 @@ function reset() {
 }
 
 .pc-reset {
-  margin-top: 0.5rem;
-  padding: 0.35rem 0.9rem;
+  margin-left: auto;
+  padding: 0.3rem 0.8rem;
   border-radius: 6px;
   border: 1px solid var(--vp-c-divider);
   background: var(--vp-c-bg);
   color: var(--vp-c-text-2);
-  font-size: 0.78rem;
+  font-size: 0.75rem;
+  font-weight: 400;
   cursor: pointer;
 }
-.pc-reset:hover { color: var(--vp-c-text-1); }
+.pc-reset:hover { color: var(--vp-c-text-1); border-color: var(--vp-c-brand-2); }
 
 /* 结果行 */
 .pc-row {
