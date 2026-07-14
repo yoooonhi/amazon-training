@@ -4,24 +4,18 @@ title: 导师后台
 ---
 
 <style>
-/* 导师后台页面撑满全宽，逐层突破 VitePress 默认内容区限制 */
+/* 导师后台页面占 80% 宽度并居中，突破 VitePress 默认内容区限制 */
 .VPDoc.has-aside .content-container {
-  max-width: 100% !important;
+  max-width: 80% !important;
+  margin: 0 auto !important;
 }
 .VPDoc .container,
-.VPDoc .container .content,
-.VPDoc.has-aside .content-container,
-.VPDoc .doc-content-container {
+.VPDoc .container .content {
   max-width: 100% !important;
-  width: 100% !important;
 }
-/* 去掉左右aside的留白，内容贴满 */
+/* 隐藏右侧大纲栏，避免压缩主内容区 */
 .VPDoc.has-aside > .container > .aside {
   display: none !important;
-}
-.VPDoc.has-aside > .container > .content {
-  padding-left: 0 !important;
-  padding-right: 0 !important;
 }
 </style>
 
