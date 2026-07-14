@@ -1,4 +1,4 @@
-# 2.4 Search Terms
+# 3.5 Search Terms
 
 > **模块3：Listing搭建基本功**
 > **本课目标**：学会写后台 Search Terms，用 250 字节塞进尽量多有效的隐藏关键词
