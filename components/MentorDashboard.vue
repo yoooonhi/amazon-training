@@ -1439,15 +1439,19 @@ h3 {
 .batch-btn {
   padding: 0.4rem 1rem;
   border-radius: 6px;
-  border: none;
-  background: var(--vp-c-brand-1);
-  color: #fff;
+  border: 1px solid var(--vp-button-brand-border);
+  background: var(--vp-button-brand-bg);
+  color: var(--vp-button-brand-text);
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
+  transition: all 0.2s;
 }
-.batch-btn:hover:not(:disabled) { opacity: 0.9; }
+.batch-btn:hover:not(:disabled) {
+  border-color: var(--vp-button-brand-hover-border);
+  background: var(--vp-button-brand-hover-bg);
+}
 .batch-btn:disabled { opacity: 0.5; cursor: default; }
 .batch-clear {
   padding: 0.4rem 0.6rem;
