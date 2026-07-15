@@ -229,8 +229,7 @@ function displayName() {
 }
 .dropdown-header {
   padding: 0.5rem 0.6rem;
-  border-bottom: 1px solid var(--vp-c-divider);
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.2rem;
 }
 .dropdown-email {
   font-size: 0.75rem;
