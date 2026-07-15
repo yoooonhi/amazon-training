@@ -2,7 +2,7 @@
   "name": "amazon-ops-training",
   "version": "1.0.0",
   "type": "module",
-  "description": "亚马逊运营新人8周入门学习站",
+  "description": "亚马逊运营训练营 · 边学边实战",
   "scripts": {
     "dev": "vitepress dev",
     "build": "vitepress build",
