@@ -15,7 +15,10 @@
  * 分组标题是 level-0 VPSidebarItem 内的 .text 元素。
  */
 import { authState, supabase } from './supabase'
-import { publicLevels, isMentorRole } from './accessControl'
+import {
+  publicLevels, isMentorRole,
+  SKILL_PATH_PREFIX, PUBLIC_SKILL_SLUGS,
+} from './accessControl'
 
 // 受保护等级的关键字（出现在侧边栏分组标题里的）
 const PROTECTED_KEYWORDS = ['初级', '中级', '高级', '进阶'].filter(
@@ -49,6 +52,39 @@ function lockTitle(titleEl: Element, level: string) {
 }
 
 function applyVisibility() {
+  applyLevelVisibility()
+  applySkillVisibility()
+}
+
+// 技能补给站：未登录时给非公开课项加 🔒，已登录/导师去掉。
+// 技能课是侧边栏里的链接项，结构为 .VPSidebarItem 内的 <a href>。
+function applySkillVisibility() {
+  const links = [
+    ...document.querySelectorAll<HTMLAnchorElement>(
+      '.VPSidebar a[href^="' + SKILL_PATH_PREFIX + '"]'
+    ),
+  ]
+  const loggedIn = currentRole !== null || isMentorRole(currentRole)
+  links.forEach((a) => {
+    // 文本节点在链接或其子元素里
+    const textEl = (a.querySelector('.text') as HTMLElement) || a
+    const href = a.getAttribute('href') || ''
+    const slug = href.slice(SKILL_PATH_PREFIX.length).replace(/\/+$/, '').split('/')[0]
+    const unlocked = isMentorRole(currentRole) || loggedIn || PUBLIC_SKILL_SLUGS.includes(slug)
+    // 去掉可能残留的锁标记后再按需添加
+    if (textEl.dataset.skillLocked === '1') {
+      textEl.textContent = textEl.textContent.replace(/🔒\s*/, '')
+      delete textEl.dataset.skillLocked
+    }
+    if (!unlocked) {
+      textEl.textContent = '🔒 ' + textEl.textContent
+      textEl.dataset.skillLocked = '1'
+    }
+  })
+}
+
+// 主课程五级：导师全可见；非导师受保护等级标 🔒，已授权的解锁。
+function applyLevelVisibility() {
   const titles = getGroupTitles()
   // 导师：所有分组可见，去掉所有 🔒
   if (isMentorRole(currentRole)) {
