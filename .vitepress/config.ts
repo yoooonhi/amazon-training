@@ -2,7 +2,7 @@ import { defineConfig } from 'vitepress'
 
 export default defineConfig({
   title: '亚马逊运营入门',
-  description: '从零开始学亚马逊运营 · 能力模块制 · 边学边实战',
+  description: '从零开始学亚马逊运营 · 能力进阶制 · 边学边实战',
   lang: 'zh-CN',
   lastUpdated: true,
 
@@ -28,7 +28,7 @@ export default defineConfig({
           ],
         },
         {
-          text: '模块1 · 平台认知与账号安全',
+          text: '入门1 · 平台认知与账号安全',
           collapsed: false,
           items: [
             { text: '1.0 亚马逊基础知识和专业术语', link: '/content/modules/m1-platform/00-amazon-basics' },
@@ -42,7 +42,7 @@ export default defineConfig({
           ],
         },
         {
-          text: '模块2 · 选品与采购',
+          text: '入门2 · 选品与采购',
           collapsed: true,
           items: [
             { text: '2.1 选品决定80%的成败', link: '/content/modules/m7-product/01-why-selection-matters' },
@@ -54,7 +54,7 @@ export default defineConfig({
           ],
         },
         {
-          text: '模块3 · Listing搭建基本功',
+          text: '入门3 · Listing搭建基本功',
           collapsed: true,
           items: [
             { text: '3.0 如何上架产品', link: '/content/modules/m2-listing/00-how-to-list' },
@@ -72,7 +72,7 @@ export default defineConfig({
           ],
         },
         {
-          text: '模块4 · 库存与FBA物流',
+          text: '入门4 · 库存与FBA物流',
           collapsed: true,
           items: [
             { text: '4.1 FBA基本逻辑', link: '/content/modules/m3-inventory/01-fba-basics' },
@@ -85,7 +85,7 @@ export default defineConfig({
           ],
         },
         {
-          text: '模块5 · 广告体系',
+          text: '入门5 · 广告体系',
           collapsed: true,
           items: [
             { text: '5.1 广告类型与基础', link: '/content/modules/m4-ads/01-ad-types' },
@@ -102,7 +102,7 @@ export default defineConfig({
           ],
         },
         {
-          text: '模块6 · 定价与利润',
+          text: '入门6 · 定价与利润',
           collapsed: true,
           items: [
             { text: '6.1 利润链全貌', link: '/content/modules/m5-pricing/01-profit-chain' },
@@ -113,7 +113,7 @@ export default defineConfig({
           ],
         },
         {
-          text: '模块7 · 日常运营与判断力',
+          text: '入门7 · 日常运营与判断力',
           collapsed: true,
           items: [
             { text: '7.1 每日工作流程', link: '/content/modules/m6-daily/01-daily-routine' },

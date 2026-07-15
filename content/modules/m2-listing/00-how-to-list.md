@@ -1,6 +1,6 @@
 # 3.0 如何上架产品
 
-> **模块3：Listing搭建基本功**
+> **入门3：Listing搭建基本功**
 > **本课目标**：学会在亚马逊后台从0创建一个产品Listing的完整操作流程
 
 ## 这节课解决什么问题
@@ -49,7 +49,7 @@ Seller Central → **Catalog** → **Add Products**
 |---|---|
 | Product ID | UPC/EAN（有品牌备案可豁免） |
 | Brand Name | 你的品牌名（需与品牌备案一致，或填Generic） |
-| Product Name | 标题（**2026年新规：最多75字符**，模块3.2会详细讲怎么写。另新增125字符商品亮点字段） |
+| Product Name | 标题（**2026年新规：最多75字符**，入门3.2会详细讲怎么写。另新增125字符商品亮点字段） |
 | Manufacturer | 制造商 |
 | Item Type | 产品类型关键词 |
 
@@ -60,7 +60,7 @@ Seller Central → **Catalog** → **Add Products**
 | Bullet Point 1-5 | 五条核心卖点，每条最多500字符 |
 | Product Description | 产品描述（有A+后可以用图文代替） |
 
-五点怎么写在模块3.3会详细讲，这里先知道填在哪。
+五点怎么写在入门3.3会详细讲，这里先知道填在哪。
 
 #### 第5步：填写价格和数量
 
@@ -75,7 +75,7 @@ Seller Central → **Catalog** → **Add Products**
 - 主图：白底产品图，至少1000×1000px（建议1600+）
 - 副图：最多6张，可以是信息图/生活场景/尺寸图/对比图等
 
-图片规格在模块3.6详细讲。
+图片规格在入门3.6详细讲。
 
 #### 第7步：填写后台属性
 
@@ -93,7 +93,7 @@ Seller Central → **Catalog** → **Add Products**
 - 不重复标题里已有的词
 - 不用竞品品牌名
 
-Search Terms怎么写在模块3.5详细讲。
+Search Terms怎么写在入门3.5详细讲。
 
 #### 第9步：提交保存
 

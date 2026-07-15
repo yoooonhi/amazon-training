@@ -143,7 +143,7 @@ onMounted(() => {
     <div class="week-list">
       <div v-for="w in curriculum" :key="w.week" class="week-item" :class="{ active: currentWeek() === w.week }">
         <div class="week-header">
-          <span class="week-label">第 {{ w.week }} 模块</span>
+          <span class="week-label">入门{{ w.week }}</span>
           <span class="week-title">{{ w.title }}</span>
           <span class="week-pct">{{ weekPercent(w.lessons) }}%</span>
         </div>

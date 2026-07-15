@@ -8,11 +8,11 @@ import ProgressTracker from '../../components/ProgressTracker.vue'
 
 ## 设计理念
 
-这套课程不按"第几周第几天"硬排，而是按**能力模块**走。每个模块学完就在真实产品上练，用熟了再学下一个。不设死线，按吸收速度来。
+这套课程不按"第几周第几天"硬排，而是按**能力进阶**走。每个单元学完就在真实产品上练，用熟了再学下一个。不设死线，按吸收速度来。
 
-## 7个模块
+## 入门课 · 7个单元
 
-### 模块1：平台认知与账号安全（先学先过）
+### 入门1：平台认知与账号安全（先学先过）
 
 不碰产品，先搞清楚亚马逊的规则是什么、什么绝对不能做。账号没了，什么利润链、广告、Listing 都是零。
 
@@ -25,7 +25,7 @@ import ProgressTracker from '../../components/ProgressTracker.vue'
 - 1.6 买家消息边界
 - 1.7 EU合规基础
 
-### 模块2：选品与采购
+### 入门2：选品与采购
 
 选品决定80%的成败。选对了运营事半功倍，选错了再努力也亏钱。
 
@@ -36,7 +36,7 @@ import ProgressTracker from '../../components/ProgressTracker.vue'
 - 2.5 找供应商与采购（1688/打样/MOQ/质检/IP检查）
 - 2.6 选品实操（完整选品报告）
 
-### 模块3：Listing搭建基本功
+### 入门3：Listing搭建基本功
 
 从0搭一个Listing，理解每个字段为什么这样写。
 
@@ -52,7 +52,7 @@ import ProgressTracker from '../../components/ProgressTracker.vue'
 - 3.9 竞品研究方法
 - 3.10 Listing实操
 
-### 模块4：库存与FBA物流
+### 入门4：库存与FBA物流
 
 库存是现金流和排名的生命线。断货一天，排名掉，恢复要花数倍广告费。
 
@@ -64,7 +64,7 @@ import ProgressTracker from '../../components/ProgressTracker.vue'
 - 4.6 断货预防
 - 4.7 发货计划实操
 
-### 模块5：广告体系（最长）
+### 入门5：广告体系（最长）
 
 亚马逊最核心的流量工具，也是最容易烧钱的。
 
@@ -80,7 +80,7 @@ import ProgressTracker from '../../components/ProgressTracker.vue'
 - 5.10 评论获取与Amazon Vine
 - 5.11 广告实操
 
-### 模块6：定价与利润
+### 入门6：定价与利润
 
 - 6.1 利润链全貌
 - 6.2 VAT与佣金基数
@@ -88,9 +88,9 @@ import ProgressTracker from '../../components/ProgressTracker.vue'
 - 6.4 Coupon与Deal
 - 6.5 利润手算实操
 
-### 模块7：日常运营与判断力
+### 入门7：日常运营与判断力
 
-把前面6个模块学到的技能串起来，变成每天的工作节奏。
+把前面6个单元学到的技能串起来，变成每天的工作节奏。
 
 - 7.1 每日工作流程
 - 7.2 优先级判断
@@ -102,4 +102,4 @@ import ProgressTracker from '../../components/ProgressTracker.vue'
 
 ## 怎么算"学完了"
 
-每个模块最后一节是实操课。拿真实产品做一遍，做对了就算通过。不赶时间，没学懂就别往下走。
+每个单元最后一节是实操课。拿真实产品做一遍，做对了就算通过。不赶时间，没学懂就别往下走。
