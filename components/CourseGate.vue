@@ -115,7 +115,7 @@ onMounted(() => {
       </p>
       <div class="gate-actions">
         <button class="gate-btn gate-btn-primary" @click="openAuthPanel">免费注册 / 登录</button>
-        <a href="/" class="gate-btn gate-btn-ghost">← 返回首页</a>
+        <button class="gate-btn gate-btn-ghost" @click="goBack">← 返回</button>
       </div>
       <p class="gate-hint">已登录用户可访问全部技能补给站内容。</p>
     </div>
