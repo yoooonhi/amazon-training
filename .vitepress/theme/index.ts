@@ -21,7 +21,7 @@ export default {
   Layout: () => {
     return h(DefaultTheme.Layout, null, {
       'nav-bar-content-after': () => h(AuthPanel),
-      'doc-after': () => [h(SiteFooter), h(Comments)],
+      'doc-after': () => [h(Comments), h(SiteFooter)],
       'layout-bottom': () => h(ModalDialog),
       'layout-top': () => h(CourseGate),
     })
