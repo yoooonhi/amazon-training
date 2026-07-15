@@ -2,7 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { supabase, authState } from '../lib/supabase'
 import { curriculum, totalLessons } from '../lib/curriculum'
-import { isMentorRole } from '../lib/accessControl'
+import { isMentorRole, isLevelAccessible } from '../lib/accessControl'
 
 const START_KEY = 'amazon-training-start-date'
 const LOCAL_PROGRESS_KEY = 'amazon-training-progress'
@@ -13,11 +13,13 @@ const isMounted = ref(false)
 const isLoggedIn = ref(false)
 const loading = ref(false)
 const isMentor = ref(false)
+const role = ref(null)
+const accessLevels = ref([])
 
-// 按角色过滤：普通学员只看入门模块，导师看全部
+// 按角色 + 授权过滤：导师看全部，普通学员看有权访问的等级（含个人授权）
 const visibleCurriculum = computed(() => {
   if (isMentor.value) return curriculum
-  return curriculum.filter(w => w.level === '入门')
+  return curriculum.filter(w => isLevelAccessible(w.level, role.value, accessLevels.value))
 })
 
 const completedCount = computed(() => Object.values(progress.value).filter(v => v.completed).length)
@@ -103,6 +105,8 @@ onMounted(() => {
   authState.onChange(async (user, profile) => {
     isLoggedIn.value = !!user
     isMentor.value = isMentorRole(profile?.role)
+    role.value = profile?.role || null
+    accessLevels.value = profile?.accessLevels || []
     if (user) {
       await loadRemoteProgress()
       await migrateLocalToRemote()
@@ -115,13 +119,19 @@ onMounted(() => {
   supabase.auth.getSession().then(async ({ data }) => {
     isLoggedIn.value = !!data.session?.user
     if (data.session?.user) {
-      // 补拉 profile 判断导师身份
+      // 补拉 profile 判断导师身份 + 授权等级
       const { data: profile } = await supabase
         .from('profiles')
-        .select('role')
+        .select('*')
         .eq('id', data.session.user.id)
         .single()
       isMentor.value = isMentorRole(profile?.role)
+      role.value = profile?.role || null
+      const { data: accessRows } = await supabase
+        .from('course_access')
+        .select('level')
+        .eq('user_id', data.session.user.id)
+      accessLevels.value = (accessRows || []).map((r) => r.level)
       await loadRemoteProgress()
     } else {
       // 未登录，进度清空（必须登录才显示进度）

@@ -8,6 +8,7 @@ import { getLevelByPath, isLevelAccessible, isMentorRole } from '../lib/accessCo
 const isMounted = ref(false)
 const lastLesson = ref(null) // { path, lessonId, ts }
 const role = ref(null)
+const accessLevels = ref([])
 
 // 根据 lessonId 反查课程标题（等级 + 课号 + 模块名）
 const lessonLabel = computed(() => {
@@ -28,7 +29,7 @@ const shouldShow = computed(() => {
   if (!lastLesson.value) return false
   // 检查这节课当前用户是否有权访问
   const level = getLevelByPath(lastLesson.value.path)
-  return isLevelAccessible(level, role.value)
+  return isLevelAccessible(level, role.value, accessLevels.value)
 })
 
 // 时间格式化
@@ -49,21 +50,29 @@ onMounted(() => {
   isMounted.value = true
   lastLesson.value = getLastLesson()
 
-  // 订阅登录状态（拿 role 做权限判断）
+  // 订阅登录状态（拿 role + accessLevels 做权限判断）
   authState.onChange((_user, profile) => {
     role.value = profile?.role || null
+    accessLevels.value = profile?.accessLevels || []
   })
   // 首次补拉 session
   supabase.auth.getSession().then(async ({ data }) => {
     if (data.session?.user) {
       const { data: profile } = await supabase
         .from('profiles')
-        .select('role')
+        .select('*')
         .eq('id', data.session.user.id)
         .single()
       role.value = profile?.role || null
+      // 补拉授权等级
+      const { data: accessRows } = await supabase
+        .from('course_access')
+        .select('level')
+        .eq('user_id', data.session.user.id)
+      accessLevels.value = (accessRows || []).map((r) => r.level)
     } else {
       role.value = null
+      accessLevels.value = []
     }
   })
 })

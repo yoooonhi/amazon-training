@@ -5,13 +5,14 @@ import { getLevelByPath, isLevelAccessible, isMentorRole, publicLevels, LEVELS }
 
 const isMounted = ref(false)
 const role = ref(null) // 当前用户角色
+const accessLevels = ref([]) // 当前用户被导师授权的等级
 const currentPath = ref('')
 
 // 判断当前页面是否需要门控拦截
 const blockedLevel = computed(() => {
   const level = getLevelByPath(currentPath.value)
   if (!level) return null // 非课程页面
-  if (isLevelAccessible(level, role.value)) return null // 可访问，不拦截
+  if (isLevelAccessible(level, role.value, accessLevels.value)) return null // 可访问，不拦截
   return level // 被拦截的等级
 })
 
@@ -19,6 +20,7 @@ const isLoggedIn = computed(() => role.value !== null)
 
 function updateRole(profile) {
   role.value = profile?.role || null
+  accessLevels.value = profile?.accessLevels || []
 }
 
 function refreshPath() {

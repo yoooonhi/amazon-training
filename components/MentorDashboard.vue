@@ -2,6 +2,7 @@
 import { ref, computed, reactive, onMounted } from 'vue'
 import { supabase, authState } from '../lib/supabase'
 import { curriculum, totalLessons } from '../lib/curriculum'
+import { LEVELS } from '../lib/accessControl'
 import { modalConfirm, modalAlert } from '../lib/modal'
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
@@ -17,15 +18,13 @@ const selectedStudent = ref(null)
 const detailProgress = ref([])
 const detailQuiz = ref([])
 
-// 搜索和筛选
-const searchQuery = ref('')
-const filterStatus = ref('all') // all | active | stale | done | new
-
-// 评论管理
-const allComments = ref([])
-
-// 网站访问统计
-const visits = ref([])
+// 课程等级授权
+const accessMap = ref({}) // { userId: ['初级', '高级'] }
+const selectedIds = ref(new Set()) // 批量授权勾选的学员 id
+const batchLevel = ref('') // 批量授权选中的等级
+const accessBusy = ref(false) // 授权操作进行中
+// 可授权的等级（不含入门，入门默认开放）
+const GRANTABLE_LEVELS = LEVELS.filter((l) => l !== '入门')
 
 async function checkMentor() {
   const { data: session } = await supabase.auth.getSession()
@@ -56,6 +55,15 @@ async function loadData() {
   const { data: allCheckins, error: checkErr } = await supabase.from('checkins').select('user_id, checkin_date')
   // 拉 quiz
   const { data: allQuiz } = await supabase.from('quiz_results').select('user_id, is_correct, lesson_id, question_index')
+  // 拉课程等级授权
+  const { data: allAccess } = await supabase.from('course_access').select('user_id, level')
+  // 构建 accessMap: { userId: ['初级', '高级'] }
+  const aMap = {}
+  ;(allAccess || []).forEach((r) => {
+    if (!aMap[r.user_id]) aMap[r.user_id] = []
+    aMap[r.user_id].push(r.level)
+  })
+  accessMap.value = aMap
 
   students.value = profiles.map(p => {
     const prog = allProgress?.filter(x => x.user_id === p.id && x.completed) || []
@@ -95,6 +103,7 @@ async function loadData() {
       lastActive,
       daysSinceActive,
       isStale: daysSinceActive !== null && daysSinceActive >= 3,
+      accessLevels: aMap[p.id] || [],
     }
   })
   // 拉网站访问统计（仅管理员能读，RLS 保证）
@@ -165,6 +174,85 @@ function lessonTitle(lessonId) {
     }
   }
   return lessonId
+}
+
+// ===== 课程等级授权操作 =====
+
+// 拿当前导师的 user_id（用于 granted_by 审计）
+async function getMentorId() {
+  const { data: session } = await supabase.auth.getSession()
+  return session.session?.user?.id || null
+}
+
+// 单个学员：切换某等级授权（开→关 / 关→开）
+async function toggleAccess(student, level) {
+  if (accessBusy.value) return
+  const has = student.accessLevels.includes(level)
+  const action = has ? '取消' : '授权'
+  const ok = await modalConfirm(`确定为「${student.profile.nickname || student.profile.email}」${action}「${level}」课程？`, '课程等级授权')
+  if (!ok) return
+  accessBusy.value = true
+  try {
+    const mentorId = await getMentorId()
+    if (has) {
+      // 取消授权
+      const { error } = await supabase.from('course_access')
+        .delete().eq('user_id', student.profile.id).eq('level', level)
+      if (error) { await modalAlert('取消失败: ' + error.message, '出错了'); return }
+      student.accessLevels = student.accessLevels.filter((l) => l !== level)
+    } else {
+      // 授权
+      const { error } = await supabase.from('course_access').upsert({
+        user_id: student.profile.id,
+        level,
+        granted_by: mentorId,
+      }, { onConflict: 'user_id,level' })
+      if (error) { await modalAlert('授权失败: ' + error.message, '出错了'); return }
+      student.accessLevels = [...student.accessLevels, level]
+    }
+    // 同步到 accessMap
+    accessMap.value[student.profile.id] = student.accessLevels
+  } finally {
+    accessBusy.value = false
+  }
+}
+
+// 批量勾选
+function toggleSelect(id) {
+  const s = new Set(selectedIds.value)
+  if (s.has(id)) s.delete(id)
+  else s.add(id)
+  selectedIds.value = s
+}
+
+// 批量授权
+async function batchGrant() {
+  if (accessBusy.value) return
+  const ids = [...selectedIds.value]
+  if (ids.length === 0) { await modalAlert('请先勾选学员', '提示'); return }
+  if (!batchLevel.value) { await modalAlert('请选择要授权的等级', '提示'); return }
+  const ok = await modalConfirm(`确定为选中的 ${ids.length} 名学员授权「${batchLevel.value}」课程？`, '批量授权')
+  if (!ok) return
+  accessBusy.value = true
+  try {
+    const mentorId = await getMentorId()
+    const rows = ids.map((uid) => ({ user_id: uid, level: batchLevel.value, granted_by: mentorId }))
+    const { error } = await supabase.from('course_access').upsert(rows, { onConflict: 'user_id,level' })
+    if (error) { await modalAlert('批量授权失败: ' + error.message, '出错了'); return }
+    // 同步本地状态
+    students.value.forEach((s) => {
+      if (selectedIds.value.has(s.profile.id)) {
+        if (!s.accessLevels.includes(batchLevel.value)) {
+          s.accessLevels = [...s.accessLevels, batchLevel.value]
+        }
+        accessMap.value[s.profile.id] = s.accessLevels
+      }
+    })
+    await modalAlert(`已为 ${ids.length} 名学员授权「${batchLevel.value}」`, '完成')
+    selectedIds.value = new Set()
+  } finally {
+    accessBusy.value = false
+  }
 }
 
 // 过滤 + 搜索 + 排序
@@ -555,49 +643,69 @@ onMounted(async () => {
         </div>
       </div>
 
+      <!-- 批量授权栏 -->
+      <div v-if="students.length > 0" class="batch-bar">
+        <span class="batch-info">已选 {{ selectedIds.size }} 人</span>
+        <select v-model="batchLevel" class="batch-select">
+          <option value="">选择等级...</option>
+          <option v-for="lv in GRANTABLE_LEVELS" :key="lv" :value="lv">{{ lv }}</option>
+        </select>
+        <button class="batch-btn" :disabled="accessBusy" @click="batchGrant">🔑 批量授权</button>
+        <button v-if="selectedIds.size > 0" class="batch-clear" @click="selectedIds = new Set()">清空选择</button>
+      </div>
+
       <!-- 学员表格 -->
       <div v-if="students.length > 0" class="table-wrap">
         <table class="student-table">
           <thead>
             <tr>
+              <th class="col-check"><input type="checkbox" :checked="filteredStudents.length > 0 && filteredStudents.every(s => selectedIds.has(s.profile.id))" @change="filteredStudents.forEach(s => toggleSelect(s.profile.id))" /></th>
               <th>学员</th>
               <th>完成进度</th>
               <th>打卡</th>
               <th>答题</th>
+              <th>课程权限</th>
               <th>最后学习</th>
               <th>状态</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="s in filteredStudents" :key="s.profile.id" :class="{ stale: s.isStale }" @click="viewDetail(s)">
-              <td class="col-name">
+            <tr v-for="s in filteredStudents" :key="s.profile.id" :class="{ stale: s.isStale }">
+              <td class="col-check" @click.stop><input type="checkbox" :checked="selectedIds.has(s.profile.id)" @change="toggleSelect(s.profile.id)" /></td>
+              <td class="col-name" @click="viewDetail(s)">
                 <strong>{{ s.profile.nickname || s.profile.email }}</strong>
                 <small>{{ new Date(s.profile.created_at).toLocaleDateString('zh-CN') }} 注册</small>
               </td>
-              <td class="col-progress">
+              <td class="col-progress" @click="viewDetail(s)">
                 <div class="tbl-bar">
                   <div class="tbl-bar-fill" :style="{ width: s.percent + '%' }"></div>
                 </div>
                 <span class="tbl-pct">{{ s.percent }}%</span>
                 <span class="tbl-count">{{ s.progressCount }}/{{ totalLessons }}</span>
               </td>
-              <td class="col-streak"><span class="streak-tag">🔥 {{ s.streak }}</span> <small>{{ s.checkinDays }}天</small></td>
-              <td>{{ s.quizCorrect }}/{{ s.quizTotal }}</td>
-              <td>
+              <td class="col-streak" @click="viewDetail(s)"><span class="streak-tag">🔥 {{ s.streak }}</span> <small>{{ s.checkinDays }}天</small></td>
+              <td @click="viewDetail(s)">{{ s.quizCorrect }}/{{ s.quizTotal }}</td>
+              <td class="col-access" @click="viewDetail(s)">
+                <span v-if="s.accessLevels.length === 0" class="access-none">仅入门</span>
+                <span v-else class="access-tags">
+                  <span v-for="lv in s.accessLevels" :key="lv" class="access-tag">{{ lv }}</span>
+                </span>
+              </td>
+              <td @click="viewDetail(s)">
                 <span v-if="s.lastActive">{{ s.daysSinceActive === 0 ? '今天' : s.daysSinceActive + '天前' }}</span>
                 <span v-else class="never">未开始</span>
               </td>
-              <td>
+              <td @click="viewDetail(s)">
                 <span v-if="s.isStale" class="badge-warn">停滞</span>
                 <span v-else-if="s.percent === 0" class="badge-new">新</span>
                 <span v-else-if="s.percent === 100" class="badge-done">毕业</span>
                 <span v-else class="badge-active">活跃</span>
               </td>
-              <td><span class="detail-link">详情 →</span></td>
+              <td @click="viewDetail(s)"><span class="detail-link">详情 →</span></td>
             </tr>
             <tr v-if="filteredStudents.length === 0">
-              <td colspan="7" class="no-result">没有匹配的学员</td>
+              <td colspan="9" class="no-result">没有匹配的学员</td>
             </tr>
           </tbody>
         </table>
@@ -619,6 +727,29 @@ onMounted(async () => {
         <div class="ds-item"><span class="ds-num">{{ selectedStudent.percent }}%</span><span class="ds-label">总完成率</span></div>
         <div class="ds-item"><span class="ds-num">{{ selectedStudent.progressCount }}/{{ totalLessons }}</span><span class="ds-label">完成课时</span></div>
         <div class="ds-item"><span class="ds-num">{{ selectedStudent.quizCorrect }}/{{ selectedStudent.quizTotal }}</span><span class="ds-label">答题正确率</span></div>
+      </div>
+
+      <!-- 课程等级授权面板 -->
+      <div class="access-panel">
+        <h3>🔑 课程等级授权</h3>
+        <p class="access-hint">为该学员开放对应等级的课程，保存后学员刷新即生效。入门默认开放。</p>
+        <div class="access-toggles">
+          <div class="access-toggle-item">
+            <span class="access-level-name">入门</span>
+            <span class="access-status always-on">默认开放</span>
+          </div>
+          <div v-for="lv in GRANTABLE_LEVELS" :key="lv" class="access-toggle-item">
+            <span class="access-level-name">{{ lv }}</span>
+            <button
+              class="access-switch"
+              :class="{ on: selectedStudent.accessLevels.includes(lv) }"
+              :disabled="accessBusy"
+              @click="toggleAccess(selectedStudent, lv)"
+            >
+              {{ selectedStudent.accessLevels.includes(lv) ? '已授权 ✓' : '未授权' }}
+            </button>
+          </div>
+        </div>
       </div>
 
       <h3>已完成的课程（{{ detailProgress.length }}）</h3>
@@ -1247,4 +1378,102 @@ h3 {
 }
 .cm-btn:hover { color: var(--vp-c-text-1); border-color: var(--vp-c-brand-2); }
 .cm-btn.danger:hover { color: #ef4444; border-color: #ef4444; background: rgba(239,68,68,0.06); }
+
+/* ===== 课程等级授权 ===== */
+.col-check { width: 36px; text-align: center; }
+.col-check input { cursor: pointer; }
+.col-access { max-width: 140px; }
+.access-none { font-size: 0.78rem; color: var(--vp-c-text-3); }
+.access-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.access-tag {
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--vp-c-brand-soft, rgba(59,130,246,0.12));
+  color: var(--vp-c-brand-1);
+  font-weight: 600;
+}
+.batch-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  padding: 0.6rem 0.8rem;
+  background: var(--vp-c-bg-soft);
+  border-radius: 8px;
+  border: 1px solid var(--vp-c-divider);
+}
+.batch-info { font-size: 0.85rem; color: var(--vp-c-text-2); font-weight: 600; min-width: 5rem; }
+.batch-select {
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid var(--vp-c-divider);
+  background: var(--vp-c-bg);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.batch-btn {
+  padding: 0.4rem 1rem;
+  border-radius: 6px;
+  border: none;
+  background: var(--vp-c-brand-1);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.batch-btn:hover:not(:disabled) { opacity: 0.9; }
+.batch-btn:disabled { opacity: 0.5; cursor: default; }
+.batch-clear {
+  padding: 0.4rem 0.6rem;
+  border: none;
+  background: none;
+  color: var(--vp-c-text-3);
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+.batch-clear:hover { color: var(--vp-c-text-1); }
+
+/* 授权面板（详情页） */
+.access-panel {
+  margin: 1.5rem 0;
+  padding: 1.25rem;
+  background: var(--vp-c-bg-soft);
+  border-radius: 12px;
+  border: 1px solid var(--vp-c-divider);
+}
+.access-panel h3 { margin: 0 0 0.5rem; font-size: 1.05rem; }
+.access-hint { font-size: 0.82rem; color: var(--vp-c-text-3); margin: 0 0 1rem; }
+.access-toggles { display: flex; flex-direction: column; gap: 0.6rem; }
+.access-toggle-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  background: var(--vp-c-bg);
+  border-radius: 8px;
+  border: 1px solid var(--vp-c-divider);
+}
+.access-level-name { font-weight: 600; font-size: 0.9rem; color: var(--vp-c-text-1); }
+.access-status.always-on { font-size: 0.82rem; color: var(--vp-c-text-3); }
+.access-switch {
+  padding: 0.35rem 0.9rem;
+  border-radius: 6px;
+  border: 1px solid var(--vp-c-divider);
+  background: var(--vp-c-bg);
+  color: var(--vp-c-text-2);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.access-switch.on {
+  background: var(--vp-c-brand-1);
+  color: #fff;
+  border-color: var(--vp-c-brand-1);
+}
+.access-switch:hover:not(:disabled) { border-color: var(--vp-c-brand-2); }
+.access-switch.on:hover:not(:disabled) { opacity: 0.9; }
+.access-switch:disabled { opacity: 0.6; cursor: default; }
 </style>

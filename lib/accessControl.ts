@@ -55,18 +55,29 @@ export function getLevelByPath(path: string): Level | null {
 /**
  * 判断某等级是否对指定角色开放。
  * - 导师：所有等级都开放
- * - 普通学员/未登录：仅 publicLevels 中的等级开放
+ * - 全局开放（publicLevels）：所有人可访问
+ * - 个人授权（accessLevels）：该用户被导师单独授权的等级
  */
-export function isLevelAccessible(level: Level | null, role: string | null | undefined): boolean {
+export function isLevelAccessible(
+  level: Level | null,
+  role: string | null | undefined,
+  accessLevels?: string[] | null
+): boolean {
   if (!level) return true // 非课程页面，不拦截
   if (isMentorRole(role)) return true // 导师全放行
-  return publicLevels.includes(level)
+  if (publicLevels.includes(level)) return true // 全局开放
+  if (accessLevels?.includes(level)) return true // 个人授权
+  return false
 }
 
 /**
  * 判断某路径是否对指定角色开放。
  * 便捷组合：getLevelByPath + isLevelAccessible。
  */
-export function isPathAccessible(path: string, role: string | null | undefined): boolean {
-  return isLevelAccessible(getLevelByPath(path), role)
+export function isPathAccessible(
+  path: string,
+  role: string | null | undefined,
+  accessLevels?: string[] | null
+): boolean {
+  return isLevelAccessible(getLevelByPath(path), role, accessLevels)
 }

@@ -3,6 +3,7 @@
  *
  * VitePress 的侧边栏是配置层生成的静态 DOM，无法在 config.ts 里按角色条件渲染。
  * 这里用客户端 DOM 操作兜底：非导师用户隐藏受保护等级的侧边栏分组。
+ * 被导师单独授权某等级的学员，该等级分组也可见。
  *
  * 识别规则：侧边栏分组的标题文本以受保护等级关键字开头（如"初级 ·"、"中级 ·"）。
  * 对应 config.ts 里的分组标题命名约定："初级N · 标题"。
@@ -16,36 +17,52 @@ const PROTECTED_KEYWORDS = ['初级', '中级', '高级', '进阶'].filter(
 )
 
 let currentRole: string | null | undefined = undefined // undefined = 还没查过
+let currentAccessLevels: string[] = [] // 当前用户被授权的等级
 let installedWatcher = false
 
 function applyVisibility() {
-  // 导师：所有分组可见
+  // 导师：所有分组可见，需把可能被隐藏的重置回来
   if (isMentorRole(currentRole)) {
+    document.querySelectorAll('.VPSidebar .group-title').forEach((title) => {
+      const group = title.closest('.VPSidebarItem') || title.closest('.group')
+      if (group) (group as HTMLElement).style.display = ''
+    })
     return
   }
-  // 非导师：隐藏受保护分组
+  // 非导师：隐藏受保护且未授权的分组
   const groupHeaders = document.querySelectorAll('.VPSidebar .group-title')
   groupHeaders.forEach((title) => {
     const text = (title.textContent || '').trim()
-    const isProtected = PROTECTED_KEYWORDS.some((kw) => text.startsWith(kw))
-    if (!isProtected) return
-    // 向上找到最近的 group 容器并隐藏
+    // 找到这个分组属于哪个等级
+    const matchedKw = PROTECTED_KEYWORDS.find((kw) => text.startsWith(kw))
+    if (!matchedKw) return
+    // 如果该用户被授权了这个等级，显示分组
     const group = title.closest('.VPSidebarItem') || title.closest('.group')
-    if (group) {
+    if (!group) return
+    if (currentAccessLevels.includes(matchedKw)) {
+      ;(group as HTMLElement).style.display = ''
+    } else {
       ;(group as HTMLElement).style.display = 'none'
     }
   })
 }
 
-async function loadRole(): Promise<string | null> {
+async function loadRole(): Promise<{ role: string | null; accessLevels: string[] }> {
   const { data: session } = await supabase.auth.getSession()
-  if (!session.session?.user) return null
+  if (!session.session?.user) return { role: null, accessLevels: [] }
   const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', session.session.user.id)
     .single()
-  return profile?.role || null
+  const { data: accessRows } = await supabase
+    .from('course_access')
+    .select('level')
+    .eq('user_id', session.session.user.id)
+  return {
+    role: profile?.role || null,
+    accessLevels: (accessRows || []).map((r: any) => r.level),
+  }
 }
 
 /**
@@ -62,11 +79,13 @@ export async function setupSidebarGuard() {
     installedWatcher = true
     authState.onChange((_user, profile) => {
       currentRole = profile?.role || null
+      currentAccessLevels = profile?.accessLevels || []
       applyVisibility()
     })
     // 首次补拉
-    loadRole().then((role) => {
+    loadRole().then(({ role, accessLevels }) => {
       currentRole = role
+      currentAccessLevels = accessLevels
       applyVisibility()
     })
   }

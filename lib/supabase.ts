@@ -34,7 +34,14 @@ supabase.auth.onAuthStateChange(async (event, session) => {
       .select('*')
       .eq('id', session.user.id)
       .single()
-    authState.set(session.user, profile)
+    // 拉该用户的课程等级授权（导师不需要，但查了也无害——导师走 isMentorRole 短路）
+    const { data: accessRows } = await supabase
+      .from('course_access')
+      .select('level')
+      .eq('user_id', session.user.id)
+    const accessLevels = (accessRows || []).map((r: any) => r.level)
+    // 把授权等级挂到 profile 上，各组件通过 authState.onChange 自动获取
+    authState.set(session.user, { ...profile, accessLevels })
   } else {
     authState.set(null, null)
   }
