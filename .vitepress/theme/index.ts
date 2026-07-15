@@ -11,6 +11,7 @@ import Comments from '../../components/Comments.vue'
 import ProfitCalculator from '../../components/ProfitCalculator.vue'
 import ModalDialog from '../../components/ModalDialog.vue'
 import CourseGate from '../../components/CourseGate.vue'
+import SiteFooter from '../../components/SiteFooter.vue'
 import { recordVisit, recordLastLesson } from '../../lib/visitTracker'
 import { setupSidebarGuard } from '../../lib/sidebarGuard'
 import './custom.css'
@@ -20,7 +21,7 @@ export default {
   Layout: () => {
     return h(DefaultTheme.Layout, null, {
       'nav-bar-content-after': () => h(AuthPanel),
-      'doc-after': () => h(Comments),
+      'doc-after': () => [h(SiteFooter), h(Comments)],
       'layout-bottom': () => h(ModalDialog),
       'layout-top': () => h(CourseGate),
     })
