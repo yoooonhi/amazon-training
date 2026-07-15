@@ -355,8 +355,8 @@ export const pathToLessonId: Record<string, string> = {
   'e4-risk-management/04-black-swan-playbook': 'e4-04',
   'e4-risk-management/05-risk-playbook-practice': 'e4-05',
   // ===== 技能补给站 =====
-  'skills/domain-basics': 'skill-domain',
-  'skills/phishing-detection': 'skill-phishing',
+  'domain-basics': 'skill-domain',
+  'phishing-detection': 'skill-phishing',
 }
 
 // 课程内容的目录前缀（getLessonIdByPath 用）
