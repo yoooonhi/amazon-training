@@ -20,27 +20,37 @@ let currentRole: string | null | undefined = undefined // undefined = 还没查�
 let currentAccessLevels: string[] = [] // 当前用户被授权的等级
 let installedWatcher = false
 
+// 去掉分组标题里的 🔒 emoji（已授权或导师可见时调用）
+function unlockTitle(titleEl: Element) {
+  const el = titleEl as HTMLElement
+  if (el.textContent?.includes('🔒')) {
+    el.textContent = el.textContent.replace(/🔒\s*/g, '')
+  }
+}
+
 function applyVisibility() {
-  // 导师：所有分组可见，需把可能被隐藏的重置回来
+  // 导师：所有分组可见，去掉所有 🔒
   if (isMentorRole(currentRole)) {
     document.querySelectorAll('.VPSidebar .group-title').forEach((title) => {
       const group = title.closest('.VPSidebarItem') || title.closest('.group')
       if (group) (group as HTMLElement).style.display = ''
+      unlockTitle(title)
     })
     return
   }
-  // 非导师：隐藏受保护且未授权的分组
+  // 非导师：隐藏受保护且未授权的分组，已授权的去掉 🔒
   const groupHeaders = document.querySelectorAll('.VPSidebar .group-title')
   groupHeaders.forEach((title) => {
     const text = (title.textContent || '').trim()
     // 找到这个分组属于哪个等级
-    const matchedKw = PROTECTED_KEYWORDS.find((kw) => text.startsWith(kw))
+    const matchedKw = PROTECTED_KEYWORDS.find((kw) => text.includes(kw))
     if (!matchedKw) return
-    // 如果该用户被授权了这个等级，显示分组
     const group = title.closest('.VPSidebarItem') || title.closest('.group')
     if (!group) return
     if (currentAccessLevels.includes(matchedKw)) {
+      // 已授权：显示并去掉 🔒
       ;(group as HTMLElement).style.display = ''
+      unlockTitle(title)
     } else {
       ;(group as HTMLElement).style.display = 'none'
     }
