@@ -26,6 +26,12 @@ const accessBusy = ref(false) // 授权操作进行中
 // 可授权的等级（不含入门，入门默认开放）
 const GRANTABLE_LEVELS = LEVELS.filter((l) => l !== '入门')
 
+// 评论管理
+const allComments = ref([])
+
+// 网站访问统计
+const visits = ref([])
+
 async function checkMentor() {
   const { data: session } = await supabase.auth.getSession()
   if (!session.session?.user) {
