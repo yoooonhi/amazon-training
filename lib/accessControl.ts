@@ -1,11 +1,18 @@
 /**
- * 课程等级权限控制
+ * 课程权限控制
  *
- * 五级体系：入门 / 初级 / 中级 / 高级 / 进阶
- * - 入门：全体学员可见
- * - 其余等级：仅导师（mentor / admin）可见，内测阶段
+ * 两套机制：
+ * 1. 主课程五级体系：入门 / 初级 / 中级 / 高级 / 进阶
+ *    - 入门：全体学员可见
+ *    - 其余等级：仅导师（mentor / admin）可见，内测阶段
+ *    - 开放某级课程给全体学员：往 publicLevels 里加即可。
  *
- * 开放某级课程给全体学员：往 publicLevels 里加即可，导师始终可访问所有内容。
+ * 2. 技能补给站：登录即可见
+ *    - 第一课（domain-basics）对所有访客公开
+ *    - 其余技能课（及后续新增的）需登录后才可访问
+ *    - 控制白名单见 PUBLIC_SKILL_SLUGS
+ *
+ * 导师始终可访问所有内容。
  */
 
 // 所有课程等级（顺序即展示顺序）
@@ -70,14 +77,66 @@ export function isLevelAccessible(
   return false
 }
 
+// ===== 技能补给站：登录可见 =====
+// 技能课路径前缀
+export const SKILL_PATH_PREFIX = '/content/skills/'
+
+/**
+ * 技能补给站中免费公开的课（slug 白名单）。
+ * 只有列在这里的课对所有访客开放；其余技能课需登录后才可访问。
+ * 默认只开放第一课，后续新增的技能课都默认需要登录。
+ */
+export const PUBLIC_SKILL_SLUGS = ['domain-basics']
+
+/**
+ * 判断路径是否属于技能补给站。
+ */
+export function isSkillPath(path: string): boolean {
+  return path.startsWith(SKILL_PATH_PREFIX)
+}
+
+/**
+ * 从技能路径中提取 slug。
+ * 如 '/content/skills/phishing-detection' → 'phishing-detection'
+ */
+export function getSkillSlug(path: string): string | null {
+  if (!isSkillPath(path)) return null
+  return path.slice(SKILL_PATH_PREFIX.length).replace(/\/+$/, '').split('/')[0]
+}
+
+/**
+ * 判断某技能课是否对指定角色开放。
+ * - 导师：全部开放
+ * - 已登录（任意角色）：全部开放
+ * - 白名单（PUBLIC_SKILL_SLUGS）：对所有访客开放
+ * - 其余：未登录访客不可访问
+ */
+export function isSkillAccessible(
+  path: string,
+  role: string | null | undefined,
+  isLoggedIn: boolean
+): boolean {
+  if (isMentorRole(role)) return true
+  if (isLoggedIn) return true
+  const slug = getSkillSlug(path)
+  if (slug && PUBLIC_SKILL_SLUGS.includes(slug)) return true
+  return false
+}
+
 /**
  * 判断某路径是否对指定角色开放。
- * 便捷组合：getLevelByPath + isLevelAccessible。
+ * 便捷组合：getLevelByPath + isLevelAccessible（主课程） + 技能课登录校验。
  */
 export function isPathAccessible(
   path: string,
   role: string | null | undefined,
-  accessLevels?: string[] | null
+  accessLevels?: string[] | null,
+  isLoggedIn?: boolean
 ): boolean {
+  // 技能补给站：登录可见
+  if (isSkillPath(path)) {
+    return isSkillAccessible(path, role, isLoggedIn ?? (role !== null))
+  }
+  // 主课程：等级授权
   return isLevelAccessible(getLevelByPath(path), role, accessLevels)
 }

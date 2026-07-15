@@ -40,11 +40,25 @@ onMounted(() => {
     }
   })
   document.addEventListener('click', handleOutsideClick)
+  // 由课程门控（如技能补给站）触发的「打开登录/注册」事件
+  window.addEventListener('open-auth-panel', handleOpenAuthPanel)
 })
 
 onUnmounted(() => {
   document.removeEventListener('click', handleOutsideClick)
+  window.removeEventListener('open-auth-panel', handleOpenAuthPanel)
 })
+
+// 外部触发打开登录面板：已登录则忽略，未登录默认进注册模式
+function handleOpenAuthPanel() {
+  if (currentUser.value) return
+  mode.value = 'signup'
+  email.value = ''
+  password.value = ''
+  errorMsg.value = ''
+  infoMsg.value = ''
+  showLogin.value = true
+}
 
 async function handleSubmit() {
   loading.value = true

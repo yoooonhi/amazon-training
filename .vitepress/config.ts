@@ -45,7 +45,8 @@ export default defineConfig({
             { text: '能力地图', link: '/content/00-overview/overview' },
           ],
         },
-        // ===== 技能补给站（通用数字技能，全员可见）=====
+        // ===== 技能补给站（通用数字技能）=====
+        // 规则：第一课 domain-basics 全员可见，其余技能课需登录后访问（见 lib/accessControl.ts）。
         {
           text: '🧰 技能补给站',
           collapsed: true,
