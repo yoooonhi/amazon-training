@@ -18,6 +18,10 @@ const selectedStudent = ref(null)
 const detailProgress = ref([])
 const detailQuiz = ref([])
 
+// 搜索和筛选
+const searchQuery = ref('')
+const filterStatus = ref('all') // all | active | stale | done | new
+
 // 课程等级授权
 const accessMap = ref({}) // { userId: ['初级', '高级'] }
 const selectedIds = ref(new Set()) // 批量授权勾选的学员 id
