@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { authState, supabase } from '../lib/supabase'
-import { curriculum } from '../lib/curriculum'
+import { curriculum, skillLessons } from '../lib/curriculum'
 import { getLastLesson } from '../lib/visitTracker'
 import { getLevelByPath, isLevelAccessible, isMentorRole } from '../lib/accessControl'
 
@@ -20,6 +20,9 @@ const lessonLabel = computed(() => {
       return `${w.level}${w.week}.${idx} ${w.title}`
     }
   }
+  // 技能补给站：独立栏目，无等级/课号，直接用标题
+  const skill = skillLessons.find((s) => s.lessonId === lessonId)
+  if (skill) return skill.title
   // 兜底：找不到课程信息，用路径
   return path
 })

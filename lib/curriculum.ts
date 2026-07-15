@@ -361,6 +361,17 @@ export const pathToLessonId: Record<string, string> = {
   'browser-shortcuts': 'skill-browser',
 }
 
+// ===== 技能补给站：独立栏目（登录可见，不参与五级体系）=====
+// 仅用于 ContinueCard 等按 lessonId 反查标题的场景。
+// 刻意不进入 curriculum 主数组，以免污染进度统计（publicLessons/totalLessons）
+// 与导师看板；其访问门控走 accessControl 里的 isSkillPath 那一套，与等级无关。
+export const skillLessons: { lessonId: string; title: string }[] = [
+  { lessonId: 'skill-domain', title: '域名结构与网址识别' },
+  { lessonId: 'skill-phishing', title: '钓鱼网站识别' },
+  { lessonId: 'skill-shortcuts', title: '电脑快捷键基础（Windows + Mac）' },
+  { lessonId: 'skill-browser', title: '浏览器快捷键实战' },
+]
+
 // 课程内容的目录前缀（getLessonIdByPath 用）
 const CONTENT_PREFIXES = [
   'content/modules/',
