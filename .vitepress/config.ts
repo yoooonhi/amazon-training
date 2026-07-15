@@ -27,6 +27,15 @@ export default defineConfig({
             { text: '能力地图', link: '/content/00-overview/overview' },
           ],
         },
+        // ===== 技能补给站（通用数字技能，全员可见）=====
+        {
+          text: '🧰 技能补给站',
+          collapsed: true,
+          items: [
+            { text: '域名结构与网址识别', link: '/content/skills/domain-basics' },
+            { text: '钓鱼网站识别', link: '/content/skills/phishing-detection' },
+          ],
+        },
         {
           text: '入门1 · 平台认知与账号安全',
           collapsed: false,
@@ -302,15 +311,6 @@ export default defineConfig({
             { text: '4.3 平台政策变动应对', link: '/content/expert/e4-risk-management/03-policy-change-response' },
             { text: '4.4 黑天鹅预案', link: '/content/expert/e4-risk-management/04-black-swan-playbook' },
             { text: '4.5 风险预警与应急预案（实操）', link: '/content/expert/e4-risk-management/05-risk-playbook-practice' },
-          ],
-        },
-        // ===== 技能补给站（通用数字技能，全员可见）=====
-        {
-          text: '🧰 技能补给站',
-          collapsed: true,
-          items: [
-            { text: '域名结构与网址识别', link: '/content/skills/domain-basics' },
-            { text: '钓鱼网站识别', link: '/content/skills/phishing-detection' },
           ],
         },
       ],
