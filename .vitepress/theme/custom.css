@@ -5,6 +5,12 @@
   align-items: center;
 }
 
+/* 课程门控：被拦截时隐藏课程正文（.vp-doc），只保留 CourseGate 提示卡。
+   侧边栏与顶部导航不受影响。class 由 CourseGate.vue 在拦截时加到 <html>。 */
+html.doc-gated .vp-doc {
+  display: none;
+}
+
 /* ===== 移动端适配 ===== */
 
 /* 表格允许横向滚动（课程正文里的大量对比表在窄屏会溢出） */

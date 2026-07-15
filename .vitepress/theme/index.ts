@@ -21,9 +21,9 @@ export default {
   Layout: () => {
     return h(DefaultTheme.Layout, null, {
       'nav-bar-content-after': () => h(AuthPanel),
+      'doc-before': () => h(CourseGate),
       'doc-after': () => [h(Comments), h(SiteFooter)],
       'layout-bottom': () => h(ModalDialog),
-      'layout-top': () => h(CourseGate),
     })
   },
   enhanceApp({ app, router }) {

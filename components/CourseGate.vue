@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { authState, supabase } from '../lib/supabase'
 import {
   getLevelByPath, isLevelAccessible, isMentorRole,
@@ -27,6 +27,16 @@ const isSkillBlocked = computed(() => {
   return !isSkillAccessible(currentPath.value, role.value, isLoggedIn.value)
 })
 
+// 是否处于拦截状态（任一遮罩显示）
+const isBlocked = computed(() => isMounted.value && (blockedLevel.value || isSkillBlocked.value))
+
+// 被拦截时给 <html> 加 class，隐藏课程正文 .vp-doc（保留侧边栏与导航）
+function syncGateClass() {
+  if (typeof document === 'undefined') return
+  document.documentElement.classList.toggle('doc-gated', !!isBlocked.value)
+}
+watch(isBlocked, syncGateClass)
+
 // 弹出登录/注册面板（触发导航栏 AuthPanel 打开）
 function openAuthPanel() {
   window.dispatchEvent(new CustomEvent('open-auth-panel'))
@@ -51,6 +61,8 @@ function refreshPath() {
 onMounted(() => {
   isMounted.value = true
   refreshPath()
+  // 首次同步一次正文可见性（watch immediate:false，这里兜底初始态）
+  syncGateClass()
 
   // 订阅全局登录状态
   authState.onChange((_user, profile) => updateRole(profile))
@@ -87,8 +99,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <!-- 主课程被拦截：内测中 -->
-  <div v-if="isMounted && blockedLevel" class="course-gate-overlay">
+  <!-- 主课程被拦截：内测中（仅内容区，保留侧边栏与导航） -->
+  <div v-if="isMounted && blockedLevel" class="course-gate">
     <div class="gate-card">
       <div class="gate-icon">🔒</div>
       <h2 class="gate-title">{{ blockedLevel }}课程 · 内测中</h2>
@@ -104,8 +116,8 @@ onMounted(() => {
     </div>
   </div>
 
-  <!-- 技能补给站被拦截：需登录 -->
-  <div v-else-if="isMounted && isSkillBlocked" class="course-gate-overlay">
+  <!-- 技能补给站被拦截：需登录（仅内容区，保留侧边栏与导航） -->
+  <div v-else-if="isMounted && isSkillBlocked" class="course-gate">
     <div class="gate-card">
       <div class="gate-icon">🔐</div>
       <h2 class="gate-title">登录后查看</h2>
@@ -123,15 +135,11 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.course-gate-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 999;
+.course-gate {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--vp-c-bg);
-  padding: 1.5rem;
+  padding: 2rem 1.5rem;
 }
 .gate-card {
   max-width: 420px;
