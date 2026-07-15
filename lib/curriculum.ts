@@ -357,6 +357,8 @@ export const pathToLessonId: Record<string, string> = {
   // ===== 技能补给站 =====
   'domain-basics': 'skill-domain',
   'phishing-detection': 'skill-phishing',
+  'system-shortcuts': 'skill-shortcuts',
+  'browser-shortcuts': 'skill-browser',
 }
 
 // 课程内容的目录前缀（getLessonIdByPath 用）
