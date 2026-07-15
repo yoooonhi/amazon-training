@@ -25,7 +25,8 @@ const filterStatus = ref('all') // all | active | stale | done | new
 // 课程等级授权
 const accessMap = ref({}) // { userId: ['初级', '高级'] }
 const selectedIds = ref(new Set()) // 批量授权勾选的学员 id
-const batchLevel = ref('') // 批量授权选中的等级
+const batchLevels = ref(new Set()) // 批量授权选中的等级（多选）
+const batchDropdownOpen = ref(false) // 自定义多选下拉展开状态
 const accessBusy = ref(false) // 授权操作进行中
 // 可授权的等级（不含入门，入门默认开放）
 const GRANTABLE_LEVELS = LEVELS.filter((l) => l !== '入门')
@@ -119,7 +120,7 @@ async function loadData() {
       lastActive,
       daysSinceActive,
       isStale: daysSinceActive !== null && daysSinceActive >= 3,
-      accessLevels: aMap[p.id] || [],
+      accessLevels: sortLevels(aMap[p.id] || []),
     }
   })
   // 拉网站访问统计（仅管理员能读，RLS 保证）
@@ -224,7 +225,7 @@ async function toggleAccess(student, level) {
         granted_by: mentorId,
       }, { onConflict: 'user_id,level' })
       if (error) { await modalAlert('授权失败: ' + error.message, '出错了'); return }
-      student.accessLevels = [...student.accessLevels, level]
+      student.accessLevels = sortLevels([...student.accessLevels, level])
     }
     // 同步到 accessMap
     accessMap.value[student.profile.id] = student.accessLevels
@@ -241,31 +242,50 @@ function toggleSelect(id) {
   selectedIds.value = s
 }
 
-// 批量授权
+// 权限等级按固定顺序排序（初级→中级→高级→进阶）
+function sortLevels(levels) {
+  return GRANTABLE_LEVELS.filter((lv) => levels.includes(lv))
+}
+
+// 多选下拉：切换某等级的选中状态
+function toggleBatchLevel(lv) {
+  const s = new Set(batchLevels.value)
+  if (s.has(lv)) s.delete(lv)
+  else s.add(lv)
+  batchLevels.value = s
+}
+
+// 批量授权（支持多等级）
 async function batchGrant() {
   if (accessBusy.value) return
   const ids = [...selectedIds.value]
+  const levels = GRANTABLE_LEVELS.filter((lv) => batchLevels.value.has(lv))
   if (ids.length === 0) { await modalAlert('请先勾选学员', '提示'); return }
-  if (!batchLevel.value) { await modalAlert('请选择要授权的等级', '提示'); return }
-  const ok = await modalConfirm(`确定为选中的 ${ids.length} 名学员授权「${batchLevel.value}」课程？`, '批量授权')
+  if (levels.length === 0) { await modalAlert('请选择要授权的等级', '提示'); return }
+  const ok = await modalConfirm(`确定为选中的 ${ids.length} 名学员授权「${levels.join('、')}」课程？`, '批量授权')
   if (!ok) return
   accessBusy.value = true
   try {
     const mentorId = await getMentorId()
-    const rows = ids.map((uid) => ({ user_id: uid, level: batchLevel.value, granted_by: mentorId }))
+    const rows = []
+    ids.forEach((uid) => {
+      levels.forEach((lv) => rows.push({ user_id: uid, level: lv, granted_by: mentorId }))
+    })
     const { error } = await supabase.from('course_access').upsert(rows, { onConflict: 'user_id,level' })
     if (error) { await modalAlert('批量授权失败: ' + error.message, '出错了'); return }
     // 同步本地状态
     students.value.forEach((s) => {
       if (selectedIds.value.has(s.profile.id)) {
-        if (!s.accessLevels.includes(batchLevel.value)) {
-          s.accessLevels = [...s.accessLevels, batchLevel.value]
-        }
+        levels.forEach((lv) => {
+          if (!s.accessLevels.includes(lv)) s.accessLevels.push(lv)
+        })
+        s.accessLevels = sortLevels(s.accessLevels)
         accessMap.value[s.profile.id] = s.accessLevels
       }
     })
-    await modalAlert(`已为 ${ids.length} 名学员授权「${batchLevel.value}」`, '完成')
+    await modalAlert(`已为 ${ids.length} 名学员授权「${levels.join('、')}」`, '完成')
     selectedIds.value = new Set()
+    batchLevels.value = new Set()
   } finally {
     accessBusy.value = false
   }
@@ -470,6 +490,10 @@ function isAdminAuthor(c) {
 
 onMounted(async () => {
   isMounted.value = true
+  // 点击外部关闭多选下拉
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.multi-select')) batchDropdownOpen.value = false
+  })
   await checkMentor()
   if (isMentor.value) {
     try {
@@ -670,10 +694,20 @@ onMounted(async () => {
       <!-- 批量授权栏 -->
       <div v-if="students.length > 0" class="batch-bar">
         <span class="batch-info">已选 {{ selectedIds.size }} 人</span>
-        <select v-model="batchLevel" class="batch-select">
-          <option value="">选择等级...</option>
-          <option v-for="lv in GRANTABLE_LEVELS" :key="lv" :value="lv">{{ lv }}</option>
-        </select>
+        <!-- 自定义多选下拉 -->
+        <div class="multi-select" @click.stop>
+          <button class="multi-select-trigger" @click="batchDropdownOpen = !batchDropdownOpen">
+            <span v-if="batchLevels.size === 0" class="placeholder">选择等级...</span>
+            <span v-else class="selected-text">{{ GRANTABLE_LEVELS.filter(l => batchLevels.has(l)).join('、') }}</span>
+            <span class="caret" :class="{ open: batchDropdownOpen }">▾</span>
+          </button>
+          <div v-if="batchDropdownOpen" class="multi-select-dropdown">
+            <label v-for="lv in GRANTABLE_LEVELS" :key="lv" class="multi-option" :class="{ checked: batchLevels.has(lv) }">
+              <input type="checkbox" :checked="batchLevels.has(lv)" @change="toggleBatchLevel(lv)" />
+              <span>{{ lv }}</span>
+            </label>
+          </div>
+        </div>
         <button class="batch-btn" :disabled="accessBusy" @click="batchGrant">🔑 批量授权</button>
         <button v-if="selectedIds.size > 0" class="batch-clear" @click="selectedIds = new Set()">清空选择</button>
       </div>
@@ -1428,14 +1462,61 @@ h3 {
   border: 1px solid var(--vp-c-divider);
 }
 .batch-info { font-size: 0.85rem; color: var(--vp-c-text-2); font-weight: 600; min-width: 5rem; }
-.batch-select {
-  padding: 0.4rem 0.6rem;
+
+/* 自定义多选下拉 */
+.multi-select {
+  position: relative;
+  min-width: 130px;
+}
+.multi-select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.4rem 0.7rem;
   border-radius: 6px;
   border: 1px solid var(--vp-c-divider);
   background: var(--vp-c-bg);
   font-size: 0.85rem;
   cursor: pointer;
 }
+.multi-select-trigger:hover { border-color: var(--vp-c-brand-2); }
+.multi-select-trigger .placeholder { color: var(--vp-c-text-3); }
+.multi-select-trigger .selected-text { color: var(--vp-c-text-1); font-weight: 600; }
+.multi-select-trigger .caret {
+  font-size: 0.7rem;
+  color: var(--vp-c-text-3);
+  transition: transform 0.2s;
+}
+.multi-select-trigger .caret.open { transform: rotate(180deg); }
+.multi-select-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: var(--vp-c-bg);
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  padding: 0.3rem;
+  overflow: hidden;
+}
+.multi-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: var(--vp-c-text-1);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.multi-option:hover { background: var(--vp-c-bg-soft); }
+.multi-option.checked { color: var(--vp-c-brand-1); font-weight: 600; }
+.multi-option input { accent-color: var(--vp-c-brand-1); cursor: pointer; }
 .batch-btn {
   padding: 0.4rem 1rem;
   border-radius: 6px;
