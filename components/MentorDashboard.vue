@@ -176,6 +176,8 @@ async function viewDetail(student) {
   selectedStudent.value = student
   detailProgress.value = []
   detailQuiz.value = []
+  // 滚动到页面顶部
+  window.scrollTo({ top: 0, behavior: 'smooth' })
   // 拉该学生的进度明细
   const { data: prog } = await supabase.from('progress').select('lesson_id, completed, completed_at').eq('user_id', student.profile.id).eq('completed', true)
   detailProgress.value = prog || []
