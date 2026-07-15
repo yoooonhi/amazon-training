@@ -1,6 +1,8 @@
-// 7 个模块的课程结构（lessonId 与内容文件实际使用的一致）
+// 课程结构（lessonId 与内容文件实际使用的一致）
+// level 字段标记所属等级：入门（全体可见）/ 初级等（导师内测中）
 export const curriculum = [
   {
+    level: '入门' as const,
     week: 1,
     title: '平台认知与账号安全',
     lessons: [
@@ -10,6 +12,7 @@ export const curriculum = [
     ],
   },
   {
+    level: '入门' as const,
     week: 2,
     title: '选品与采购',
     lessons: [
@@ -18,6 +21,7 @@ export const curriculum = [
     ],
   },
   {
+    level: '入门' as const,
     week: 3,
     title: 'Listing搭建基本功',
     lessons: [
@@ -26,6 +30,7 @@ export const curriculum = [
     ],
   },
   {
+    level: '入门' as const,
     week: 4,
     title: '库存与FBA物流',
     lessons: [
@@ -33,6 +38,7 @@ export const curriculum = [
     ],
   },
   {
+    level: '入门' as const,
     week: 5,
     title: '广告体系',
     lessons: [
@@ -41,6 +47,7 @@ export const curriculum = [
     ],
   },
   {
+    level: '入门' as const,
     week: 6,
     title: '定价与利润',
     lessons: [
@@ -49,6 +56,7 @@ export const curriculum = [
     ],
   },
   {
+    level: '入门' as const,
     week: 7,
     title: '日常运营与判断力',
     lessons: [
@@ -57,10 +65,51 @@ export const curriculum = [
       'm6-07-returns-exceptions',
     ],
   },
+  // ===== 初级（导师内测中）=====
+  {
+    level: '初级' as const,
+    week: 1,
+    title: '广告优化实战',
+    lessons: [
+      'b1-01', 'b1-02', 'b1-03', 'b1-04', 'b1-05',
+    ],
+  },
+  {
+    level: '初级' as const,
+    week: 2,
+    title: 'Listing持续优化',
+    lessons: [
+      'b2-01', 'b2-02', 'b2-03', 'b2-04', 'b2-05',
+    ],
+  },
+  {
+    level: '初级' as const,
+    week: 3,
+    title: '库存精细化运营',
+    lessons: [
+      'b3-01', 'b3-02', 'b3-03', 'b3-04',
+    ],
+  },
+  {
+    level: '初级' as const,
+    week: 4,
+    title: '定价与促销策略',
+    lessons: [
+      'b4-01', 'b4-02', 'b4-03', 'b4-04',
+    ],
+  },
 ]
 
+// 所有课程（含受保护等级）
 export const allLessons = curriculum.flatMap(w => w.lessons)
-export const totalLessons = allLessons.length
+
+// 仅对公众开放的课程（普通学员可见的进度分母，不含受保护等级）
+export const publicLessons = curriculum
+  .filter(w => w.level === '入门')
+  .flatMap(w => w.lessons)
+
+// totalLessons 用于进度分母：保持为入门课数量，避免普通学员看到分母变大
+export const totalLessons = publicLessons.length
 
 // URL 路径 → lessonId 的权威映射表
 // lessonId 命名规则在模块间不统一（m1-m4 用纯课号 m4-04，m5-m7 带完整文件名），
@@ -123,14 +172,48 @@ export const pathToLessonId: Record<string, string> = {
   'm6-daily/05-common-mistakes': 'm6-05-common-mistakes',
   'm6-daily/06-hijack-buybox': 'm6-06-hijack-buybox',
   'm6-daily/07-returns-exceptions': 'm6-07-returns-exceptions',
+  // ===== 初级课程（导师内测中）=====
+  'b1-ads-optimization/01-search-term-attribution': 'b1-01',
+  'b1-ads-optimization/02-negative-keyword-pool': 'b1-02',
+  'b1-ads-optimization/03-dayparting-tos': 'b1-03',
+  'b1-ads-optimization/04-acos-reduction-loop': 'b1-04',
+  'b1-ads-optimization/05-weekly-checklist-practice': 'b1-05',
+  'b2-listing-optimization/01-ab-testing': 'b2-01',
+  'b2-listing-optimization/02-rank-monitoring': 'b2-02',
+  'b2-listing-optimization/03-search-terms-iteration': 'b2-03',
+  'b2-listing-optimization/04-image-ctr': 'b2-04',
+  'b2-listing-optimization/05-listing-audit-practice': 'b2-05',
+  'b3-inventory-advanced/01-replenishment-model': 'b3-01',
+  'b3-inventory-advanced/02-stock-budget': 'b3-02',
+  'b3-inventory-advanced/03-stagnant-inventory': 'b3-03',
+  'b3-inventory-advanced/04-replenishment-practice': 'b3-04',
+  'b4-pricing-strategy/01-competitor-pricing': 'b4-01',
+  'b4-pricing-strategy/02-promo-rhythm': 'b4-02',
+  'b4-pricing-strategy/03-price-elasticity': 'b4-03',
+  'b4-pricing-strategy/04-monthly-promo-plan': 'b4-04',
 }
+
+// 课程内容的目录前缀（getLessonIdByPath 用）
+const CONTENT_PREFIXES = [
+  'content/modules/',
+  'content/beginner/',
+  'content/intermediate/',
+  'content/advanced/',
+  'content/expert/',
+]
 
 // 根据页面相对路径推导 lessonId（Comments 组件零侵入注入用）
 export function getLessonIdByPath(relativePath: string): string | null {
-  if (!relativePath || !relativePath.startsWith('content/modules/')) return null
-  // content/modules/m4-ads/04-be-acos.md → m4-ads/04-be-acos
-  const key = relativePath
-    .replace('content/modules/', '')
-    .replace(/\.md$/, '')
-  return pathToLessonId[key] || null
+  if (!relativePath) return null
+  // 尝试匹配已知的内容目录前缀
+  for (const prefix of CONTENT_PREFIXES) {
+    if (relativePath.startsWith(prefix)) {
+      const key = relativePath
+        .replace(prefix, '')
+        .replace(/\.md$/, '')
+      const id = pathToLessonId[key]
+      if (id) return id
+    }
+  }
+  return null
 }

@@ -161,7 +161,7 @@ async function viewDetail(student) {
 function lessonTitle(lessonId) {
   for (const w of curriculum) {
     if (w.lessons.includes(lessonId)) {
-      return `入门${w.week} · ${lessonId}`
+      return `${w.level}${w.week} · ${lessonId}`
     }
   }
   return lessonId

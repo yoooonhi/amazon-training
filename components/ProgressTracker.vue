@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { supabase, authState } from '../lib/supabase'
 import { curriculum, totalLessons } from '../lib/curriculum'
+import { isMentorRole } from '../lib/accessControl'
 
 const START_KEY = 'amazon-training-start-date'
 const LOCAL_PROGRESS_KEY = 'amazon-training-progress'
@@ -11,6 +12,13 @@ const startDate = ref(null)
 const isMounted = ref(false)
 const isLoggedIn = ref(false)
 const loading = ref(false)
+const isMentor = ref(false)
+
+// 按角色过滤：普通学员只看入门模块，导师看全部
+const visibleCurriculum = computed(() => {
+  if (isMentor.value) return curriculum
+  return curriculum.filter(w => w.level === '入门')
+})
 
 const completedCount = computed(() => Object.values(progress.value).filter(v => v.completed).length)
 const overallPercent = computed(() => Math.round((completedCount.value / totalLessons) * 100))
@@ -92,8 +100,9 @@ async function migrateLocalToRemote() {
 onMounted(() => {
   loadStartDate()
   isMounted.value = true
-  authState.onChange(async (user) => {
+  authState.onChange(async (user, profile) => {
     isLoggedIn.value = !!user
+    isMentor.value = isMentorRole(profile?.role)
     if (user) {
       await loadRemoteProgress()
       await migrateLocalToRemote()
@@ -106,6 +115,13 @@ onMounted(() => {
   supabase.auth.getSession().then(async ({ data }) => {
     isLoggedIn.value = !!data.session?.user
     if (data.session?.user) {
+      // 补拉 profile 判断导师身份
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', data.session.user.id)
+        .single()
+      isMentor.value = isMentorRole(profile?.role)
       await loadRemoteProgress()
     } else {
       // 未登录，进度清空（必须登录才显示进度）
@@ -141,9 +157,9 @@ onMounted(() => {
     </div>
 
     <div class="week-list">
-      <div v-for="w in curriculum" :key="w.week" class="week-item" :class="{ active: currentWeek() === w.week }">
+      <div v-for="w in visibleCurriculum" :key="w.level + '-' + w.week" class="week-item" :class="{ active: w.level === '入门' && currentWeek() === w.week }">
         <div class="week-header">
-          <span class="week-label">入门{{ w.week }}</span>
+          <span class="week-label">{{ w.level }}{{ w.week }}</span>
           <span class="week-title">{{ w.title }}</span>
           <span class="week-pct">{{ weekPercent(w.lessons) }}%</span>
         </div>

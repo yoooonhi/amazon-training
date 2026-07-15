@@ -10,7 +10,9 @@ import AuthPanel from '../../components/AuthPanel.vue'
 import Comments from '../../components/Comments.vue'
 import ProfitCalculator from '../../components/ProfitCalculator.vue'
 import ModalDialog from '../../components/ModalDialog.vue'
+import CourseGate from '../../components/CourseGate.vue'
 import { recordVisit } from '../../lib/visitTracker'
+import { setupSidebarGuard } from '../../lib/sidebarGuard'
 import './custom.css'
 
 export default {
@@ -20,6 +22,7 @@ export default {
       'nav-bar-content-after': () => h(AuthPanel),
       'doc-after': () => h(Comments),
       'layout-bottom': () => h(ModalDialog),
+      'layout-top': () => h(CourseGate),
     })
   },
   enhanceApp({ app, router }) {
@@ -36,9 +39,13 @@ export default {
     if (router) {
       router.onAfterRouteChanged = () => {
         recordVisit()
+        // 路由切换后重新检查侧边栏可见性（角色可能已变）
+        setupSidebarGuard()
       }
     }
     // 首次进入记一次（onAfterRouteChanged 不会在首次加载时触发）
     recordVisit()
+    // 侧边栏权限守卫：非导师隐藏受保护等级的侧边栏分组
+    setupSidebarGuard()
   },
 } satisfies Theme

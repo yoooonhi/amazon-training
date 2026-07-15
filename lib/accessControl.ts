@@ -1,0 +1,72 @@
+/**
+ * 课程等级权限控制
+ *
+ * 五级体系：入门 / 初级 / 中级 / 高级 / 进阶
+ * - 入门：全体学员可见
+ * - 其余等级：仅导师（mentor / admin）可见，内测阶段
+ *
+ * 开放某级课程给全体学员：往 publicLevels 里加即可，导师始终可访问所有内容。
+ */
+
+// 所有课程等级（顺序即展示顺序）
+export const LEVELS = ['入门', '初级', '中级', '高级', '进阶'] as const
+export type Level = (typeof LEVELS)[number]
+
+// 等级 → URL 路径前缀（对应 content/ 下的目录名）
+export const LEVEL_PATH_PREFIX: Record<Level, string> = {
+  入门: '/content/modules/',
+  初级: '/content/beginner/',
+  中级: '/content/intermediate/',
+  高级: '/content/advanced/',
+  进阶: '/content/expert/',
+}
+
+// 反向映射：路径前缀 → 等级
+const PREFIX_TO_LEVEL: Record<string, Level> = Object.fromEntries(
+  Object.entries(LEVEL_PATH_PREFIX).map(([level, prefix]) => [prefix, level as Level])
+)
+
+/**
+ * 当前已对全体学员开放的等级。
+ * 导师（mentor / admin）始终可访问所有等级，不受此限制。
+ * 要开放新等级，往数组里加即可。
+ */
+export const publicLevels: Level[] = ['入门']
+
+/**
+ * 判断一个 role 是否为导师（含管理员）。
+ * 全项目统一口径：mentor 和 admin 都放行。
+ */
+export function isMentorRole(role: string | null | undefined): boolean {
+  return role === 'mentor' || role === 'admin'
+}
+
+/**
+ * 根据当前页面路径，判断它属于哪个等级。
+ * 不属于任何等级（如首页、总览页）返回 null。
+ */
+export function getLevelByPath(path: string): Level | null {
+  for (const [prefix, level] of Object.entries(PREFIX_TO_LEVEL)) {
+    if (path.startsWith(prefix)) return level
+  }
+  return null
+}
+
+/**
+ * 判断某等级是否对指定角色开放。
+ * - 导师：所有等级都开放
+ * - 普通学员/未登录：仅 publicLevels 中的等级开放
+ */
+export function isLevelAccessible(level: Level | null, role: string | null | undefined): boolean {
+  if (!level) return true // 非课程页面，不拦截
+  if (isMentorRole(role)) return true // 导师全放行
+  return publicLevels.includes(level)
+}
+
+/**
+ * 判断某路径是否对指定角色开放。
+ * 便捷组合：getLevelByPath + isLevelAccessible。
+ */
+export function isPathAccessible(path: string, role: string | null | undefined): boolean {
+  return isLevelAccessible(getLevelByPath(path), role)
+}

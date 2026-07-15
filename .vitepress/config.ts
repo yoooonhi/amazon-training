@@ -125,6 +125,49 @@ export default defineConfig({
             { text: '7.7 常见误判', link: '/content/modules/m6-daily/05-common-mistakes' },
           ],
         },
+        // ===== 初级（导师内测中，普通学员侧边栏不显示）=====
+        {
+          text: '🔒 初级1 · 广告优化实战',
+          collapsed: true,
+          items: [
+            { text: '1.1 搜索词报表与归因窗口', link: '/content/beginner/b1-ads-optimization/01-search-term-attribution' },
+            { text: '1.2 否定词池搭建', link: '/content/beginner/b1-ads-optimization/02-negative-keyword-pool' },
+            { text: '1.3 分时调价与TOS抢占', link: '/content/beginner/b1-ads-optimization/03-dayparting-tos' },
+            { text: '1.4 ACOS压降闭环', link: '/content/beginner/b1-ads-optimization/04-acos-reduction-loop' },
+            { text: '1.5 周度优化清单（实操）', link: '/content/beginner/b1-ads-optimization/05-weekly-checklist-practice' },
+          ],
+        },
+        {
+          text: '🔒 初级2 · Listing持续优化',
+          collapsed: true,
+          items: [
+            { text: '2.1 文案A/B测试', link: '/content/beginner/b2-listing-optimization/01-ab-testing' },
+            { text: '2.2 关键词排名监控', link: '/content/beginner/b2-listing-optimization/02-rank-monitoring' },
+            { text: '2.3 Search Terms迭代', link: '/content/beginner/b2-listing-optimization/03-search-terms-iteration' },
+            { text: '2.4 图片点击率优化', link: '/content/beginner/b2-listing-optimization/04-image-ctr' },
+            { text: '2.5 Listing体检（实操）', link: '/content/beginner/b2-listing-optimization/05-listing-audit-practice' },
+          ],
+        },
+        {
+          text: '🔒 初级3 · 库存精细化运营',
+          collapsed: true,
+          items: [
+            { text: '3.1 补货量计算模型', link: '/content/beginner/b3-inventory-advanced/01-replenishment-model' },
+            { text: '3.2 备货资金预算', link: '/content/beginner/b3-inventory-advanced/02-stock-budget' },
+            { text: '3.3 滞销预警与处理', link: '/content/beginner/b3-inventory-advanced/03-stagnant-inventory' },
+            { text: '3.4 补货计划（实操）', link: '/content/beginner/b3-inventory-advanced/04-replenishment-practice' },
+          ],
+        },
+        {
+          text: '🔒 初级4 · 定价与促销策略',
+          collapsed: true,
+          items: [
+            { text: '4.1 竞品定价跟踪', link: '/content/beginner/b4-pricing-strategy/01-competitor-pricing' },
+            { text: '4.2 促销节奏设计', link: '/content/beginner/b4-pricing-strategy/02-promo-rhythm' },
+            { text: '4.3 价格弹性测试', link: '/content/beginner/b4-pricing-strategy/03-price-elasticity' },
+            { text: '4.4 月度促销表（实操）', link: '/content/beginner/b4-pricing-strategy/04-monthly-promo-plan' },
+          ],
+        },
       ],
     },
 
