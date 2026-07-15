@@ -1,3 +1,8 @@
+---
+title: 跟卖防御与Buy Box
+description: 讲清跟卖是怎么回事、怎么发现、怎么用亚马逊官方工具正确防御，以及 Buy Box 为什么决定你的销量。学完你能区分合法竞品、假冒、未授权三种跟卖者，会用 Brand Registry、Report a Violation、Project Zero 应对，并监控 Buy Box 占比。
+---
+
 # 7.4 跟卖防御与 Buy Box
 
 > **入门7：日常运营与判断力**

@@ -1,3 +1,8 @@
+---
+title: 广告报表解读
+description: 分清 Campaign、Targeting、Search Term、Placement 四张核心广告报表各自看什么、不该用它做什么。学完你懂得调价用 Targeting、找否定词和毕业词用搜索词报表、看完整关键词清单要用 Bulk Export，能快速判断每个问题该打开哪张报表。
+---
+
 # 5.8 广告报表解读
 
 > **入门5：广告体系**

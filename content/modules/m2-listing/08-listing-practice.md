@@ -1,3 +1,8 @@
+---
+title: Listing实操
+description: 从零搭一个完整合规的亚马逊 Listing 作为毕业作业，把关键词池、类目、标题、五点、Search Terms、七张图规划、后台属性七项串起来，按上线前 Checklist 逐项验收。
+---
+
 # 3.11 Listing实操
 
 > **入门3：Listing搭建基本功**

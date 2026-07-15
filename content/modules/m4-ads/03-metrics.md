@@ -1,3 +1,8 @@
+---
+title: 核心指标
+description: 把广告后台 Impressions、CTR、CPC、ACOS、ROAS、TACOS 这些核心指标翻译成人话，告诉你哪个数字说明广告有效、哪个说明在亏钱。学完你能算出每个指标的值，理解为什么只看 ACOS 不够必须配合 TACOS 看全局。
+---
+
 # 5.3 核心指标
 
 > **入门5：广告体系**

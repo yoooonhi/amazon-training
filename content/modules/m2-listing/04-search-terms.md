@@ -1,3 +1,8 @@
+---
+title: Search Terms
+description: 学会写亚马逊后台 Search Terms 隐藏关键词字段，用 250 字节限制塞进尽量多有效的同义词、场景词、人群词和西语法语词，掌握全小写空格分隔、不重复标题词的格式和字节计数方法。
+---
+
 # 3.5 Search Terms
 
 > **入门3：Listing搭建基本功**

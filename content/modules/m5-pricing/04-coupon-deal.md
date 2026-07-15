@@ -1,3 +1,8 @@
+---
+title: Coupon与Deal
+description: 搞清楚亚马逊 Coupon 优惠券和 Deal 秒杀促销的真实成本结构，学会用盈亏平衡增量销量公式判断促销到底划不划算，警惕 Coupon 和 Sale Price 叠加导致每单亏钱的致命风险。
+---
+
 # 6.4 Coupon与Deal
 
 > **入门6：定价与利润**
