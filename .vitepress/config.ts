@@ -168,6 +168,142 @@ export default defineConfig({
             { text: '4.4 月度促销表（实操）', link: '/content/beginner/b4-pricing-strategy/04-monthly-promo-plan' },
           ],
         },
+        // ===== 中级（导师内测中）=====
+        {
+          text: '🔒 中级1 · 新品冷启动全流程',
+          collapsed: true,
+          items: [
+            { text: '1.1 选款验证', link: '/content/intermediate/i1-cold-start/01-selection-validation' },
+            { text: '1.2 上架节奏规划', link: '/content/intermediate/i1-cold-start/02-launch-timeline' },
+            { text: '1.3 冷启动四阶段细化', link: '/content/intermediate/i1-cold-start/03-cold-start-four-phases' },
+            { text: '1.4 榜单冲刺打法', link: '/content/intermediate/i1-cold-start/04-ranking-push' },
+            { text: '1.5 首批评论策略', link: '/content/intermediate/i1-cold-start/05-first-reviews' },
+            { text: '1.6 流量结构搭建', link: '/content/intermediate/i1-cold-start/06-traffic-structure' },
+            { text: '1.7 新品0-60天作战计划（实操）', link: '/content/intermediate/i1-cold-start/07-launch-plan-practice' },
+          ],
+        },
+        {
+          text: '🔒 中级2 · 多SKU与产品线管理',
+          collapsed: true,
+          items: [
+            { text: '2.1 产品线规划', link: '/content/intermediate/i2-multi-sku/01-product-line-planning' },
+            { text: '2.2 新老品配比与资源分配', link: '/content/intermediate/i2-multi-sku/02-new-old-ratio' },
+            { text: '2.3 SKU精简与聚焦', link: '/content/intermediate/i2-multi-sku/03-sku-rationalization' },
+            { text: '2.4 产品生命周期管理', link: '/content/intermediate/i2-multi-sku/04-lifecycle-management' },
+            { text: '2.5 产品线健康度盘点（实操）', link: '/content/intermediate/i2-multi-sku/05-portfolio-review-practice' },
+          ],
+        },
+        {
+          text: '🔒 中级3 · 品牌化基础',
+          collapsed: true,
+          items: [
+            { text: '3.1 品牌备案深度用法', link: '/content/intermediate/i3-branding/01-brand-registry-deep' },
+            { text: '3.2 A+高级版与品牌故事', link: '/content/intermediate/i3-branding/02-a-plus-premium' },
+            { text: '3.3 品牌旗舰店搭建', link: '/content/intermediate/i3-branding/03-brand-store' },
+            { text: '3.4 Brand Analytics实战', link: '/content/intermediate/i3-branding/04-brand-analytics' },
+            { text: '3.5 品牌基础搭建清单（实操）', link: '/content/intermediate/i3-branding/05-brand-foundation-practice' },
+          ],
+        },
+        {
+          text: '🔒 中级4 · 数据分析与运营看板',
+          collapsed: true,
+          items: [
+            { text: '4.1 Business Reports深读', link: '/content/intermediate/i4-data-analysis/01-business-reports' },
+            { text: '4.2 第三方工具实战', link: '/content/intermediate/i4-data-analysis/02-third-party-tools' },
+            { text: '4.3 用数据找增长点', link: '/content/intermediate/i4-data-analysis/03-growth-diagnosis' },
+            { text: '4.4 自建运营看板', link: '/content/intermediate/i4-data-analysis/04-dashboard-building' },
+          ],
+        },
+        // ===== 高级（导师内测中）=====
+        {
+          text: '🔒 高级1 · 品牌保护与长期主义',
+          collapsed: true,
+          items: [
+            { text: '1.1 Transparency透明计划', link: '/content/advanced/a1-brand-protection/01-transparency-program' },
+            { text: '1.2 Project Zero与自动保护', link: '/content/advanced/a1-brand-protection/02-project-zero' },
+            { text: '1.3 跟卖打击SOP', link: '/content/advanced/a1-brand-protection/03-hijack-defense-sop' },
+            { text: '1.4 品牌资产沉淀', link: '/content/advanced/a1-brand-protection/04-brand-assets' },
+            { text: '1.5 品牌防御体系搭建（实操）', link: '/content/advanced/a1-brand-protection/05-defense-strategy-practice' },
+          ],
+        },
+        {
+          text: '🔒 高级2 · 多站点全球扩张',
+          collapsed: true,
+          items: [
+            { text: '2.1 美欧日站点差异', link: '/content/advanced/a2-global-expansion/01-site-differences' },
+            { text: '2.2 自发货vs FBA选择', link: '/content/advanced/a2-global-expansion/02-fba-vs-fbm-choice' },
+            { text: '2.3 跨境物流方案', link: '/content/advanced/a2-global-expansion/03-cross-border-logistics' },
+            { text: '2.4 Listing本地化', link: '/content/advanced/a2-global-expansion/04-localization' },
+            { text: '2.5 各国税务合规', link: '/content/advanced/a2-global-expansion/05-tax-compliance' },
+            { text: '2.6 新站点扩张可行性评估（实操）', link: '/content/advanced/a2-global-expansion/06-expansion-feasibility-practice' },
+          ],
+        },
+        {
+          text: '🔒 高级3 · 合规深水区与申诉',
+          collapsed: true,
+          items: [
+            { text: '3.1 账号冻结申诉全流程', link: '/content/advanced/a3-compliance-appeal/01-account-suspension-appeal' },
+            { text: '3.2 侵权处理', link: '/content/advanced/a3-compliance-appeal/02-infringement' },
+            { text: '3.3 视频验证应对', link: '/content/advanced/a3-compliance-appeal/03-video-verification' },
+            { text: '3.4 评论违规与恢复', link: '/content/advanced/a3-compliance-appeal/04-review-manipulation' },
+            { text: '3.5 撰写一份POA申诉书（实操）', link: '/content/advanced/a3-compliance-appeal/05-appeal-writing-practice' },
+          ],
+        },
+        {
+          text: '🔒 高级4 · 高阶广告与流量组合',
+          collapsed: true,
+          items: [
+            { text: '4.1 DSP广告入门', link: '/content/advanced/a4-advanced-ads/01-dsp-ads' },
+            { text: '4.2 SD再营销', link: '/content/advanced/a4-advanced-ads/02-sd-retargeting' },
+            { text: '4.3 品牌广告组合', link: '/content/advanced/a4-advanced-ads/03-brand-ads-combo' },
+            { text: '4.4 全漏斗流量打法设计（实操）', link: '/content/advanced/a4-advanced-ads/04-full-funnel-strategy' },
+          ],
+        },
+        // ===== 进阶（导师内测中）=====
+        {
+          text: '🔒 进阶1 · 团队运营与SOP',
+          collapsed: true,
+          items: [
+            { text: '1.1 运营岗位分工', link: '/content/expert/e1-team-sop/01-role-design' },
+            { text: '1.2 KPI设计', link: '/content/expert/e1-team-sop/02-kpi-design' },
+            { text: '1.3 SOP化与流程沉淀', link: '/content/expert/e1-team-sop/03-sop-system' },
+            { text: '1.4 新人培训体系', link: '/content/expert/e1-team-sop/04-training-system' },
+            { text: '1.5 岗位分工+KPI+SOP框架（实操）', link: '/content/expert/e1-team-sop/05-team-framework-practice' },
+          ],
+        },
+        {
+          text: '🔒 进阶2 · 财务与现金流管理',
+          collapsed: true,
+          items: [
+            { text: '2.1 资金预算与占用', link: '/content/expert/e2-finance-cashflow/01-capital-budget' },
+            { text: '2.2 库存周转天数管理', link: '/content/expert/e2-finance-cashflow/02-turnover-management' },
+            { text: '2.3 利润盘汇总', link: '/content/expert/e2-finance-cashflow/03-profit-aggregation' },
+            { text: '2.4 现金流预警', link: '/content/expert/e2-finance-cashflow/04-cashflow-warning' },
+            { text: '2.5 利润+现金流监控表（实操）', link: '/content/expert/e2-finance-cashflow/05-financial-model-practice' },
+          ],
+        },
+        {
+          text: '🔒 进阶3 · 战略选品与品类布局',
+          collapsed: true,
+          items: [
+            { text: '3.1 品类卡位分析', link: '/content/expert/e3-category-strategy/01-category-positioning' },
+            { text: '3.2 产品矩阵设计', link: '/content/expert/e3-category-strategy/02-product-matrix' },
+            { text: '3.3 护城河构建', link: '/content/expert/e3-category-strategy/03-moat-building' },
+            { text: '3.4 长期品类规划', link: '/content/expert/e3-category-strategy/04-long-term-planning' },
+            { text: '3.5 品类战略规划（实操）', link: '/content/expert/e3-category-strategy/05-category-strategy-practice' },
+          ],
+        },
+        {
+          text: '🔒 进阶4 · 风险管理与危机应对',
+          collapsed: true,
+          items: [
+            { text: '4.1 账号风险预警体系', link: '/content/expert/e4-risk-management/01-account-risk-system' },
+            { text: '4.2 库存与资金风险', link: '/content/expert/e4-risk-management/02-inventory-capital-risk' },
+            { text: '4.3 平台政策变动应对', link: '/content/expert/e4-risk-management/03-policy-change-response' },
+            { text: '4.4 黑天鹅预案', link: '/content/expert/e4-risk-management/04-black-swan-playbook' },
+            { text: '4.5 风险预警与应急预案（实操）', link: '/content/expert/e4-risk-management/05-risk-playbook-practice' },
+          ],
+        },
       ],
     },
 

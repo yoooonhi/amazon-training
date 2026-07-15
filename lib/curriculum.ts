@@ -98,6 +98,105 @@ export const curriculum = [
       'b4-01', 'b4-02', 'b4-03', 'b4-04',
     ],
   },
+  // ===== 中级（导师内测中）=====
+  {
+    level: '中级' as const,
+    week: 1,
+    title: '新品冷启动全流程',
+    lessons: [
+      'i1-01', 'i1-02', 'i1-03', 'i1-04', 'i1-05', 'i1-06', 'i1-07',
+    ],
+  },
+  {
+    level: '中级' as const,
+    week: 2,
+    title: '多SKU与产品线管理',
+    lessons: [
+      'i2-01', 'i2-02', 'i2-03', 'i2-04', 'i2-05',
+    ],
+  },
+  {
+    level: '中级' as const,
+    week: 3,
+    title: '品牌化基础',
+    lessons: [
+      'i3-01', 'i3-02', 'i3-03', 'i3-04', 'i3-05',
+    ],
+  },
+  {
+    level: '中级' as const,
+    week: 4,
+    title: '数据分析与运营看板',
+    lessons: [
+      'i4-01', 'i4-02', 'i4-03', 'i4-04',
+    ],
+  },
+  // ===== 高级（导师内测中）=====
+  {
+    level: '高级' as const,
+    week: 1,
+    title: '品牌保护与长期主义',
+    lessons: [
+      'a1-01', 'a1-02', 'a1-03', 'a1-04', 'a1-05',
+    ],
+  },
+  {
+    level: '高级' as const,
+    week: 2,
+    title: '多站点全球扩张',
+    lessons: [
+      'a2-01', 'a2-02', 'a2-03', 'a2-04', 'a2-05', 'a2-06',
+    ],
+  },
+  {
+    level: '高级' as const,
+    week: 3,
+    title: '合规深水区与申诉',
+    lessons: [
+      'a3-01', 'a3-02', 'a3-03', 'a3-04', 'a3-05',
+    ],
+  },
+  {
+    level: '高级' as const,
+    week: 4,
+    title: '高阶广告与流量组合',
+    lessons: [
+      'a4-01', 'a4-02', 'a4-03', 'a4-04',
+    ],
+  },
+  // ===== 进阶（导师内测中）=====
+  {
+    level: '进阶' as const,
+    week: 1,
+    title: '团队运营与SOP',
+    lessons: [
+      'e1-01', 'e1-02', 'e1-03', 'e1-04', 'e1-05',
+    ],
+  },
+  {
+    level: '进阶' as const,
+    week: 2,
+    title: '财务与现金流管理',
+    lessons: [
+      'e2-01', 'e2-02', 'e2-03', 'e2-04', 'e2-05',
+    ],
+  },
+  {
+    level: '进阶' as const,
+    week: 3,
+    title: '战略选品与品类布局',
+    lessons: [
+      'e3-01', 'e3-02', 'e3-03', 'e3-04', 'e3-05',
+    ],
+  },
+  {
+    level: '进阶' as const,
+    week: 4,
+    title: '风险管理与危机应对',
+    lessons: [
+      'e4-01', 'e4-02', 'e4-03', 'e4-04', 'e4-05',
+    ],
+  },
 ]
 
 // 所有课程（含受保护等级）
@@ -191,6 +290,70 @@ export const pathToLessonId: Record<string, string> = {
   'b4-pricing-strategy/02-promo-rhythm': 'b4-02',
   'b4-pricing-strategy/03-price-elasticity': 'b4-03',
   'b4-pricing-strategy/04-monthly-promo-plan': 'b4-04',
+  // ===== 中级课程 =====
+  'i1-cold-start/01-selection-validation': 'i1-01',
+  'i1-cold-start/02-launch-timeline': 'i1-02',
+  'i1-cold-start/03-cold-start-four-phases': 'i1-03',
+  'i1-cold-start/04-ranking-push': 'i1-04',
+  'i1-cold-start/05-first-reviews': 'i1-05',
+  'i1-cold-start/06-traffic-structure': 'i1-06',
+  'i1-cold-start/07-launch-plan-practice': 'i1-07',
+  'i2-multi-sku/01-product-line-planning': 'i2-01',
+  'i2-multi-sku/02-new-old-ratio': 'i2-02',
+  'i2-multi-sku/03-sku-rationalization': 'i2-03',
+  'i2-multi-sku/04-lifecycle-management': 'i2-04',
+  'i2-multi-sku/05-portfolio-review-practice': 'i2-05',
+  'i3-branding/01-brand-registry-deep': 'i3-01',
+  'i3-branding/02-a-plus-premium': 'i3-02',
+  'i3-branding/03-brand-store': 'i3-03',
+  'i3-branding/04-brand-analytics': 'i3-04',
+  'i3-branding/05-brand-foundation-practice': 'i3-05',
+  'i4-data-analysis/01-business-reports': 'i4-01',
+  'i4-data-analysis/02-third-party-tools': 'i4-02',
+  'i4-data-analysis/03-growth-diagnosis': 'i4-03',
+  'i4-data-analysis/04-dashboard-building': 'i4-04',
+  // ===== 高级课程 =====
+  'a1-brand-protection/01-transparency-program': 'a1-01',
+  'a1-brand-protection/02-project-zero': 'a1-02',
+  'a1-brand-protection/03-hijack-defense-sop': 'a1-03',
+  'a1-brand-protection/04-brand-assets': 'a1-04',
+  'a1-brand-protection/05-defense-strategy-practice': 'a1-05',
+  'a2-global-expansion/01-site-differences': 'a2-01',
+  'a2-global-expansion/02-fba-vs-fbm-choice': 'a2-02',
+  'a2-global-expansion/03-cross-border-logistics': 'a2-03',
+  'a2-global-expansion/04-localization': 'a2-04',
+  'a2-global-expansion/05-tax-compliance': 'a2-05',
+  'a2-global-expansion/06-expansion-feasibility-practice': 'a2-06',
+  'a3-compliance-appeal/01-account-suspension-appeal': 'a3-01',
+  'a3-compliance-appeal/02-infringement': 'a3-02',
+  'a3-compliance-appeal/03-video-verification': 'a3-03',
+  'a3-compliance-appeal/04-review-manipulation': 'a3-04',
+  'a3-compliance-appeal/05-appeal-writing-practice': 'a3-05',
+  'a4-advanced-ads/01-dsp-ads': 'a4-01',
+  'a4-advanced-ads/02-sd-retargeting': 'a4-02',
+  'a4-advanced-ads/03-brand-ads-combo': 'a4-03',
+  'a4-advanced-ads/04-full-funnel-strategy': 'a4-04',
+  // ===== 进阶课程 =====
+  'e1-team-sop/01-role-design': 'e1-01',
+  'e1-team-sop/02-kpi-design': 'e1-02',
+  'e1-team-sop/03-sop-system': 'e1-03',
+  'e1-team-sop/04-training-system': 'e1-04',
+  'e1-team-sop/05-team-framework-practice': 'e1-05',
+  'e2-finance-cashflow/01-capital-budget': 'e2-01',
+  'e2-finance-cashflow/02-turnover-management': 'e2-02',
+  'e2-finance-cashflow/03-profit-aggregation': 'e2-03',
+  'e2-finance-cashflow/04-cashflow-warning': 'e2-04',
+  'e2-finance-cashflow/05-financial-model-practice': 'e2-05',
+  'e3-category-strategy/01-category-positioning': 'e3-01',
+  'e3-category-strategy/02-product-matrix': 'e3-02',
+  'e3-category-strategy/03-moat-building': 'e3-03',
+  'e3-category-strategy/04-long-term-planning': 'e3-04',
+  'e3-category-strategy/05-category-strategy-practice': 'e3-05',
+  'e4-risk-management/01-account-risk-system': 'e4-01',
+  'e4-risk-management/02-inventory-capital-risk': 'e4-02',
+  'e4-risk-management/03-policy-change-response': 'e4-03',
+  'e4-risk-management/04-black-swan-playbook': 'e4-04',
+  'e4-risk-management/05-risk-playbook-practice': 'e4-05',
 }
 
 // 课程内容的目录前缀（getLessonIdByPath 用）
