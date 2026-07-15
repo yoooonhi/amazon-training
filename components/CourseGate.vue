@@ -103,7 +103,6 @@ onMounted(() => {
         测试通过后将开放，敬请期待。
       </p>
       <p v-if="isLoggedIn" class="gate-hint">你当前无法访问此内容。</p>
-      <p v-else class="gate-hint">如你是导师，请先登录。</p>
     </div>
   </div>
 
