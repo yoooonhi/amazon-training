@@ -42,12 +42,6 @@ function openAuthPanel() {
   window.dispatchEvent(new CustomEvent('open-auth-panel'))
 }
 
-// 返回上一页（无历史记录则回首页兜底）
-function goBack() {
-  if (window.history.length > 1) window.history.back()
-  else window.location.href = '/'
-}
-
 function updateRole(profile) {
   role.value = profile?.role || null
   accessLevels.value = profile?.accessLevels || []
@@ -108,9 +102,6 @@ onMounted(() => {
         本课程正在内测阶段，暂未对学员开放。<br />
         测试通过后将开放，敬请期待。
       </p>
-      <div class="gate-actions">
-        <button class="gate-btn gate-btn-primary" @click="goBack">← 返回</button>
-      </div>
       <p v-if="isLoggedIn" class="gate-hint">你当前无法访问此内容。</p>
       <p v-else class="gate-hint">如你是导师，请先登录。</p>
     </div>
@@ -127,7 +118,6 @@ onMounted(() => {
       </p>
       <div class="gate-actions">
         <button class="gate-btn gate-btn-primary" @click="openAuthPanel">免费注册 / 登录</button>
-        <button class="gate-btn gate-btn-ghost" @click="goBack">← 返回</button>
       </div>
       <p class="gate-hint">已登录用户可访问全部技能补给站内容。</p>
     </div>
@@ -186,11 +176,6 @@ onMounted(() => {
 .gate-btn-primary {
   background: var(--vp-c-brand-1);
   color: #fff;
-}
-.gate-btn-ghost {
-  background: transparent;
-  color: var(--vp-c-text-2);
-  border: 1px solid var(--vp-c-divider);
 }
 .gate-hint {
   margin: 1.25rem 0 0;
