@@ -19,9 +19,13 @@ export default defineConfig({
     ['meta', { property: 'og:title', content: '亚马逊运营训练营' }],
     ['meta', { property: 'og:description', content: '亚马逊运营系统课程：从零开始到独立操盘。5大等级140+节课，覆盖选品、Listing、FBA库存、广告优化、定价利润全链路。' }],
     ['meta', { property: 'og:url', content: 'https://www.pipishou.top' }],
+    ['meta', { property: 'og:image', content: 'https://www.pipishou.top/og-image.png' }],
+    ['meta', { property: 'og:image:width', content: '1200' }],
+    ['meta', { property: 'og:image:height', content: '630' }],
     ['meta', { property: 'og:locale', content: 'zh_CN' }],
     // Twitter Card
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
+    ['meta', { name: 'twitter:image', content: 'https://www.pipishou.top/og-image.png' }],
     ['meta', { name: 'twitter:title', content: '亚马逊运营训练营' }],
     ['meta', { name: 'twitter:description', content: '亚马逊运营系统课程：从零开始到独立操盘。5大等级140+节课。' }],
     // theme-color（移动端浏览器地址栏配色）
