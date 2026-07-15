@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# 导师后台不需要被搜索引擎索引
+Disallow: /dashboard
+
+Sitemap: https://www.pipishou.top/sitemap.xml

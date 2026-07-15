@@ -2,8 +2,9 @@
  * 侧边栏权限守卫
  *
  * VitePress 的侧边栏是配置层生成的静态 DOM，无法在 config.ts 里按角色条件渲染。
- * 这里用客户端 DOM 操作兜底：非导师用户隐藏受保护等级的侧边栏分组。
- * 被导师单独授权某等级的学员，该等级分组也可见，并去掉 🔒 图标。
+ * 这里用客户端 DOM 操作兜底：所有课程标题始终可见，受保护等级用 🔒 标记锁定状态。
+ * 被导师单独授权某等级的学员，该等级去掉 🔒 图标；未授权的保留 🔒，
+ * 点击后由 CourseGate.vue 的全屏遮罩拦截（无法访问内容）。
  *
  * DOM 结构（VitePress 1.6）：
  *   <section class="VPSidebarItem level-0">
@@ -61,12 +62,12 @@ function applyVisibility() {
     })
     return
   }
-  // 非导师：隐藏受保护且未授权的分组，已授权的去掉 🔒
+  // 非导师：受保护等级始终可见，已授权的去掉 🔒，未授权的保留 🔒 标记锁定。
+  // 未授权用户点击课程项后，由 CourseGate.vue 全屏遮罩拦截内容访问。
   titles.forEach((title) => {
     const text = (title.textContent || '').trim()
     const matchedKw = PROTECTED_KEYWORDS.find((kw) => text.includes(kw))
     if (!matchedKw) return // 非受保护等级，不动
-    // 隐藏时必须隐藏外层 .group 容器（它有 padding-top 间距，否则残留空白）
     const group = title.closest('.group') as HTMLElement
     const section = title.closest('.VPSidebarItem.level-0') as HTMLElement
     if (currentAccessLevels.includes(matchedKw)) {
@@ -75,9 +76,10 @@ function applyVisibility() {
       if (section) section.style.display = ''
       unlockTitle(title)
     } else {
-      // 未授权：隐藏外层容器（连间距一起隐藏）
-      if (group) group.style.display = 'none'
-      else if (section) section.style.display = 'none'
+      // 未授权：保持显示，保留 🔒 锁定标识
+      if (group) group.style.display = ''
+      if (section) section.style.display = ''
+      lockTitle(title, matchedKw)
     }
   })
 }

@@ -2,12 +2,30 @@ import { defineConfig } from 'vitepress'
 
 export default defineConfig({
   title: '亚马逊运营训练营',
-  description: '从零开始学亚马逊运营 · 能力进阶制 · 边学边实战',
+  description: '亚马逊运营系统课程：从零开始到独立操盘。5大等级140+节课，覆盖选品、Listing、FBA库存、广告优化、定价利润全链路，边学边实战。',
   lang: 'zh-CN',
   lastUpdated: true,
+  cleanUrls: true,
+
+  sitemap: {
+    hostname: 'https://www.pipishou.top',
+  },
 
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' }],
+    // Open Graph：分享到微信/微博/Twitter 的卡片
+    ['meta', { property: 'og:type', content: 'website' }],
+    ['meta', { property: 'og:site_name', content: '亚马逊运营训练营' }],
+    ['meta', { property: 'og:title', content: '亚马逊运营训练营' }],
+    ['meta', { property: 'og:description', content: '亚马逊运营系统课程：从零开始到独立操盘。5大等级140+节课，覆盖选品、Listing、FBA库存、广告优化、定价利润全链路。' }],
+    ['meta', { property: 'og:url', content: 'https://www.pipishou.top' }],
+    ['meta', { property: 'og:locale', content: 'zh_CN' }],
+    // Twitter Card
+    ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
+    ['meta', { name: 'twitter:title', content: '亚马逊运营训练营' }],
+    ['meta', { name: 'twitter:description', content: '亚马逊运营系统课程：从零开始到独立操盘。5大等级140+节课。' }],
+    // theme-color（移动端浏览器地址栏配色）
+    ['meta', { name: 'theme-color', content: '#3451b2' }],
   ],
 
   themeConfig: {
