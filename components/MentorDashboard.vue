@@ -461,7 +461,15 @@ function isAdminAuthor(c) {
 onMounted(async () => {
   isMounted.value = true
   await checkMentor()
-  if (isMentor.value) await loadData()
+  if (isMentor.value) {
+    try {
+      await loadData()
+    } catch (e) {
+      console.error('[Dashboard] loadData 崩溃:', e)
+      errorMsg.value = '数据加载出错: ' + (e?.message || e)
+      loading.value = false
+    }
+  }
 })
 </script>
 
