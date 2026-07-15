@@ -354,6 +354,9 @@ export const pathToLessonId: Record<string, string> = {
   'e4-risk-management/03-policy-change-response': 'e4-03',
   'e4-risk-management/04-black-swan-playbook': 'e4-04',
   'e4-risk-management/05-risk-playbook-practice': 'e4-05',
+  // ===== 技能补给站 =====
+  'skills/domain-basics': 'skill-domain',
+  'skills/phishing-detection': 'skill-phishing',
 }
 
 // 课程内容的目录前缀（getLessonIdByPath 用）
@@ -363,6 +366,7 @@ const CONTENT_PREFIXES = [
   'content/intermediate/',
   'content/advanced/',
   'content/expert/',
+  'content/skills/',
 ]
 
 // 根据页面相对路径推导 lessonId（Comments 组件零侵入注入用）

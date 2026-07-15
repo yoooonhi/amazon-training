@@ -304,6 +304,15 @@ export default defineConfig({
             { text: '4.5 风险预警与应急预案（实操）', link: '/content/expert/e4-risk-management/05-risk-playbook-practice' },
           ],
         },
+        // ===== 技能补给站（通用数字技能，全员可见）=====
+        {
+          text: '🧰 技能补给站',
+          collapsed: true,
+          items: [
+            { text: '域名结构与网址识别', link: '/content/skills/domain-basics' },
+            { text: '钓鱼网站识别', link: '/content/skills/phishing-detection' },
+          ],
+        },
       ],
     },
 

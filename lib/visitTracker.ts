@@ -15,6 +15,7 @@ const CONTENT_PREFIXES = [
   '/content/intermediate/',
   '/content/advanced/',
   '/content/expert/',
+  '/content/skills/',
 ]
 
 // 获取或生成访客永久 ID
