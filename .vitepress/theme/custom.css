@@ -4,3 +4,28 @@
   display: flex;
   align-items: center;
 }
+
+/* ===== 移动端适配 ===== */
+
+/* 表格允许横向滚动（课程正文里的大量对比表在窄屏会溢出） */
+.vp-doc div[class*='language-'],
+.vp-doc pre {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+/* 移动端：窄屏下的通用修正 */
+@media (max-width: 768px) {
+  /* 正文表格横向滚动 */
+  .vp-doc table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* 代码块圆角适配 */
+  .vp-doc div[class*='language-'] {
+    border-radius: 6px;
+  }
+}

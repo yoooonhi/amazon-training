@@ -63,7 +63,7 @@ function handleKey(e) {
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18), 0 2px 8px rgba(0, 0, 0, 0.08);
   border: 1px solid var(--vp-c-divider);
   padding: 1.5rem;
-  min-width: 320px;
+  min-width: min(320px, calc(100vw - 2rem));
   max-width: 90vw;
   display: flex;
   flex-direction: column;
