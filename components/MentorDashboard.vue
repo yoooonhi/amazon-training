@@ -55,8 +55,14 @@ async function loadData() {
   const { data: allCheckins, error: checkErr } = await supabase.from('checkins').select('user_id, checkin_date')
   // 拉 quiz
   const { data: allQuiz } = await supabase.from('quiz_results').select('user_id, is_correct, lesson_id, question_index')
-  // 拉课程等级授权
-  const { data: allAccess } = await supabase.from('course_access').select('user_id, level')
+  // 拉课程等级授权（表可能还没建，容错处理）
+  let allAccess = null
+  try {
+    const res = await supabase.from('course_access').select('user_id, level')
+    if (!res.error) allAccess = res.data
+  } catch {
+    // course_access 表不存在时静默降级，授权功能不可用但不影响其他数据
+  }
   // 构建 accessMap: { userId: ['初级', '高级'] }
   const aMap = {}
   ;(allAccess || []).forEach((r) => {

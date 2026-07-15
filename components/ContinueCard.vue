@@ -64,12 +64,14 @@ onMounted(() => {
         .eq('id', data.session.user.id)
         .single()
       role.value = profile?.role || null
-      // 补拉授权等级
-      const { data: accessRows } = await supabase
-        .from('course_access')
-        .select('level')
-        .eq('user_id', data.session.user.id)
-      accessLevels.value = (accessRows || []).map((r) => r.level)
+      // 补拉授权等级（表可能还没建，容错）
+      try {
+        const { data: accessRows, error: aErr } = await supabase
+          .from('course_access')
+          .select('level')
+          .eq('user_id', data.session.user.id)
+        if (!aErr && accessRows) accessLevels.value = accessRows.map((r) => r.level)
+      } catch { /* 静默降级 */ }
     } else {
       role.value = null
       accessLevels.value = []

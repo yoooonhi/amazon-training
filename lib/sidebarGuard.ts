@@ -55,13 +55,18 @@ async function loadRole(): Promise<{ role: string | null; accessLevels: string[]
     .select('role')
     .eq('id', session.session.user.id)
     .single()
-  const { data: accessRows } = await supabase
-    .from('course_access')
-    .select('level')
-    .eq('user_id', session.session.user.id)
+  // 拉授权等级（表可能还没建，容错）
+  let accessLevels: string[] = []
+  try {
+    const { data: accessRows, error: aErr } = await supabase
+      .from('course_access')
+      .select('level')
+      .eq('user_id', session.session.user.id)
+    if (!aErr && accessRows) accessLevels = accessRows.map((r: any) => r.level)
+  } catch { /* 静默降级 */ }
   return {
     role: profile?.role || null,
-    accessLevels: (accessRows || []).map((r: any) => r.level),
+    accessLevels,
   }
 }
 

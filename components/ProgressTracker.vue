@@ -127,11 +127,14 @@ onMounted(() => {
         .single()
       isMentor.value = isMentorRole(profile?.role)
       role.value = profile?.role || null
-      const { data: accessRows } = await supabase
-        .from('course_access')
-        .select('level')
-        .eq('user_id', data.session.user.id)
-      accessLevels.value = (accessRows || []).map((r) => r.level)
+      // 补拉授权等级（表可能还没建，容错）
+      try {
+        const { data: accessRows, error: aErr } = await supabase
+          .from('course_access')
+          .select('level')
+          .eq('user_id', data.session.user.id)
+        if (!aErr && accessRows) accessLevels.value = accessRows.map((r) => r.level)
+      } catch { /* 静默降级 */ }
       await loadRemoteProgress()
     } else {
       // 未登录，进度清空（必须登录才显示进度）

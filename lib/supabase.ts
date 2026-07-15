@@ -34,12 +34,19 @@ supabase.auth.onAuthStateChange(async (event, session) => {
       .select('*')
       .eq('id', session.user.id)
       .single()
-    // 拉该用户的课程等级授权（导师不需要，但查了也无害——导师走 isMentorRole 短路）
-    const { data: accessRows } = await supabase
-      .from('course_access')
-      .select('level')
-      .eq('user_id', session.user.id)
-    const accessLevels = (accessRows || []).map((r: any) => r.level)
+    // 拉该用户的课程等级授权（表可能还没建，用 try-catch 容错）
+    let accessLevels: string[] = []
+    try {
+      const { data: accessRows, error: accessErr } = await supabase
+        .from('course_access')
+        .select('level')
+        .eq('user_id', session.user.id)
+      if (!accessErr && accessRows) {
+        accessLevels = accessRows.map((r: any) => r.level)
+      }
+    } catch {
+      // course_access 表不存在时静默降级
+    }
     // 把授权等级挂到 profile 上，各组件通过 authState.onChange 自动获取
     authState.set(session.user, { ...profile, accessLevels })
   } else {
