@@ -52,8 +52,11 @@ function applyVisibility() {
   // 导师：所有分组可见，去掉所有 🔒
   if (isMentorRole(currentRole)) {
     titles.forEach((title) => {
-      const section = title.closest('.VPSidebarItem.level-0')
-      if (section) (section as HTMLElement).style.display = ''
+      // 显示：连同外层 .group 容器一起恢复
+      const group = title.closest('.group') as HTMLElement
+      const section = title.closest('.VPSidebarItem.level-0') as HTMLElement
+      if (group) group.style.display = ''
+      if (section) section.style.display = ''
       unlockTitle(title)
     })
     return
@@ -63,13 +66,18 @@ function applyVisibility() {
     const text = (title.textContent || '').trim()
     const matchedKw = PROTECTED_KEYWORDS.find((kw) => text.includes(kw))
     if (!matchedKw) return // 非受保护等级，不动
-    const section = title.closest('.VPSidebarItem.level-0')
-    if (!section) return
+    // 隐藏时必须隐藏外层 .group 容器（它有 padding-top 间距，否则残留空白）
+    const group = title.closest('.group') as HTMLElement
+    const section = title.closest('.VPSidebarItem.level-0') as HTMLElement
     if (currentAccessLevels.includes(matchedKw)) {
-      ;(section as HTMLElement).style.display = ''
+      // 已授权：显示并去掉 🔒
+      if (group) group.style.display = ''
+      if (section) section.style.display = ''
       unlockTitle(title)
     } else {
-      ;(section as HTMLElement).style.display = 'none'
+      // 未授权：隐藏外层容器（连间距一起隐藏）
+      if (group) group.style.display = 'none'
+      else if (section) section.style.display = 'none'
     }
   })
 }
