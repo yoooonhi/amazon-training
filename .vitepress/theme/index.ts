@@ -11,7 +11,7 @@ import Comments from '../../components/Comments.vue'
 import ProfitCalculator from '../../components/ProfitCalculator.vue'
 import ModalDialog from '../../components/ModalDialog.vue'
 import CourseGate from '../../components/CourseGate.vue'
-import { recordVisit } from '../../lib/visitTracker'
+import { recordVisit, recordLastLesson } from '../../lib/visitTracker'
 import { setupSidebarGuard } from '../../lib/sidebarGuard'
 import './custom.css'
 
@@ -39,12 +39,15 @@ export default {
     if (router) {
       router.onAfterRouteChanged = () => {
         recordVisit()
+        // 记录用户最后学习的课程位置（仅课程页才记）
+        recordLastLesson()
         // 路由切换后重新检查侧边栏可见性（角色可能已变）
         setupSidebarGuard()
       }
     }
     // 首次进入记一次（onAfterRouteChanged 不会在首次加载时触发）
     recordVisit()
+    recordLastLesson()
     // 侧边栏权限守卫：非导师隐藏受保护等级的侧边栏分组
     setupSidebarGuard()
   },
