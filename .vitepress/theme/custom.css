@@ -11,6 +11,20 @@ html.doc-gated .vp-doc {
   display: none;
 }
 
+/* ===== 右侧栏（aside）：降低显示断点，让更多屏幕能看到 ===== */
+/* VitePress 默认要 1280px 才显示右侧大纲，对很多笔记本太高。
+   降到 1024px，同时收窄正文让出空间。 */
+@media (min-width: 1024px) {
+  .VPDoc.has-sidebar.has-aside .aside {
+    display: block;
+    padding-left: 24px;
+  }
+  /* 配合收窄正文，避免整体被挤压 */
+  .VPDoc.has-sidebar.has-aside .content-container {
+    max-width: 640px;
+  }
+}
+
 /* ===== 移动端适配 ===== */
 
 /* 表格允许横向滚动（课程正文里的大量对比表在窄屏会溢出） */
