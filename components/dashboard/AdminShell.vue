@@ -203,10 +203,15 @@ onMounted(() => {
 
 <style scoped>
 /* ===== 全屏根容器 ===== */
+/* 不用 fixed（会被父容器 transform 破坏），用 100vw/100vh + 负 margin 撑满 */
 .admin-root {
-  position: fixed;
-  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  max-height: 100vh;
+  margin-left: calc(50% - 50vw);
+  position: relative;
   z-index: 9999;
+  overflow: hidden;
 }
 
 /* ===== 门控屏（未登录/加载） ===== */
