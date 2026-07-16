@@ -86,10 +86,13 @@ function applySkillVisibility() {
     textEl.textContent = text
     delete textEl.dataset.skillLocked
     if (!unlocked) {
-      // 会员专属课用 👑，普通受保护课用 🔒
+      // 被拦截：会员专属课用 👑，普通受保护课用 🔒
       const icon = isMemberOnly ? '👑' : '🔒'
       textEl.textContent = icon + ' ' + text
       textEl.dataset.skillLocked = '1'
+    } else if (isMemberOnly) {
+      // 会员专属课即使已解锁也保留 👑，让会员感受到专属身份
+      textEl.textContent = '👑 ' + text
     }
   })
 }
