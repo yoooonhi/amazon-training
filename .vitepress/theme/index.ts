@@ -13,6 +13,7 @@ import ModalDialog from '../../components/ModalDialog.vue'
 import CourseGate from '../../components/CourseGate.vue'
 import SiteFooter from '../../components/SiteFooter.vue'
 import PortfolioHealthCheck from '../../components/PortfolioHealthCheck.vue'
+import ReplenishmentCalculator from '../../components/ReplenishmentCalculator.vue'
 import { recordVisit, recordLastLesson } from '../../lib/visitTracker'
 import { setupSidebarGuard } from '../../lib/sidebarGuard'
 import './custom.css'
@@ -35,6 +36,7 @@ export default {
     app.component('AuthPanel', AuthPanel)
     app.component('ProfitCalculator', ProfitCalculator)
     app.component('PortfolioHealthCheck', PortfolioHealthCheck)
+    app.component('ReplenishmentCalculator', ReplenishmentCalculator)
 
     // 网站访问埋点：首次加载记一次 + SPA 路由切换时按 24h 合并规则记录
     // onAfterRouteChanged 在每次页面切换时触发，但 recordVisit 内部会判断
