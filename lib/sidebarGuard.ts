@@ -44,6 +44,15 @@ function unlockTitle(titleEl: Element) {
   }
 }
 
+// 把标题里的 🔒 换成 👑（已解锁的等级，显示会员尊享感）
+function crownTitle(titleEl: Element) {
+  const el = titleEl as HTMLElement
+  // 先去掉可能残留的 🔒 或 👑（emoji surrogate pair 占2单元 + 空格1 = 3字符）
+  let text = el.textContent || ''
+  if (text.startsWith('🔒 ') || text.startsWith('👑 ')) text = text.slice(3)
+  el.textContent = '👑 ' + text
+}
+
 // 恢复标题里的 🔒 emoji（需要时还原）
 function lockTitle(titleEl: Element, level: string) {
   const el = titleEl as HTMLElement
@@ -121,10 +130,10 @@ function applyLevelVisibility() {
     const group = title.closest('.group') as HTMLElement
     const section = title.closest('.VPSidebarItem.level-0') as HTMLElement
     if (currentAccessLevels.includes(matchedKw)) {
-      // 已授权：显示并去掉 🔒
+      // 已授权：显示，并把 🔒 换成 👑（会员尊享感）
       if (group) group.style.display = ''
       if (section) section.style.display = ''
-      unlockTitle(title)
+      crownTitle(title)
     } else {
       // 未授权：保持显示，保留 🔒 锁定标识
       if (group) group.style.display = ''
