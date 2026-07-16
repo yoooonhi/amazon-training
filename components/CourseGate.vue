@@ -9,6 +9,7 @@ import {
 const isMounted = ref(false)
 const role = ref(null) // 当前用户角色
 const accessLevels = ref([]) // 当前用户被导师授权的等级
+const profile = ref(null) // 当前用户完整 profile（含 is_member）
 const currentPath = ref('')
 
 const isLoggedIn = computed(() => role.value !== null)
@@ -21,10 +22,10 @@ const blockedLevel = computed(() => {
   return level // 被拦截的等级
 })
 
-// 判断当前页面是否是需登录才能访问的技能课
+// 判断当前页面是否是需要会员才能访问的技能课
 const isSkillBlocked = computed(() => {
   if (!isSkillPath(currentPath.value)) return false
-  return !isSkillAccessible(currentPath.value, role.value, isLoggedIn.value)
+  return !isSkillAccessible(currentPath.value, profile.value)
 })
 
 // 是否处于拦截状态（任一遮罩显示）
@@ -42,9 +43,10 @@ function openAuthPanel() {
   window.dispatchEvent(new CustomEvent('open-auth-panel'))
 }
 
-function updateRole(profile) {
-  role.value = profile?.role || null
-  accessLevels.value = profile?.accessLevels || []
+function updateRole(p) {
+  profile.value = p || null
+  role.value = p?.role || null
+  accessLevels.value = p?.accessLevels || []
 }
 
 function refreshPath() {
@@ -106,19 +108,24 @@ onMounted(() => {
     </div>
   </div>
 
-  <!-- 技能补给站被拦截：需登录（仅内容区，保留侧边栏与导航） -->
+  <!-- 技能补给站被拦截：会员专享（仅内容区，保留侧边栏与导航） -->
   <div v-else-if="isMounted && isSkillBlocked" class="course-gate">
     <div class="gate-card">
-      <div class="gate-icon">🔐</div>
-      <h2 class="gate-title">登录后查看</h2>
-      <p class="gate-desc">
+      <div class="gate-icon">👑</div>
+      <h2 class="gate-title">会员专享内容</h2>
+      <p class="gate-desc" v-if="!isLoggedIn">
         这是技能补给站的进阶内容。<br />
-        免费注册 / 登录后即可解锁全部技能课程。
+        升级会员即可解锁全部技能课程。
+      </p>
+      <p class="gate-desc" v-else>
+        你当前是免费用户。<br />
+        升级会员即可解锁全部技能补给站内容。
       </p>
       <div class="gate-actions">
-        <button class="gate-btn gate-btn-primary" @click="openAuthPanel">免费注册 / 登录</button>
+        <button v-if="!isLoggedIn" class="gate-btn gate-btn-primary" @click="openAuthPanel">免费注册 / 登录</button>
+        <span v-else class="gate-member-hint">👑 联系导师开通会员解锁</span>
       </div>
-      <p class="gate-hint">已登录用户可访问全部技能补给站内容。</p>
+      <p class="gate-hint">会员可访问全部技能补给站内容。</p>
     </div>
   </div>
 </template>
@@ -175,6 +182,16 @@ onMounted(() => {
 .gate-btn-primary {
   background: var(--vp-c-brand-1);
   color: #fff;
+}
+.gate-member-hint {
+  display: inline-block;
+  padding: 0.55rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #b45309;
+  background: rgba(255, 193, 7, 0.12);
+  border: 1px solid rgba(255, 193, 7, 0.35);
 }
 .gate-hint {
   margin: 1.25rem 0 0;

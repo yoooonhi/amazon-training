@@ -62,7 +62,7 @@ async function loadComments() {
     if (userIds.length > 0) {
       const { data: profilesData } = await supabase
         .from('profiles')
-        .select('id, nickname, role')
+        .select('id, nickname, role, is_member')
         .in('id', userIds)
       ;(profilesData || []).forEach(p => { profileMap[p.id] = p })
     }
@@ -81,7 +81,7 @@ async function loadComments() {
       })
     }
     // 组装最终数据
-    comments.value = list.map(c => ({ ...c, profiles: profileMap[c.user_id] || { nickname: null, role: null } }))
+    comments.value = list.map(c => ({ ...c, profiles: profileMap[c.user_id] || { nickname: null, role: null, is_member: false } }))
     likeCounts.value = likeCountsMap
     myLikes.value = myLikesSet
   } catch (e) {
@@ -147,7 +147,7 @@ async function submitComment() {
       .select('id, lesson_id, user_id, parent_id, content, is_pinned, is_featured, created_at')
       .single()
     if (error) throw error
-    comments.value.push({ ...data, profiles: { nickname: profile.value?.nickname, role: profile.value?.role } })
+    comments.value.push({ ...data, profiles: { nickname: profile.value?.nickname, role: profile.value?.role, is_member: profile.value?.is_member } })
     newComment.value = ''
   } catch (e) {
     submitError.value = '发布失败：' + (e.message || e) + '（若刚建表，请检查是否已在 Supabase 执行建表 SQL）'
@@ -187,7 +187,7 @@ async function submitReply(parentId) {
       .select('id, lesson_id, user_id, parent_id, content, is_pinned, is_featured, created_at')
       .single()
     if (error) throw error
-    comments.value.push({ ...data, profiles: { nickname: profile.value?.nickname, role: profile.value?.role } })
+    comments.value.push({ ...data, profiles: { nickname: profile.value?.nickname, role: profile.value?.role, is_member: profile.value?.is_member } })
     cancelReply()
   } catch (e) {
     submitError.value = '回复失败：' + (e.message || e)
@@ -414,6 +414,7 @@ watch(lessonId, async (id) => {
               {{ displayName(c) }}
             </span>
             <span v-if="c.profiles?.role === 'mentor' || c.profiles?.role === 'admin'" class="role-badge">管理员</span>
+            <span v-else-if="c.profiles?.is_member" class="member-badge" title="付费会员">👑 会员</span>
             <span v-if="c.is_featured" class="featured-badge" title="管理员标记优质/已解决">⭐ 精选</span>
             <span class="comment-time">{{ timeAgo(c.created_at) }}</span>
           </div>
@@ -453,6 +454,7 @@ watch(lessonId, async (id) => {
                 {{ displayName(r) }}
               </span>
               <span v-if="r.profiles?.role === 'mentor' || r.profiles?.role === 'admin'" class="role-badge">管理员</span>
+              <span v-else-if="r.profiles?.is_member" class="member-badge" title="付费会员">👑 会员</span>
               <span v-if="r.is_featured" class="featured-badge">⭐ 精选</span>
               <span class="comment-time">{{ timeAgo(r.created_at) }}</span>
             </div>
@@ -702,6 +704,14 @@ watch(lessonId, async (id) => {
   border-radius: 3px;
   background: var(--vp-c-brand-soft, rgba(52, 81, 178, 0.12));
   color: var(--vp-c-brand-1);
+  font-weight: 600;
+}
+.member-badge {
+  font-size: 0.7rem;
+  padding: 0.05rem 0.4rem;
+  border-radius: 3px;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: #fff;
   font-weight: 600;
 }
 .pin-badge {

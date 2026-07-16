@@ -1,6 +1,7 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { supabase, authState } from '../lib/supabase'
+import { isMember as isMemberOf } from '../lib/accessControl'
 
 const isMounted = ref(false)
 const currentUser = ref(null)
@@ -14,6 +15,9 @@ const nickname = ref('')
 const loading = ref(false)
 const errorMsg = ref('')
 const infoMsg = ref('')
+
+// 是否为付费会员（导师也视为会员）
+const isMemberUser = computed(() => isMemberOf(currentProfile.value))
 
 // 点击页面任意位置关闭下拉菜单（点菜单自身不关）
 function handleOutsideClick(e) {
@@ -120,12 +124,14 @@ function displayName() {
       <span class="nav-avatar">👤</span>
       <span class="nav-username">{{ displayName() }}</span>
       <span v-if="currentProfile?.role === 'mentor'" class="nav-role">导师</span>
+      <span v-else-if="isMemberUser" class="nav-member">VIP 会员</span>
 
       <!-- 下拉菜单 -->
       <Transition name="dropdown">
         <div v-if="showUserMenu" class="user-dropdown" @click.stop>
           <div class="dropdown-header">
             <span class="dropdown-email">{{ currentUser.email }}</span>
+            <span v-if="currentProfile?.role !== 'mentor' && isMemberUser" class="dropdown-member">👑 付费会员</span>
           </div>
           <a v-if="currentProfile?.role === 'mentor'" href="/dashboard" class="dropdown-item">
             📊 导师后台
@@ -226,6 +232,26 @@ function displayName() {
   background: #ff9900;
   color: #fff;
   font-weight: 600;
+}
+.nav-member {
+  font-size: 0.62rem;
+  padding: 0.05rem 0.4rem;
+  border-radius: 3px;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  box-shadow: 0 1px 2px rgba(245, 158, 11, 0.35);
+}
+.dropdown-member {
+  display: inline-block;
+  margin-top: 0.25rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #b45309;
+  background: rgba(255, 193, 7, 0.14);
+  padding: 0.1rem 0.45rem;
+  border-radius: 4px;
 }
 
 /* 下拉菜单 */

@@ -16,7 +16,7 @@
  */
 import { authState, supabase } from './supabase'
 import {
-  publicLevels, isMentorRole,
+  publicLevels, isMentorRole, isMember,
   SKILL_PATH_PREFIX, PUBLIC_SKILL_SLUGS,
 } from './accessControl'
 
@@ -27,6 +27,7 @@ const PROTECTED_KEYWORDS = ['初级', '中级', '高级', '进阶'].filter(
 
 let currentRole: string | null | undefined = undefined // undefined = 还没查过
 let currentAccessLevels: string[] = [] // 当前用户被授权的等级
+let currentIsMember = false // 当前用户是否为付费会员
 let installedWatcher = false
 
 // 取侧边栏所有 level-0 分组标题元素
@@ -56,7 +57,7 @@ function applyVisibility() {
   applySkillVisibility()
 }
 
-// 技能补给站：未登录时给非公开课项加 🔒，已登录/导师去掉。
+// 技能补给站：非会员时给非公开课项加 🔒，会员/导师去掉。
 // 技能课是侧边栏里的链接项，结构为 .VPSidebarItem 内的 <a href>。
 function applySkillVisibility() {
   const links = [
@@ -64,13 +65,14 @@ function applySkillVisibility() {
       '.VPSidebar a[href^="' + SKILL_PATH_PREFIX + '"]'
     ),
   ]
-  const loggedIn = currentRole !== null || isMentorRole(currentRole)
+  // 会员或导师才解锁全部；未登录/免费登录用户只能看白名单
+  const member = currentIsMember || isMentorRole(currentRole)
   links.forEach((a) => {
     // 文本节点在链接或其子元素里
     const textEl = (a.querySelector('.text') as HTMLElement) || a
     const href = a.getAttribute('href') || ''
     const slug = href.slice(SKILL_PATH_PREFIX.length).replace(/\/+$/, '').split('/')[0]
-    const unlocked = isMentorRole(currentRole) || loggedIn || PUBLIC_SKILL_SLUGS.includes(slug)
+    const unlocked = member || PUBLIC_SKILL_SLUGS.includes(slug)
     // 去掉可能残留的锁标记后再按需添加
     if (textEl.dataset.skillLocked === '1') {
       textEl.textContent = textEl.textContent.replace(/🔒\s*/, '')
@@ -120,12 +122,12 @@ function applyLevelVisibility() {
   })
 }
 
-async function loadRole(): Promise<{ role: string | null; accessLevels: string[] }> {
+async function loadRole(): Promise<{ role: string | null; accessLevels: string[]; isMember: boolean }> {
   const { data: session } = await supabase.auth.getSession()
-  if (!session.session?.user) return { role: null, accessLevels: [] }
+  if (!session.session?.user) return { role: null, accessLevels: [], isMember: false }
   const { data: profile } = await supabase
     .from('profiles')
-    .select('role')
+    .select('role, is_member')
     .eq('id', session.session.user.id)
     .single()
   // 拉授权等级（表可能还没建，容错）
@@ -140,6 +142,7 @@ async function loadRole(): Promise<{ role: string | null; accessLevels: string[]
   return {
     role: profile?.role || null,
     accessLevels,
+    isMember: isMember(profile),
   }
 }
 
@@ -158,12 +161,14 @@ export async function setupSidebarGuard() {
     authState.onChange((_user, profile) => {
       currentRole = profile?.role || null
       currentAccessLevels = profile?.accessLevels || []
+      currentIsMember = isMember(profile)
       applyVisibility()
     })
     // 首次补拉
-    loadRole().then(({ role, accessLevels }) => {
+    loadRole().then(({ role, accessLevels, isMember: member }) => {
       currentRole = role
       currentAccessLevels = accessLevels
+      currentIsMember = member
       applyVisibility()
     })
   }

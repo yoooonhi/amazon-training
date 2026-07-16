@@ -195,6 +195,32 @@ function lessonTitle(lessonId) {
   return lessonId
 }
 
+// ===== 会员开通操作 =====
+const memberBusy = ref(false)
+
+// 切换某学员的会员状态（开→关 / 关→开）
+async function toggleMember(student) {
+  if (memberBusy.value) return
+  const next = !student.profile.is_member
+  const action = next ? '开通' : '取消'
+  const name = student.profile.nickname || student.profile.email
+  const ok = await modalConfirm(
+    `确定为「${name}」${action}付费会员？\n${next ? '开通后该学员可访问全部技能补给站。' : '取消后该学员将失去技能补给站访问权限。'}`,
+    '会员管理'
+  )
+  if (!ok) return
+  memberBusy.value = true
+  try {
+    const { error } = await supabase.from('profiles')
+      .update({ is_member: next })
+      .eq('id', student.profile.id)
+    if (error) { await modalAlert('操作失败: ' + error.message, '出错了'); return }
+    student.profile.is_member = next
+  } finally {
+    memberBusy.value = false
+  }
+}
+
 // ===== 课程等级授权操作 =====
 
 // 拿当前导师的 user_id（用于 granted_by 审计）
@@ -734,7 +760,10 @@ onMounted(async () => {
             <tr v-for="s in filteredStudents" :key="s.profile.id" :class="{ stale: s.isStale }">
               <td class="col-check" @click.stop><input type="checkbox" :checked="selectedIds.has(s.profile.id)" @change="toggleSelect(s.profile.id)" /></td>
               <td class="col-name" @click="viewDetail(s)">
-                <strong>{{ s.profile.nickname || s.profile.email }}</strong>
+                <strong>
+                  <span v-if="s.profile.is_member" class="member-crown" title="付费会员">👑</span>
+                  {{ s.profile.nickname || s.profile.email }}
+                </strong>
                 <small>{{ new Date(s.profile.created_at).toLocaleDateString('zh-CN') }} 注册</small>
               </td>
               <td class="col-progress" @click="viewDetail(s)">
@@ -780,8 +809,29 @@ onMounted(async () => {
     <!-- 学员详情 -->
     <div v-else-if="selectedStudent" class="student-detail">
       <button class="back-btn" @click="selectedStudent = null">← 返回列表</button>
-      <h2>{{ selectedStudent.profile.nickname || selectedStudent.profile.email }}</h2>
+      <h2>
+        <span v-if="selectedStudent.profile.is_member" class="detail-member-badge">👑 会员</span>
+        {{ selectedStudent.profile.nickname || selectedStudent.profile.email }}
+      </h2>
       <p class="detail-email">{{ selectedStudent.profile.email }} · {{ new Date(selectedStudent.profile.created_at).toLocaleDateString('zh-CN') }} 注册</p>
+
+      <!-- 会员开通开关 -->
+      <div class="member-panel">
+        <div class="member-panel-info">
+          <span class="member-panel-title">👑 付费会员</span>
+          <span class="member-panel-status" :class="{ on: selectedStudent.profile.is_member }">
+            {{ selectedStudent.profile.is_member ? '已开通会员' : '非会员（仅免费内容）' }}
+          </span>
+        </div>
+        <button
+          class="member-switch"
+          :class="{ on: selectedStudent.profile.is_member }"
+          :disabled="memberBusy"
+          @click="toggleMember(selectedStudent)"
+        >
+          {{ selectedStudent.profile.is_member ? '取消会员' : '设为会员' }}
+        </button>
+      </div>
 
       <div class="detail-stats">
         <div class="ds-item"><span class="ds-num">{{ selectedStudent.percent }}%</span><span class="ds-label">总完成率</span></div>
@@ -1587,4 +1637,75 @@ h3 {
 .access-switch:hover:not(:disabled) { border-color: var(--vp-c-brand-2); }
 .access-switch.on:hover:not(:disabled) { opacity: 0.9; }
 .access-switch:disabled { opacity: 0.6; cursor: default; }
+
+/* ===== 会员标识与开通 ===== */
+/* 学员表格里的会员皇冠 */
+.member-crown {
+  color: #f59e0b;
+  font-size: 0.85rem;
+  margin-right: 0.15rem;
+}
+/* 详情页标题旁的会员徽章 */
+.detail-member-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #b45309;
+  background: linear-gradient(135deg, #fde68a, #fcd34d);
+  padding: 0.1rem 0.55rem;
+  border-radius: 4px;
+  vertical-align: middle;
+  margin-right: 0.4rem;
+}
+/* 会员开通面板 */
+.member-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 1.25rem 0;
+  padding: 0.85rem 1rem;
+  background: linear-gradient(135deg, rgba(255, 193, 7, 0.08), rgba(245, 158, 11, 0.04));
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: 12px;
+}
+.member-panel-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.member-panel-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #b45309;
+}
+.member-panel-status {
+  font-size: 0.82rem;
+  color: var(--vp-c-text-2);
+}
+.member-panel-status.on {
+  color: #b45309;
+  font-weight: 600;
+}
+.member-switch {
+  padding: 0.4rem 1.1rem;
+  border-radius: 6px;
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  background: #fff;
+  color: #b45309;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+.member-switch:hover:not(:disabled) { background: rgba(245, 158, 11, 0.12); }
+.member-switch.on {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #fff;
+  border-color: transparent;
+}
+.member-switch.on:hover:not(:disabled) { opacity: 0.9; }
+.member-switch:disabled { opacity: 0.6; cursor: default; }
+:root.dark .member-switch { background: var(--vp-c-bg); }
 </style>
