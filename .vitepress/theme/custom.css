@@ -1,14 +1,34 @@
-/* ===== 页面底部栏：让 VitePress 原生 footer 在课程页（有侧边栏）也显示 ===== */
-/* 默认 VitePress 在 has-sidebar 页面隐藏 footer，覆盖它让联系信息显示在页面最底部 */
+/* ===== 页面底部栏：滚到底部时侧边栏淡出，footer 横跨全宽出现（如飞书效果）===== */
+/* VitePress 默认在 has-sidebar 页面隐藏 footer，覆盖它 */
 .VPFooter.has-sidebar {
   display: block !important;
 }
 
-/* 侧边栏默认 bottom:0 会盖住 footer 左侧区域。
-   给侧边栏底部留出 footer 高度，让 footer 横跨整个页面宽度不被遮挡。 */
+/* 桌面端：侧边栏淡出动画 + footer 上滑出现动画 */
 @media (min-width: 960px) {
+  /* 侧边栏：默认可见，滚到底部时淡出 */
   .VPSidebar {
-    bottom: 89px !important; /* footer 高度（padding 64 + 内容 25 ≈ 89px） */
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  /* 滚到底部时：侧边栏淡出 + footer 从底部滑入 */
+  html.at-bottom .VPSidebar {
+    opacity: 0 !important;
+    transform: translateX(-30px);
+    pointer-events: none;
+  }
+  /* footer：默认在视口下方隐藏，滚到底部时滑入 */
+  .VPFooter.has-sidebar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 30;
+    transform: translateY(100%);
+    transition: transform 0.4s ease;
+    background: var(--vp-c-bg);
+  }
+  html.at-bottom .VPFooter.has-sidebar {
+    transform: translateY(0);
   }
 }
 

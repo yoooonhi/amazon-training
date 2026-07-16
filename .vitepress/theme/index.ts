@@ -54,5 +54,30 @@ export default {
     recordLastLesson()
     // 侧边栏权限守卫：非导师隐藏受保护等级的侧边栏分组
     setupSidebarGuard()
+
+    // 底部栏交互：滚到接近底部时，侧边栏淡出、footer 横跨全宽滑入（如飞书效果）
+    if (typeof window !== 'undefined') {
+      let scrollTimer: number | undefined
+      const checkBottom = () => {
+        const scrollY = window.scrollY + window.innerHeight
+        const docHeight = document.documentElement.scrollHeight
+        // 距底部小于 120px 时触发（footer 约 89px + 一点提前量）
+        const atBottom = scrollY >= docHeight - 120
+        document.documentElement.classList.toggle('at-bottom', atBottom)
+      }
+      window.addEventListener('scroll', () => {
+        if (scrollTimer) cancelAnimationFrame(scrollTimer)
+        scrollTimer = requestAnimationFrame(checkBottom)
+      }, { passive: true })
+      // 页面加载和路由切换后也要检查（短页面可能一开始就在底部）
+      setTimeout(checkBottom, 500)
+      if (router) {
+        router.onAfterRouteChanged = () => {
+          // 路由切换后重置并重新检查
+          document.documentElement.classList.remove('at-bottom')
+          setTimeout(checkBottom, 300)
+        }
+      }
+    }
   },
 } satisfies Theme
