@@ -12,14 +12,35 @@ html.doc-gated .vp-doc {
 }
 
 /* ===== 右侧栏（aside）：降低显示断点，让更多屏幕能看到 ===== */
-/* VitePress 默认要 1280px 才显示右侧大纲，对很多笔记本太高。
-   降到 1024px，同时收窄正文让出空间。 */
+/* VitePress 默认要 1280px 才让 container 变 flex 并显示右侧大纲。
+   问题：1280px 以下 container 不是 flex，aside 即便 display:block 也无法并排。
+   解决：在 1024px 就让 container 变 flex + aside 可见。 */
 @media (min-width: 1024px) {
-  .VPDoc.has-sidebar.has-aside .aside {
-    display: block;
-    padding-left: 24px;
+  /* 关键：让 container 变成 flex，aside 和 content 才能并排 */
+  .VPDoc .container {
+    display: flex !important;
+    justify-content: center;
   }
-  /* 配合收窄正文，避免整体被挤压 */
+
+  /* aside 可见 */
+  .VPDoc.has-sidebar.has-aside .aside {
+    display: block !important;
+    padding-left: 24px;
+    max-width: 256px;
+    order: 2;
+  }
+
+  .VPDoc.has-sidebar.has-aside .aside-container {
+    width: 224px;
+  }
+
+  /* content 在左，配合收窄给右侧让空间 */
+  .VPDoc.has-sidebar.has-aside .content {
+    order: 1;
+    margin: 0;
+    min-width: 0;
+  }
+
   .VPDoc.has-sidebar.has-aside .content-container {
     max-width: 640px;
   }
