@@ -1,3 +1,9 @@
+/* ===== 页面底部栏：让 VitePress 原生 footer 在课程页（有侧边栏）也显示 ===== */
+/* 默认 VitePress 在 has-sidebar 页面隐藏 footer，覆盖它让联系信息显示在页面最底部 */
+.VPFooter.has-sidebar {
+  display: block !important;
+}
+
 /* 把右上角登录/用户区推到导航栏最右侧 */
 .nav-auth {
   margin-left: auto !important;

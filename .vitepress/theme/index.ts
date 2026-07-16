@@ -11,7 +11,6 @@ import Comments from '../../components/Comments.vue'
 import ProfitCalculator from '../../components/ProfitCalculator.vue'
 import ModalDialog from '../../components/ModalDialog.vue'
 import CourseGate from '../../components/CourseGate.vue'
-import SiteFooter from '../../components/SiteFooter.vue'
 import PortfolioHealthCheck from '../../components/PortfolioHealthCheck.vue'
 import ReplenishmentCalculator from '../../components/ReplenishmentCalculator.vue'
 import { recordVisit, recordLastLesson } from '../../lib/visitTracker'
@@ -24,7 +23,7 @@ export default {
     return h(DefaultTheme.Layout, null, {
       'nav-bar-content-after': () => h(AuthPanel),
       'doc-before': () => h(CourseGate),
-      'doc-after': () => [h(Comments), h(SiteFooter)],
+      'doc-after': () => [h(Comments)],
       'layout-bottom': () => h(ModalDialog),
     })
   },
