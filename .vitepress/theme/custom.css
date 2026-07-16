@@ -1,31 +1,21 @@
-/* ===== 页面底部栏：滚到底部时侧边栏淡出，footer 横跨全宽出现（如飞书效果）===== */
+/* ===== 页面底部栏：滚到底部时滑入，盖在侧边栏上方（如飞书效果）===== */
 /* VitePress 默认在 has-sidebar 页面隐藏 footer，覆盖它 */
 .VPFooter.has-sidebar {
   display: block !important;
 }
 
-/* 桌面端：侧边栏淡出动画 + footer 上滑出现动画 */
+/* 桌面端：footer 固定在视口底部，滚到底部时滑入，z-index 高于侧边栏 */
 @media (min-width: 960px) {
-  /* 侧边栏：默认可见，滚到底部时淡出 */
-  .VPSidebar {
-    transition: opacity 0.4s ease, transform 0.4s ease;
-  }
-  /* 滚到底部时：侧边栏淡出 + footer 从底部滑入 */
-  html.at-bottom .VPSidebar {
-    opacity: 0 !important;
-    transform: translateX(-30px);
-    pointer-events: none;
-  }
-  /* footer：默认在视口下方隐藏，滚到底部时滑入 */
   .VPFooter.has-sidebar {
     position: fixed;
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 30;
+    z-index: 30; /* 高于侧边栏的 25，盖在侧边栏上方 */
     transform: translateY(100%);
     transition: transform 0.4s ease;
     background: var(--vp-c-bg);
+    border-top: 1px solid var(--vp-c-gutter);
   }
   html.at-bottom .VPFooter.has-sidebar {
     transform: translateY(0);
