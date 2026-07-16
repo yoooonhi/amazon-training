@@ -1,6 +1,7 @@
 import DefaultTheme from 'vitepress/theme'
 import type { Theme } from 'vitepress'
-import { h } from 'vue'
+import { h, defineComponent } from 'vue'
+import { useData } from 'vitepress'
 
 import ProgressTracker from '../../components/ProgressTracker.vue'
 import DailyGate from '../../components/DailyGate.vue'
@@ -13,13 +14,24 @@ import ModalDialog from '../../components/ModalDialog.vue'
 import CourseGate from '../../components/CourseGate.vue'
 import PortfolioHealthCheck from '../../components/PortfolioHealthCheck.vue'
 import ReplenishmentCalculator from '../../components/ReplenishmentCalculator.vue'
+import AdminShell from '../../components/dashboard/AdminShell.vue'
 import { recordVisit, recordLastLesson } from '../../lib/visitTracker'
 import { setupSidebarGuard } from '../../lib/sidebarGuard'
 import './custom.css'
 
+// dashboard 页面用全屏后台布局，跳过 VitePress 的导航/侧边栏/底部栏
+const AdminLayout = defineComponent(() => {
+  return () => h(AdminShell)
+})
+
 export default {
   extends: DefaultTheme,
   Layout: () => {
+    const { page } = useData()
+    // dashboard 页面：全屏后台，不套 VitePress 布局
+    if ((page.value.relativePath || '').startsWith('dashboard')) {
+      return h(AdminLayout)
+    }
     return h(DefaultTheme.Layout, null, {
       'nav-bar-content-after': () => h(AuthPanel),
       'doc-before': () => h(CourseGate),
