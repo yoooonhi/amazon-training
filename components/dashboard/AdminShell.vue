@@ -148,9 +148,6 @@ onMounted(async () => {
             <span class="nav-label">{{ item.label }}</span>
           </button>
         </nav>
-        <div class="sidebar-footer">
-          <a href="/" class="back-home">← 返回首页</a>
-        </div>
       </aside>
 
       <!-- 右侧内容区 -->
@@ -199,7 +196,7 @@ onMounted(async () => {
   min-height: 70vh;
 }
 
-/* 左侧导航 */
+/* 左侧导航：sticky 固定，不随右侧内容滚动 */
 .admin-sidebar {
   width: 200px;
   flex-shrink: 0;
@@ -208,6 +205,11 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   padding: 1rem 0;
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  max-height: 100vh;
+  overflow-y: auto;
 }
 .sidebar-header {
   display: flex;
@@ -260,18 +262,6 @@ onMounted(async () => {
   font-size: 1.05rem;
   width: 1.3rem;
   text-align: center;
-}
-.sidebar-footer {
-  padding: 0.75rem 1.25rem;
-  border-top: 1px solid var(--vp-c-divider);
-}
-.back-home {
-  font-size: 0.82rem;
-  color: var(--vp-c-text-3);
-  text-decoration: none;
-}
-.back-home:hover {
-  color: var(--vp-c-brand-1);
 }
 
 /* 移动端顶部栏（默认隐藏） */
