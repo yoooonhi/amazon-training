@@ -127,7 +127,7 @@ onMounted(loadData)
           </div>
           <div class="ratio-legend">
             <span><span class="dot" style="background: var(--vp-c-brand-1);"></span>登录 {{ loginRatio.logged }} ({{ Math.round(loginRatio.logged / totalVisits * 100) }}%)</span>
-            <span><span class="dot" style="background: var(--vp-c-divider);"></span>游客 {{ loginRatio.guest }} ({{ Math.round(loginRatio.guest / totalVisits * 100) }}%)</span>
+            <span><span class="dot" style="background: var(--dash-track); border: 1px solid var(--vp-c-divider);"></span>游客 {{ loginRatio.guest }} ({{ Math.round(loginRatio.guest / totalVisits * 100) }}%)</span>
           </div>
         </div>
         <p v-else class="empty-hint">暂无数据</p>
@@ -142,7 +142,7 @@ onMounted(loadData)
 .path-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; }
 .path-rank { width: 1.5rem; font-weight: 700; color: var(--vp-c-brand-1); text-align: center; }
 .path-name { flex: 1; color: var(--vp-c-text-1); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.path-bar-wrap { width: 60px; height: 14px; background: var(--vp-c-divider); border-radius: 3px; overflow: hidden; }
+.path-bar-wrap { width: 60px; height: 14px; background: var(--dash-track); border-radius: 3px; overflow: hidden; }
 .path-bar-fill { height: 100%; background: var(--vp-c-brand-1); border-radius: 3px; }
 .path-count { font-weight: 700; color: var(--vp-c-text-1); min-width: 2rem; text-align: right; }
 </style>

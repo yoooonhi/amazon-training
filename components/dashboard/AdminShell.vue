@@ -74,6 +74,11 @@ const currentIcon = computed(() => {
   return '📊'
 })
 
+// 内联 SVG 图标（类浏览器标签/仪表盘风格，深色背景上清晰）
+const icons = {
+  logo: `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>`,
+}
+
 const pageComponents = {
   overview: OverviewPage, students: StudentsPage, learning: LearningPage,
   visits: VisitsPage, members: MembersPage, comments: CommentsPage,
@@ -142,7 +147,7 @@ onMounted(() => {
       >
         <!-- Logo 区 -->
         <div class="nav-logo" @click="switchPage('overview')">
-          <span class="nav-logo-icon">📊</span>
+          <span class="nav-logo-icon" v-html="icons.logo"></span>
           <span v-if="!sidebarCollapsed" class="nav-logo-text">运营后台</span>
         </div>
 
@@ -217,15 +222,14 @@ onMounted(() => {
 
 <style scoped>
 /* ===== 全屏根容器 ===== */
-/* 后台统一品牌色：#272843（深蓝灰），覆盖 VitePress 默认的浅蓝 */
+/* 品牌色：不覆盖 --vp-c-brand-1，让 VitePress 默认值亮暗自适应，
+   保证所有把它当字体色的数字/链接在深色模式下可读。
+   按钮背景单独用 indigo，侧边栏 active 用半透明高亮。*/
 .admin-root {
-  --vp-c-brand-1: #272843;
-  --vp-c-brand-2: #3d3e5c;
-  --vp-c-brand-3: #54557a;
-  --vp-c-brand-soft: rgba(39, 40, 67, 0.08);
-  --vp-button-brand-bg: #272843;
-  --vp-button-brand-hover-bg: #3d3e5c;
-  --vp-button-brand-border: #272843;
+  --vp-c-brand-soft: rgba(99, 102, 241, 0.12);
+  --vp-button-brand-bg: #4f46e5;
+  --vp-button-brand-hover-bg: #4338ca;
+  --vp-button-brand-border: #4f46e5;
 }
 /* 不用 fixed（会被父容器 transform 破坏），用 100vw/100vh + 负 margin 撑满 */
 .admin-root {
@@ -303,7 +307,7 @@ onMounted(() => {
   border-bottom: 1px solid rgba(255,255,255,0.06);
   flex-shrink: 0;
 }
-.nav-logo-icon { font-size: 1.4rem; }
+.nav-logo-icon { font-size: 1.4rem; color: #818cf8; display: inline-flex; }
 .nav-logo-text {
   font-size: 1rem;
   font-weight: 700;
@@ -313,14 +317,14 @@ onMounted(() => {
 
 .nav-collapse-btn {
   position: absolute;
-  right: -12px;
-  top: 28px;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
+  right: 8px;
+  top: 20px;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
   border: 1px solid rgba(255,255,255,0.12);
-  background: var(--vp-c-bg-alt, #1a1a2e);
-  color: var(--vp-c-text-2);
+  background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.7);
   font-size: 0.6rem;
   cursor: pointer;
   z-index: 10;
@@ -328,6 +332,7 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
 }
+.nav-collapse-btn:hover { background: rgba(255,255,255,0.12); color: #fff; }
 .admin-nav { position: relative; }
 
 .nav-body {
@@ -369,9 +374,20 @@ onMounted(() => {
   color: rgba(255,255,255,0.9);
 }
 .nav-link.active {
-  background: var(--vp-c-brand-1);
+  background: rgba(99, 102, 241, 0.22);
   color: #fff;
   font-weight: 600;
+  position: relative;
+}
+.nav-link.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: #818cf8;
 }
 .nav-link-icon { font-size: 1.1rem; flex-shrink: 0; width: 1.4rem; text-align: center; }
 .nav-link-text { overflow: hidden; }

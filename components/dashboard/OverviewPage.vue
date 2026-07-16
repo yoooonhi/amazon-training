@@ -169,41 +169,37 @@ onMounted(loadData)
 
     <!-- 转化漏斗 -->
     <div class="data-section">
-      <h3 class="section-title"> funnel 转化漏斗</h3>
+      <h3 class="section-title">转化漏斗</h3>
       <div class="funnel">
         <div class="funnel-row">
           <span class="funnel-label">注册</span>
           <div class="funnel-bar-wrap">
-            <div class="funnel-bar" style="width: 100%; background: var(--vp-c-brand-1);">
-              <span>{{ funnel.registered }} 人</span>
-            </div>
+            <div class="funnel-bar" style="width: 100%; background: var(--vp-c-brand-1);"></div>
+            <span class="funnel-count">{{ funnel.registered }} 人</span>
           </div>
           <span class="funnel-pct">100%</span>
         </div>
         <div class="funnel-row">
           <span class="funnel-label">开始学习</span>
           <div class="funnel-bar-wrap">
-            <div class="funnel-bar" :style="{ width: pct(funnel.started, funnel.registered) + '%', background: 'var(--vp-c-brand-1)' }">
-              <span>{{ funnel.started }} 人</span>
-            </div>
+            <div class="funnel-bar" :style="{ width: pct(funnel.started, funnel.registered) + '%', background: 'var(--vp-c-brand-1)' }"></div>
+            <span class="funnel-count">{{ funnel.started }} 人</span>
           </div>
           <span class="funnel-pct">{{ pct(funnel.started, funnel.registered) }}%</span>
         </div>
         <div class="funnel-row">
           <span class="funnel-label">完成 50%</span>
           <div class="funnel-bar-wrap">
-            <div class="funnel-bar" :style="{ width: pct(funnel.halfDone, funnel.registered) + '%', background: '#16a34a' }">
-              <span>{{ funnel.halfDone }} 人</span>
-            </div>
+            <div class="funnel-bar" :style="{ width: pct(funnel.halfDone, funnel.registered) + '%', background: '#16a34a' }"></div>
+            <span class="funnel-count">{{ funnel.halfDone }} 人</span>
           </div>
           <span class="funnel-pct">{{ pct(funnel.halfDone, funnel.registered) }}%</span>
         </div>
         <div class="funnel-row">
           <span class="funnel-label">👑 会员</span>
           <div class="funnel-bar-wrap">
-            <div class="funnel-bar" :style="{ width: pct(funnel.member, funnel.registered) + '%', background: 'linear-gradient(90deg, #fbbf24, #f59e0b)' }">
-              <span>{{ funnel.member }} 人</span>
-            </div>
+            <div class="funnel-bar" :style="{ width: pct(funnel.member, funnel.registered) + '%', background: 'linear-gradient(90deg, #fbbf24, #f59e0b)' }"></div>
+            <span class="funnel-count">{{ funnel.member }} 人</span>
           </div>
           <span class="funnel-pct">{{ pct(funnel.member, funnel.registered) }}%</span>
         </div>
@@ -229,8 +225,9 @@ onMounted(loadData)
 .funnel { display: flex; flex-direction: column; gap: 0.75rem; }
 .funnel-row { display: flex; align-items: center; gap: 0.75rem; }
 .funnel-label { width: 80px; font-size: 0.85rem; font-weight: 600; color: var(--vp-c-text-2); flex-shrink: 0; }
-.funnel-bar-wrap { flex: 1; height: 28px; background: var(--vp-c-divider); border-radius: 6px; overflow: hidden; }
-.funnel-bar { height: 100%; display: flex; align-items: center; padding-left: 0.6rem; color: #fff; font-size: 0.78rem; font-weight: 600; border-radius: 6px; min-width: 2px; transition: width 0.3s; }
+.funnel-bar-wrap { position: relative; flex: 1; height: 28px; background: var(--dash-track); border-radius: 6px; overflow: hidden; }
+.funnel-bar { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 6px; min-width: 2px; transition: width 0.3s; }
+.funnel-count { position: absolute; left: 0.6rem; top: 50%; transform: translateY(-50%); color: var(--vp-c-text-1); font-size: 0.78rem; font-weight: 600; z-index: 2; pointer-events: none; }
 .funnel-pct { width: 50px; text-align: right; font-size: 0.82rem; font-weight: 600; color: var(--vp-c-text-2); }
 
 .alert-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0.75rem; }

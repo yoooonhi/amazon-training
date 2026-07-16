@@ -1,5 +1,11 @@
 /* ===== 后台共享视觉系统（Vercel/Linear 风格）===== */
 
+/* 进度/占比条的未填充轨道：不用 --vp-c-divider（深色模式下偏黑 #26273d），
+   改用半透明中性灰，深浅模式都柔和可读。*/
+.admin-root {
+  --dash-track: rgba(120, 120, 140, 0.18);
+}
+
 /* 统计卡 —— 带图标 + 大数字 + 标签 */
 .stats-row {
   display: grid;
@@ -130,7 +136,7 @@
 .col-name small { color: var(--vp-c-text-2); font-size: 0.72rem; }
 .member-crown { color: #f59e0b; font-size: 0.85rem; }
 .col-progress { white-space: nowrap; }
-.tbl-bar { display: inline-block; width: 60px; height: 6px; background: var(--vp-c-divider); border-radius: 3px; overflow: hidden; vertical-align: middle; margin-right: 0.4rem; }
+.tbl-bar { display: inline-block; width: 60px; height: 6px; background: var(--dash-track); border-radius: 3px; overflow: hidden; vertical-align: middle; margin-right: 0.4rem; }
 .tbl-bar-fill { height: 100%; background: var(--vp-c-brand-1); border-radius: 3px; }
 .tbl-pct { font-weight: 600; color: var(--vp-c-brand-1); margin-right: 0.3rem; }
 .tbl-count { font-size: 0.75rem; color: var(--vp-c-text-2); }
@@ -250,7 +256,7 @@ h3 { font-size: 1rem; margin: 1.5rem 0 0.75rem; color: var(--vp-c-text-1); }
 /* 占比条 */
 .ratio-bar { display: flex; height: 28px; border-radius: 8px; overflow: hidden; margin-bottom: 0.6rem; }
 .ratio-seg-a { background: var(--vp-c-brand-1); transition: width 0.3s; }
-.ratio-seg-b { background: var(--vp-c-divider); transition: width 0.3s; }
+.ratio-seg-b { background: var(--dash-track); transition: width 0.3s; }
 .ratio-legend { display: flex; gap: 1.25rem; font-size: 0.78rem; color: var(--vp-c-text-2); }
 .ratio-legend span { display: flex; align-items: center; gap: 0.35rem; }
 .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
