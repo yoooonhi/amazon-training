@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 480" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <rect width="1100" height="480" fill="#fafafa"/>
+  <text x="550" y="45" text-anchor="middle" font-size="26" font-weight="700" fill="#23289e">资金占用周期：一块钱压在路上多少天</text>
+  <text x="550" y="72" text-anchor="middle" font-size="15" fill="#666">以一个标准件为例，从下单到回款约 131 天（年化只能转 2.8 圈）</text>
+
+  <!-- 时间轴主线 -->
+  <line x1="80" y1="240" x2="1020" y2="240" stroke="#cbd5e1" stroke-width="3"/>
+
+  <!-- 六个阶段色块 -->
+  <!-- 1. 下单采购 -->
+  <rect x="80" y="200" width="110" height="80" rx="6" fill="#fde68a" stroke="#f59e0b"/>
+  <text x="135" y="235" text-anchor="middle" font-size="15" font-weight="700" fill="#92400e">下单采购</text>
+  <text x="135" y="258" text-anchor="middle" font-size="20" font-weight="800" fill="#92400e">7天</text>
+  <text x="135" y="180" text-anchor="middle" font-size="12" fill="#666">付款给工厂</text>
+
+  <!-- 2. 生产备货 -->
+  <rect x="200" y="200" width="180" height="80" rx="6" fill="#fcd34d" stroke="#f59e0b"/>
+  <text x="290" y="235" text-anchor="middle" font-size="15" font-weight="700" fill="#92400e">生产备货</text>
+  <text x="290" y="258" text-anchor="middle" font-size="20" font-weight="800" fill="#92400e">15-30天</text>
+  <text x="290" y="180" text-anchor="middle" font-size="12" fill="#666">工厂生产+质检</text>
+
+  <!-- 3. 头程运输 -->
+  <rect x="390" y="200" width="200" height="80" rx="6" fill="#fb923c" stroke="#ea580c"/>
+  <text x="490" y="235" text-anchor="middle" font-size="15" font-weight="700" fill="#7c2d12">头程运输</text>
+  <text x="490" y="258" text-anchor="middle" font-size="20" font-weight="800" fill="#7c2d12">25-45天</text>
+  <text x="490" y="180" text-anchor="middle" font-size="12" fill="#666">海运/空运到目的国</text>
+
+  <!-- 4. FBA接收上架 -->
+  <rect x="600" y="200" width="120" height="80" rx="6" fill="#f87171" stroke="#dc2626"/>
+  <text x="660" y="235" text-anchor="middle" font-size="14" font-weight="700" fill="#7f1d1d">FBA上架</text>
+  <text x="660" y="258" text-anchor="middle" font-size="20" font-weight="800" fill="#7f1d1d">7-14天</text>
+  <text x="660" y="180" text-anchor="middle" font-size="12" fill="#666">最易被忽略</text>
+
+  <!-- 5. 销售周期 -->
+  <rect x="730" y="200" width="170" height="80" rx="6" fill="#a78bfa" stroke="#7c3aed"/>
+  <text x="815" y="235" text-anchor="middle" font-size="15" font-weight="700" fill="#4c1d95">销售周期</text>
+  <text x="815" y="258" text-anchor="middle" font-size="20" font-weight="800" fill="#4c1d95">30-45天</text>
+  <text x="815" y="180" text-anchor="middle" font-size="12" fill="#666">库存卖完</text>
+
+  <!-- 6. 回款到账 -->
+  <rect x="910" y="200" width="100" height="80" rx="6" fill="#34d399" stroke="#059669"/>
+  <text x="960" y="235" text-anchor="middle" font-size="14" font-weight="700" fill="#064e3b">回款到账</text>
+  <text x="960" y="258" text-anchor="middle" font-size="20" font-weight="800" fill="#064e3b">14天</text>
+  <text x="960" y="180" text-anchor="middle" font-size="12" fill="#666">亚马逊打款</text>
+
+  <!-- 总计标注 -->
+  <line x1="80" y1="310" x2="1010" y2="310" stroke="#23289e" stroke-width="2" stroke-dasharray="6,4"/>
+  <text x="545" y="340" text-anchor="middle" font-size="20" font-weight="800" fill="#23289e">合计 ≈ 131 天</text>
+  <text x="545" y="365" text-anchor="middle" font-size="14" fill="#666">365天 ÷ 131天 ≈ 一年转 2.8 圈（年化资金回报 = 单圈利润率 × 2.8）</text>
+
+  <!-- 关键洞察 -->
+  <rect x="80" y="395" width="930" height="65" rx="8" fill="#fef2f2" stroke="#dc2626" stroke-width="1.5"/>
+  <text x="545" y="425" text-anchor="middle" font-size="15" font-weight="700" fill="#dc2626">⚠ 关键认知：毛利30%的产品，若资金占用131天，年化回报=30%×2.8=84%</text>
+  <text x="545" y="448" text-anchor="middle" font-size="13" fill="#666">如果能把周期压到90天（转4圈），年化回报=30%×4=120%——缩短周期比提毛利更来钱</text>
+</svg>
