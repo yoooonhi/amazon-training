@@ -4,6 +4,14 @@
   display: block !important;
 }
 
+/* 侧边栏默认 bottom:0 会盖住 footer 左侧区域。
+   给侧边栏底部留出 footer 高度，让 footer 横跨整个页面宽度不被遮挡。 */
+@media (min-width: 960px) {
+  .VPSidebar {
+    bottom: 89px !important; /* footer 高度（padding 64 + 内容 25 ≈ 89px） */
+  }
+}
+
 /* 把右上角登录/用户区推到导航栏最右侧 */
 .nav-auth {
   margin-left: auto !important;
