@@ -71,7 +71,7 @@ export const curriculum = [
     week: 1,
     title: '广告优化实战',
     lessons: [
-      'b1-01', 'b1-02', 'b1-03', 'b1-04', 'b1-05',
+      'b1-01', 'b1-02', 'b1-03', 'b1-04', 'b1-05', 'b1-06',
     ],
   },
   {
@@ -79,7 +79,7 @@ export const curriculum = [
     week: 2,
     title: 'Listing持续优化',
     lessons: [
-      'b2-01', 'b2-02', 'b2-03', 'b2-04', 'b2-05',
+      'b2-01', 'b2-02', 'b2-03', 'b2-04', 'b2-05', 'b2-06',
     ],
   },
   {
@@ -95,7 +95,7 @@ export const curriculum = [
     week: 4,
     title: '定价与促销策略',
     lessons: [
-      'b4-01', 'b4-02', 'b4-03', 'b4-04',
+      'b4-01', 'b4-02', 'b4-03', 'b4-04', 'b4-05',
     ],
   },
   // ===== 中级（导师内测中）=====
@@ -277,11 +277,13 @@ export const pathToLessonId: Record<string, string> = {
   'b1-ads-optimization/03-dayparting-tos': 'b1-03',
   'b1-ads-optimization/04-acos-reduction-loop': 'b1-04',
   'b1-ads-optimization/05-weekly-checklist-practice': 'b1-05',
+  'b1-ads-optimization/06-sb-sd-ads': 'b1-06',
   'b2-listing-optimization/01-ab-testing': 'b2-01',
   'b2-listing-optimization/02-rank-monitoring': 'b2-02',
   'b2-listing-optimization/03-search-terms-iteration': 'b2-03',
   'b2-listing-optimization/04-image-ctr': 'b2-04',
   'b2-listing-optimization/05-listing-audit-practice': 'b2-05',
+  'b2-listing-optimization/06-review-management': 'b2-06',
   'b3-inventory-advanced/01-replenishment-model': 'b3-01',
   'b3-inventory-advanced/02-stock-budget': 'b3-02',
   'b3-inventory-advanced/03-stagnant-inventory': 'b3-03',
@@ -290,6 +292,7 @@ export const pathToLessonId: Record<string, string> = {
   'b4-pricing-strategy/02-promo-rhythm': 'b4-02',
   'b4-pricing-strategy/03-price-elasticity': 'b4-03',
   'b4-pricing-strategy/04-monthly-promo-plan': 'b4-04',
+  'b4-pricing-strategy/05-buybox-hijack-defense': 'b4-05',
   // ===== 中级课程 =====
   'i1-cold-start/01-selection-validation': 'i1-01',
   'i1-cold-start/02-launch-timeline': 'i1-02',

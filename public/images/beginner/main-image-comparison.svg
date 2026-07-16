@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <!-- 背景 -->
+  <rect width="1600" height="900" fill="#fafafa"/>
+
+  <!-- 标题 -->
+  <text x="800" y="60" text-anchor="middle" font-size="36" font-weight="700" fill="#23289e">亚马逊主图优化：合格 vs 不合格</text>
+  <text x="800" y="95" text-anchor="middle" font-size="20" fill="#666">同样的产品，主图质量直接决定 CTR（点击率）</text>
+
+  <!-- 分隔线 -->
+  <line x1="800" y1="130" x2="800" y2="780" stroke="#ddd" stroke-width="2" stroke-dasharray="8,6"/>
+
+  <!-- ===== 左列：合格主图 ===== -->
+  <text x="400" y="160" text-anchor="middle" font-size="28" font-weight="700" fill="#16a34a">✓ 合格主图</text>
+
+  <!-- 模拟搜索结果缩略图框（纯白背景） -->
+  <rect x="120" y="190" width="560" height="420" fill="#ffffff" stroke="#e5e5e5" stroke-width="2" rx="8"/>
+
+  <!-- 产品：瑜伽垫，占比 85%，45度角，卷起状态 -->
+  <g transform="translate(400,400)">
+    <!-- 卷起的瑜伽垫主体（椭圆截面 + 圆柱体） -->
+    <ellipse cx="0" cy="120" rx="180" ry="32" fill="#3b3b3b" opacity="0.12"/>
+    <rect x="-150" y="-130" width="300" height="250" rx="12" fill="#2563eb"/>
+    <rect x="-150" y="-130" width="300" height="40" rx="12" fill="#1d4ed8"/>
+    <ellipse cx="0" cy="-130" rx="150" ry="22" fill="#1e40af"/>
+    <ellipse cx="0" cy="-130" rx="150" ry="22" fill="none" stroke="#3b82f6" stroke-width="3"/>
+    <!-- 卷起纹理线 -->
+    <line x1="-140" y1="-60" x2="140" y2="-60" stroke="#1e40af" stroke-width="2" opacity="0.4"/>
+    <line x1="-145" y1="0" x2="145" y2="0" stroke="#1e40af" stroke-width="2" opacity="0.4"/>
+    <line x1="-148" y1="60" x2="148" y2="60" stroke="#1e40af" stroke-width="2" opacity="0.4"/>
+    <!-- 绑带 -->
+    <rect x="-155" y="20" width="310" height="18" fill="#64748b"/>
+  </g>
+
+  <!-- 合格标记列表 -->
+  <g font-size="20" fill="#444">
+    <text x="140" y="660">✓ 纯白背景（RGB 255,255,255）</text>
+    <text x="140" y="695">✓ 产品占比 ≥85%</text>
+    <text x="140" y="730">✓ 45° 角展示卖点，无文字</text>
+    <text x="140" y="765">✓ 缩略图里清晰突出</text>
+  </g>
+
+  <!-- ===== 右列：不合格主图 ===== -->
+  <text x="1200" y="160" text-anchor="middle" font-size="28" font-weight="700" fill="#dc2626">✗ 不合格主图</text>
+
+  <!-- 模拟缩略图框（略灰背景） -->
+  <rect x="920" y="190" width="560" height="420" fill="#f0f0f0" stroke="#e5e5e5" stroke-width="2" rx="8"/>
+
+  <!-- 产品：占比只有 50%，正面平铺，周围大片留白 -->
+  <g transform="translate(1200,400)">
+    <rect x="-120" y="-90" width="240" height="180" rx="8" fill="#2563eb" opacity="0.85"/>
+    <rect x="-120" y="-90" width="240" height="30" rx="8" fill="#1d4ed8" opacity="0.85"/>
+    <!-- 模糊边缘 -->
+    <rect x="-120" y="-90" width="240" height="180" rx="8" fill="none" stroke="#999" stroke-width="1" opacity="0.5"/>
+  </g>
+
+  <!-- 不合格标记列表 -->
+  <g font-size="20" fill="#444">
+    <text x="940" y="660">✗ 背景偏灰，不纯净</text>
+    <text x="940" y="695">✗ 产品占比仅 ~50%，大片留白</text>
+    <text x="940" y="730">✗ 正面平铺，看不出特征</text>
+    <text x="940" y="765">✗ 缩略图里"消失"，CTR 吃亏</text>
+  </g>
+
+  <!-- 底部总结条 -->
+  <rect x="0" y="810" width="1600" height="90" fill="#23289e"/>
+  <text x="800" y="865" text-anchor="middle" font-size="24" font-weight="600" fill="#fff">铁律：纯白背景 · 产品占比 ≥85% · 角度展示卖点 · 缩略图里要"跳出来"</text>
+</svg>

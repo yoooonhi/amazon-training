@@ -62,6 +62,8 @@ ACOS 高
             → 动作：收匹配类型（宽→词组→精准）、降出价、砍热词
 ```
 
+![ACOS 诊断树](/images/beginner/acos-diagnosis-tree.svg)
+
 ### 三种问题的诊断对照表
 
 | 根因 | 报表特征 | 典型数字 | 对症动作 |

@@ -180,6 +180,7 @@ export default defineConfig({
                 { text: '1.3 分时调价与TOS抢占', link: '/content/beginner/b1-ads-optimization/03-dayparting-tos' },
                 { text: '1.4 ACOS压降闭环', link: '/content/beginner/b1-ads-optimization/04-acos-reduction-loop' },
                 { text: '1.5 周度优化清单（实操）', link: '/content/beginner/b1-ads-optimization/05-weekly-checklist-practice' },
+                { text: '1.6 品牌广告与展示广告（SB/SD）', link: '/content/beginner/b1-ads-optimization/06-sb-sd-ads' },
               ],
             },
             {
@@ -191,6 +192,7 @@ export default defineConfig({
                 { text: '2.3 Search Terms迭代', link: '/content/beginner/b2-listing-optimization/03-search-terms-iteration' },
                 { text: '2.4 图片点击率优化', link: '/content/beginner/b2-listing-optimization/04-image-ctr' },
                 { text: '2.5 Listing体检（实操）', link: '/content/beginner/b2-listing-optimization/05-listing-audit-practice' },
+                { text: '2.6 评论获取与差评管理', link: '/content/beginner/b2-listing-optimization/06-review-management' },
               ],
             },
             {
@@ -211,6 +213,7 @@ export default defineConfig({
                 { text: '4.2 促销节奏设计', link: '/content/beginner/b4-pricing-strategy/02-promo-rhythm' },
                 { text: '4.3 价格弹性测试', link: '/content/beginner/b4-pricing-strategy/03-price-elasticity' },
                 { text: '4.4 月度促销表（实操）', link: '/content/beginner/b4-pricing-strategy/04-monthly-promo-plan' },
+                { text: '4.5 Buy Box防御与跟卖应对', link: '/content/beginner/b4-pricing-strategy/05-buybox-hijack-defense' },
               ],
             },
           ],
