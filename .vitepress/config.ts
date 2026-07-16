@@ -63,8 +63,7 @@ export default defineConfig({
         },
         // ===== 入门课（7个模块）=====
         {
-          text: '📘 入门课',
-          collapsed: false,
+          text: '入门课',
           items: [
             {
               text: '入门1 · 平台认知与账号安全',
