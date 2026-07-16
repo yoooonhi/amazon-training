@@ -3,7 +3,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { authState, supabase } from '../lib/supabase'
 import {
   getLevelByPath, isLevelAccessible, isMentorRole,
-  isSkillPath, isSkillAccessible,
+  isSkillPath, isSkillAccessible, getSkillSlug, MEMBER_SKILL_SLUGS,
 } from '../lib/accessControl'
 
 const isMounted = ref(false)
@@ -26,6 +26,13 @@ const blockedLevel = computed(() => {
 const isSkillBlocked = computed(() => {
   if (!isSkillPath(currentPath.value)) return false
   return !isSkillAccessible(currentPath.value, profile.value)
+})
+
+// 被拦截的是不是会员专属技能课（文案区分用）
+const isMemberSkillBlocked = computed(() => {
+  if (!isSkillBlocked.value) return false
+  const slug = getSkillSlug(currentPath.value)
+  return slug ? MEMBER_SKILL_SLUGS.includes(slug) : false
 })
 
 // 是否处于拦截状态（任一遮罩显示）
@@ -108,6 +115,27 @@ onMounted(() => {
     </div>
   </div>
 
+  <!-- 会员专属技能课被拦截 -->
+  <div v-else-if="isMounted && isSkillBlocked && isMemberSkillBlocked" class="course-gate">
+    <div class="gate-card">
+      <div class="gate-icon">👑</div>
+      <h2 class="gate-title">会员专享内容</h2>
+      <p class="gate-desc" v-if="!isLoggedIn">
+        这是技能补给站的会员专享课程。<br />
+        升级会员即可解锁全部技能课程。
+      </p>
+      <p class="gate-desc" v-else>
+        你当前是免费用户。<br />
+        升级会员即可解锁这门专享技能课。
+      </p>
+      <div class="gate-actions">
+        <button v-if="!isLoggedIn" class="gate-btn gate-btn-primary" @click="openAuthPanel">免费注册 / 登录</button>
+        <span v-else class="gate-member-hint">👑 联系导师开通会员解锁</span>
+      </div>
+      <p class="gate-hint">会员可访问全部技能补给站内容。</p>
+    </div>
+  </div>
+
   <!-- 技能补给站被拦截：需登录（仅内容区，保留侧边栏与导航） -->
   <div v-else-if="isMounted && isSkillBlocked" class="course-gate">
     <div class="gate-card">
@@ -177,6 +205,16 @@ onMounted(() => {
 .gate-btn-primary {
   background: var(--vp-c-brand-1);
   color: #fff;
+}
+.gate-member-hint {
+  display: inline-block;
+  padding: 0.55rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #b45309;
+  background: rgba(255, 193, 7, 0.12);
+  border: 1px solid rgba(255, 193, 7, 0.35);
 }
 .gate-hint {
   margin: 1.25rem 0 0;

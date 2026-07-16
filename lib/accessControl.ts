@@ -89,6 +89,13 @@ export const SKILL_PATH_PREFIX = '/content/skills/'
 export const PUBLIC_SKILL_SLUGS = ['domain-basics']
 
 /**
+ * 会员专属的技能课（slug 白名单）。
+ * 只有付费会员（is_member）或导师可访问；免费登录用户和游客被拦截。
+ * 要把某门技能课设为会员专属，把它的 slug 加到这个数组里。
+ */
+export const MEMBER_SKILL_SLUGS = ['excel-for-ops']
+
+/**
  * 判断是否为付费会员。
  * - 导师 / 管理员：视为会员（避免被技能站门控拦截）
  * - profile.is_member === true：付费会员
@@ -119,7 +126,8 @@ export function getSkillSlug(path: string): string | null {
 /**
  * 判断某技能课是否对指定角色开放。
  * - 导师：全部开放
- * - 已登录（任意角色，含免费用户）：全部开放
+ * - 会员专属（MEMBER_SKILL_SLUGS）：仅付费会员可访问
+ * - 已登录（任意角色，含免费用户）：其余技能课全部开放
  * - 白名单（PUBLIC_SKILL_SLUGS）：对所有访客开放
  * - 其余（未登录访客）：不可访问
  */
@@ -128,8 +136,12 @@ export function isSkillAccessible(
   profile: any | null | undefined
 ): boolean {
   if (isMentorRole(profile?.role)) return true
-  if (profile?.role) return true // 任意已登录用户
   const slug = getSkillSlug(path)
+  // 会员专属技能课：只有付费会员能看，免费用户和游客拦截
+  if (slug && MEMBER_SKILL_SLUGS.includes(slug)) {
+    return isMember(profile)
+  }
+  if (profile?.role) return true // 任意已登录用户
   if (slug && PUBLIC_SKILL_SLUGS.includes(slug)) return true
   return false
 }

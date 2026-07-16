@@ -17,7 +17,7 @@
 import { authState, supabase } from './supabase'
 import {
   publicLevels, isMentorRole, isMember,
-  SKILL_PATH_PREFIX, PUBLIC_SKILL_SLUGS,
+  SKILL_PATH_PREFIX, PUBLIC_SKILL_SLUGS, MEMBER_SKILL_SLUGS,
 } from './accessControl'
 
 // 受保护等级的关键字（出现在侧边栏分组标题里的）
@@ -57,7 +57,7 @@ function applyVisibility() {
   applySkillVisibility()
 }
 
-// 技能补给站：未登录时给非公开课项加 🔒，已登录/导师去掉。
+// 技能补给站：非会员/未登录时给受保护课项加 🔒。
 // 技能课是侧边栏里的链接项，结构为 .VPSidebarItem 内的 <a href>。
 function applySkillVisibility() {
   const links = [
@@ -65,14 +65,18 @@ function applySkillVisibility() {
       '.VPSidebar a[href^="' + SKILL_PATH_PREFIX + '"]'
     ),
   ]
-  // 已登录或导师才解锁全部；未登录访客只能看白名单
+  const member = currentIsMember || isMentorRole(currentRole)
   const loggedIn = currentRole !== null
   links.forEach((a) => {
-    // 文本节点在链接或其子元素里
     const textEl = (a.querySelector('.text') as HTMLElement) || a
     const href = a.getAttribute('href') || ''
     const slug = href.slice(SKILL_PATH_PREFIX.length).replace(/\/+$/, '').split('/')[0]
-    const unlocked = loggedIn || isMentorRole(currentRole) || PUBLIC_SKILL_SLUGS.includes(slug)
+    // 会员专属课：非会员加锁（含免费登录用户）
+    // 普通技能课：未登录加锁，已登录解锁
+    // 白名单课：所有人解锁
+    const unlocked = member
+      || PUBLIC_SKILL_SLUGS.includes(slug)
+      || (loggedIn && !MEMBER_SKILL_SLUGS.includes(slug))
     // 去掉可能残留的锁标记后再按需添加
     if (textEl.dataset.skillLocked === '1') {
       textEl.textContent = textEl.textContent.replace(/🔒\s*/, '')
