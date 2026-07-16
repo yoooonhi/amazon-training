@@ -56,8 +56,11 @@ function crownTitle(titleEl: Element) {
 // 恢复标题里的 🔒 emoji（需要时还原）
 function lockTitle(titleEl: Element, level: string) {
   const el = titleEl as HTMLElement
-  if (!el.textContent?.includes('🔒')) {
-    el.textContent = '🔒 ' + level + el.textContent.replace(level, '')
+  // 先去掉可能残留的标记（🔒 或 👑），避免叠加
+  let text = el.textContent || ''
+  if (text.startsWith('🔒 ') || text.startsWith('👑 ')) text = text.slice(3)
+  if (!text.includes('🔒')) {
+    el.textContent = '🔒 ' + text
   }
 }
 
