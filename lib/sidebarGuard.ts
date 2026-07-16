@@ -3,7 +3,7 @@
  *
  * VitePress 的侧边栏是配置层生成的静态 DOM，无法在 config.ts 里按角色条件渲染。
  * 这里用客户端 DOM 操作兜底：所有课程标题始终可见，受保护等级用 🔒 标记锁定状态。
- * 被导师单独授权某等级的学员，该等级去掉 🔒 图标；未授权的保留 🔒，
+ * 被管理员单独授权某等级的学员，该等级去掉 🔒 图标；未授权的保留 🔒，
  * 点击后由 CourseGate.vue 的全屏遮罩拦截（无法访问内容）。
  *
  * DOM 结构（VitePress 1.6）：
@@ -89,10 +89,10 @@ function applySkillVisibility() {
   })
 }
 
-// 主课程五级：导师全可见；非导师受保护等级标 🔒，已授权的解锁。
+// 主课程五级：管理员全可见；非管理员受保护等级标 🔒，已授权的解锁。
 function applyLevelVisibility() {
   const titles = getGroupTitles()
-  // 导师：所有分组可见，去掉所有 🔒
+  // 管理员：所有分组可见，去掉所有 🔒
   if (isMentorRole(currentRole)) {
     titles.forEach((title) => {
       // 显示：连同外层 .group 容器一起恢复
@@ -104,7 +104,7 @@ function applyLevelVisibility() {
     })
     return
   }
-  // 非导师：受保护等级始终可见，已授权的去掉 🔒，未授权的保留 🔒 标记锁定。
+  // 非管理员：受保护等级始终可见，已授权的去掉 🔒，未授权的保留 🔒 标记锁定。
   // 未授权用户点击课程项后，由 CourseGate.vue 全屏遮罩拦截内容访问。
   titles.forEach((title) => {
     const text = (title.textContent || '').trim()

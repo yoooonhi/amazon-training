@@ -8,7 +8,7 @@ import {
 
 const isMounted = ref(false)
 const role = ref(null) // 当前用户角色
-const accessLevels = ref([]) // 当前用户被导师授权的等级
+const accessLevels = ref([]) // 当前用户被管理员授权的等级
 const profile = ref(null) // 当前用户完整 profile（含 is_member）
 const currentPath = ref('')
 
@@ -130,7 +130,7 @@ onMounted(() => {
       </p>
       <div class="gate-actions">
         <button v-if="!isLoggedIn" class="gate-btn gate-btn-primary" @click="openAuthPanel">免费注册 / 登录</button>
-        <span v-else class="gate-member-hint">👑 联系导师开通会员解锁</span>
+        <span v-else class="gate-member-hint">👑 联系管理员开通会员解锁</span>
       </div>
       <p class="gate-hint">会员可访问全部技能补给站内容。</p>
     </div>

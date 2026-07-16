@@ -4,7 +4,7 @@
  * 两套机制：
  * 1. 主课程五级体系：入门 / 初级 / 中级 / 高级 / 进阶
  *    - 入门：全体学员可见
- *    - 其余等级：仅导师（mentor / admin）可见，内测阶段
+ *    - 其余等级：仅管理员（mentor / admin）可见，内测阶段
  *    - 开放某级课程给全体学员：往 publicLevels 里加即可。
  *
  * 2. 技能补给站：登录即可见
@@ -12,7 +12,7 @@
  *    - 其余技能课（及后续新增的）需登录后才可访问
  *    - 控制白名单见 PUBLIC_SKILL_SLUGS
  *
- * 导师始终可访问所有内容。
+ * 管理员始终可访问所有内容。
  */
 
 // 所有课程等级（顺序即展示顺序）
@@ -35,13 +35,13 @@ const PREFIX_TO_LEVEL: Record<string, Level> = Object.fromEntries(
 
 /**
  * 当前已对全体学员开放的等级。
- * 导师（mentor / admin）始终可访问所有等级，不受此限制。
+ * 管理员（mentor / admin）始终可访问所有等级，不受此限制。
  * 要开放新等级，往数组里加即可。
  */
 export const publicLevels: Level[] = ['入门']
 
 /**
- * 判断一个 role 是否为导师（含管理员）。
+ * 判断一个 role 是否为管理员（含管理员）。
  * 全项目统一口径：mentor 和 admin 都放行。
  */
 export function isMentorRole(role: string | null | undefined): boolean {
@@ -61,9 +61,9 @@ export function getLevelByPath(path: string): Level | null {
 
 /**
  * 判断某等级是否对指定角色开放。
- * - 导师：所有等级都开放
+ * - 管理员：所有等级都开放
  * - 全局开放（publicLevels）：所有人可访问
- * - 个人授权（accessLevels）：该用户被导师单独授权的等级
+ * - 个人授权（accessLevels）：该用户被管理员单独授权的等级
  */
 export function isLevelAccessible(
   level: Level | null,
@@ -71,7 +71,7 @@ export function isLevelAccessible(
   accessLevels?: string[] | null
 ): boolean {
   if (!level) return true // 非课程页面，不拦截
-  if (isMentorRole(role)) return true // 导师全放行
+  if (isMentorRole(role)) return true // 管理员全放行
   if (publicLevels.includes(level)) return true // 全局开放
   if (accessLevels?.includes(level)) return true // 个人授权
   return false
@@ -90,14 +90,14 @@ export const PUBLIC_SKILL_SLUGS = ['domain-basics']
 
 /**
  * 会员专属的技能课（slug 白名单）。
- * 只有付费会员（is_member）或导师可访问；免费登录用户和游客被拦截。
+ * 只有付费会员（is_member）或管理员可访问；免费登录用户和游客被拦截。
  * 要把某门技能课设为会员专属，把它的 slug 加到这个数组里。
  */
 export const MEMBER_SKILL_SLUGS = ['excel-for-ops']
 
 /**
  * 判断是否为付费会员。
- * - 导师 / 管理员：视为会员（避免被技能站门控拦截）
+ * - 管理员 / 管理员：视为会员（避免被技能站门控拦截）
  * - profile.is_member === true：付费会员
  * 其余（含未登录、免费登录用户）返回 false。
  */
@@ -125,7 +125,7 @@ export function getSkillSlug(path: string): string | null {
 
 /**
  * 判断某技能课是否对指定角色开放。
- * - 导师：全部开放
+ * - 管理员：全部开放
  * - 会员专属（MEMBER_SKILL_SLUGS）：仅付费会员可访问
  * - 已登录（任意角色，含免费用户）：其余技能课全部开放
  * - 白名单（PUBLIC_SKILL_SLUGS）：对所有访客开放

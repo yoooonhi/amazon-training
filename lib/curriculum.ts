@@ -1,5 +1,5 @@
 // 课程结构（lessonId 与内容文件实际使用的一致）
-// level 字段标记所属等级：入门（全体可见）/ 初级等（导师内测中）
+// level 字段标记所属等级：入门（全体可见）/ 初级等（管理员内测中）
 export const curriculum = [
   {
     level: '入门' as const,
@@ -65,7 +65,7 @@ export const curriculum = [
       'm6-07-returns-exceptions',
     ],
   },
-  // ===== 初级（导师内测中）=====
+  // ===== 初级（管理员内测中）=====
   {
     level: '初级' as const,
     week: 1,
@@ -98,7 +98,7 @@ export const curriculum = [
       'b4-01', 'b4-02', 'b4-03', 'b4-04', 'b4-05',
     ],
   },
-  // ===== 中级（导师内测中）=====
+  // ===== 中级（管理员内测中）=====
   {
     level: '中级' as const,
     week: 1,
@@ -131,7 +131,7 @@ export const curriculum = [
       'i4-01', 'i4-02', 'i4-03', 'i4-04',
     ],
   },
-  // ===== 高级（导师内测中）=====
+  // ===== 高级（管理员内测中）=====
   {
     level: '高级' as const,
     week: 1,
@@ -164,7 +164,7 @@ export const curriculum = [
       'a4-01', 'a4-02', 'a4-03', 'a4-04',
     ],
   },
-  // ===== 进阶（导师内测中）=====
+  // ===== 进阶（管理员内测中）=====
   {
     level: '进阶' as const,
     week: 1,
@@ -271,7 +271,7 @@ export const pathToLessonId: Record<string, string> = {
   'm6-daily/05-common-mistakes': 'm6-05-common-mistakes',
   'm6-daily/06-hijack-buybox': 'm6-06-hijack-buybox',
   'm6-daily/07-returns-exceptions': 'm6-07-returns-exceptions',
-  // ===== 初级课程（导师内测中）=====
+  // ===== 初级课程（管理员内测中）=====
   'b1-ads-optimization/01-search-term-attribution': 'b1-01',
   'b1-ads-optimization/02-negative-keyword-pool': 'b1-02',
   'b1-ads-optimization/03-dayparting-tos': 'b1-03',
@@ -368,7 +368,7 @@ export const pathToLessonId: Record<string, string> = {
 // ===== 技能补给站：独立栏目（登录可见，不参与五级体系）=====
 // 仅用于 ContinueCard 等按 lessonId 反查标题的场景。
 // 刻意不进入 curriculum 主数组，以免污染进度统计（publicLessons/totalLessons）
-// 与导师看板；其访问门控走 accessControl 里的 isSkillPath 那一套，与等级无关。
+// 与管理员看板；其访问门控走 accessControl 里的 isSkillPath 那一套，与等级无关。
 export const skillLessons: { lessonId: string; title: string }[] = [
   { lessonId: 'skill-domain', title: '域名结构与网址识别' },
   { lessonId: 'skill-phishing', title: '钓鱼网站识别' },

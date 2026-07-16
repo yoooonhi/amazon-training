@@ -16,7 +16,7 @@ const loading = ref(false)
 const errorMsg = ref('')
 const infoMsg = ref('')
 
-// 是否为付费会员（导师也视为会员）
+// 是否为付费会员（管理员也视为会员）
 const isMemberUser = computed(() => isMemberOf(currentProfile.value))
 
 // 点击页面任意位置关闭下拉菜单（点菜单自身不关）
@@ -123,7 +123,7 @@ function displayName() {
     <div v-if="currentUser" class="nav-user" @click="showUserMenu = !showUserMenu">
       <span class="nav-avatar">👤</span>
       <span class="nav-username">{{ displayName() }}</span>
-      <span v-if="currentProfile?.role === 'mentor'" class="nav-role">导师</span>
+      <span v-if="currentProfile?.role === 'mentor'" class="nav-role">管理员</span>
       <span v-else-if="isMemberUser" class="nav-member">VIP 会员</span>
 
       <!-- 下拉菜单 -->
@@ -134,7 +134,7 @@ function displayName() {
             <span v-if="currentProfile?.role !== 'mentor' && isMemberUser" class="dropdown-member">👑 付费会员</span>
           </div>
           <a v-if="currentProfile?.role === 'mentor'" href="/dashboard" class="dropdown-item">
-            📊 导师后台
+            📊 管理员后台
           </a>
           <div v-if="!currentProfile?.nickname" class="dropdown-item nickname-row">
             <input v-model="nickname" placeholder="设置昵称" class="dropdown-input" @keyup.enter="saveNickname" />

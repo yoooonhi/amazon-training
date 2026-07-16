@@ -52,7 +52,7 @@ export default {
     // 首次进入记一次（onAfterRouteChanged 不会在首次加载时触发）
     recordVisit()
     recordLastLesson()
-    // 侧边栏权限守卫：非导师隐藏受保护等级的侧边栏分组
+    // 侧边栏权限守卫：非管理员隐藏受保护等级的侧边栏分组
     setupSidebarGuard()
 
     // 底部栏交互：滚到接近底部时，侧边栏淡出、footer 横跨全宽滑入（如飞书效果）

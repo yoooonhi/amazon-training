@@ -16,7 +16,7 @@ const isMentor = ref(false)
 const role = ref(null)
 const accessLevels = ref([])
 
-// 按角色 + 授权过滤：导师看全部，普通学员看有权访问的等级（含个人授权）
+// 按角色 + 授权过滤：管理员看全部，普通学员看有权访问的等级（含个人授权）
 const visibleCurriculum = computed(() => {
   if (isMentor.value) return curriculum
   return curriculum.filter(w => isLevelAccessible(w.level, role.value, accessLevels.value))
@@ -56,7 +56,7 @@ async function loadRemoteProgress() {
   const userId = session.session?.user?.id
   if (!userId) { loading.value = false; return }
 
-  // 只查自己的进度，导师也不会看到别人的
+  // 只查自己的进度，管理员也不会看到别人的
   const { data, error } = await supabase
     .from('progress')
     .select('lesson_id, completed, completed_at')
@@ -119,7 +119,7 @@ onMounted(() => {
   supabase.auth.getSession().then(async ({ data }) => {
     isLoggedIn.value = !!data.session?.user
     if (data.session?.user) {
-      // 补拉 profile 判断导师身份 + 授权等级
+      // 补拉 profile 判断管理员身份 + 授权等级
       const { data: profile } = await supabase
         .from('profiles')
         .select('*')

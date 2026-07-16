@@ -1,10 +1,10 @@
 ---
 layout: doc
-title: 导师后台
+title: 管理员后台
 ---
 
 <style>
-/* 导师后台页面占 80% 宽度并居中，突破 VitePress 默认内容区限制。
+/* 管理员后台页面占 80% 宽度并居中，突破 VitePress 默认内容区限制。
    关键：所有规则必须限定在 .vp-doc._dashboard 下（VitePress 给每个页面
    加路径名 class，dashboard 页 → _dashboard），否则会全局生效、
    把所有课程页的右侧栏和内容宽度也改掉。

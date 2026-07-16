@@ -167,7 +167,7 @@ export default defineConfig({
             },
           ],
         },
-        // ===== 初级（导师内测中，大分组标题含等级关键字，sidebarGuard 自动隐藏）=====
+        // ===== 初级（管理员内测中，大分组标题含等级关键字，sidebarGuard 自动隐藏）=====
         {
           text: '🔒 初级',
           collapsed: true,
@@ -219,7 +219,7 @@ export default defineConfig({
             },
           ],
         },
-        // ===== 中级（导师内测中）=====
+        // ===== 中级（管理员内测中）=====
         {
           text: '🔒 中级',
           collapsed: true,
@@ -271,7 +271,7 @@ export default defineConfig({
             },
           ],
         },
-        // ===== 高级（导师内测中）=====
+        // ===== 高级（管理员内测中）=====
         {
           text: '🔒 高级',
           collapsed: true,
@@ -322,7 +322,7 @@ export default defineConfig({
             },
           ],
         },
-        // ===== 进阶（导师内测中）=====
+        // ===== 进阶（管理员内测中）=====
         {
           text: '🔒 进阶',
           collapsed: true,

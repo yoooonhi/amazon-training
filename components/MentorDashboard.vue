@@ -40,7 +40,7 @@ const visits = ref([])
 async function checkMentor() {
   const { data: session } = await supabase.auth.getSession()
   if (!session.session?.user) {
-    errorMsg.value = '请先登录导师账号'
+    errorMsg.value = '请先登录管理员账号'
     loading.value = false
     return
   }
@@ -223,7 +223,7 @@ async function toggleMember(student) {
 
 // ===== 课程等级授权操作 =====
 
-// 拿当前导师的 user_id（用于 granted_by 审计）
+// 拿当前管理员的 user_id（用于 granted_by 审计）
 async function getMentorId() {
   const { data: session } = await supabase.auth.getSession()
   return session.session?.user?.id || null
@@ -394,7 +394,7 @@ const topPages = computed(() => {
     .sort((a, b) => b.count - a.count)
 })
 function pageTypeLabel(t) {
-  return { home: '首页', lesson: '课程页', overview: '总览', dashboard: '导师后台', other: '其他' }[t] || t
+  return { home: '首页', lesson: '课程页', overview: '总览', dashboard: '管理员后台', other: '其他' }[t] || t
 }
 const maxTopCount = computed(() => Math.max(1, ...topPages.value.map(p => p.count)))
 
@@ -537,7 +537,7 @@ onMounted(async () => {
 
 <template>
   <div v-if="isMounted" class="dashboard">
-    <!-- 未登录或非导师 -->
+    <!-- 未登录或非管理员 -->
     <div v-if="errorMsg" class="error-box">
       <p>🔒 {{ errorMsg }}</p>
       <a href="/" class="back-link">← 返回首页</a>
@@ -548,10 +548,10 @@ onMounted(async () => {
       加载全员数据中...
     </div>
 
-    <!-- 导师后台 -->
+    <!-- 管理员后台 -->
     <div v-else-if="isMentor && !selectedStudent">
       <div class="dash-header">
-        <h2>📊 导师后台 · 全员进度</h2>
+        <h2>📊 管理员后台 · 全员进度</h2>
         <button class="refresh-btn" @click="loadData">🔄 刷新</button>
       </div>
 
