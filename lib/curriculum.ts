@@ -362,6 +362,7 @@ export const pathToLessonId: Record<string, string> = {
   'phishing-detection': 'skill-phishing',
   'system-shortcuts': 'skill-shortcuts',
   'browser-shortcuts': 'skill-browser',
+  'excel-for-ops': 'skill-excel',
 }
 
 // ===== 技能补给站：独立栏目（登录可见，不参与五级体系）=====
@@ -373,6 +374,7 @@ export const skillLessons: { lessonId: string; title: string }[] = [
   { lessonId: 'skill-phishing', title: '钓鱼网站识别' },
   { lessonId: 'skill-shortcuts', title: '电脑快捷键基础（Windows + Mac）' },
   { lessonId: 'skill-browser', title: '浏览器快捷键实战' },
+  { lessonId: 'skill-excel', title: 'Excel 三大神器（运营向）' },
 ]
 
 // 课程内容的目录前缀（getLessonIdByPath 用）

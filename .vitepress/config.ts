@@ -58,7 +58,8 @@ export default defineConfig({
             { text: '域名结构与网址识别', link: '/content/skills/domain-basics' },
             { text: '钓鱼网站识别', link: '/content/skills/phishing-detection' },
             { text: '电脑快捷键基础（Windows + Mac）', link: '/content/skills/system-shortcuts' },
-            { text: '浏览器快捷键实战', link: '/content/skills/browser-shortcuts' },
+                { text: '浏览器快捷键实战', link: '/content/skills/browser-shortcuts' },
+                { text: 'Excel 三大神器（运营向）', link: '/content/skills/excel-for-ops' },
           ],
         },
         // ===== 入门课（7个模块）=====
