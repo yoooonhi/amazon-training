@@ -276,6 +276,27 @@ async function toggleMember(student) {
   }
 }
 
+// 排序状态
+const sortKey = ref('percent') // 默认按完成率
+const sortDir = ref('desc') // desc 降序 / asc 升序
+function toggleSort(key) {
+  if (sortKey.value === key) {
+    sortDir.value = sortDir.value === 'desc' ? 'asc' : 'desc'
+  } else {
+    sortKey.value = key
+    sortDir.value = 'desc'
+  }
+}
+function sortVal(s, key) {
+  if (key === 'name') return (s.profile.nickname || s.profile.email || '').toLowerCase()
+  if (key === 'percent') return s.percent
+  if (key === 'streak') return s.streak
+  if (key === 'quiz') return s.quizTotal > 0 ? s.quizCorrect / s.quizTotal : 0
+  if (key === 'lastActive') return s.lastActive ? new Date(s.lastActive).getTime() : 0
+  if (key === 'created') return new Date(s.profile.created_at).getTime()
+  return 0
+}
+
 const filteredStudents = computed(() => {
   let result = [...students.value]
   if (searchQuery.value.trim()) {
@@ -296,7 +317,14 @@ const filteredStudents = computed(() => {
       return true
     })
   }
-  return result.sort((a, b) => b.percent - a.percent)
+  const dir = sortDir.value === 'desc' ? -1 : 1
+  return result.sort((a, b) => {
+    const va = sortVal(a, sortKey.value)
+    const vb = sortVal(b, sortKey.value)
+    if (va < vb) return dir
+    if (va > vb) return -dir
+    return 0
+  })
 })
 
 onMounted(async () => {
@@ -377,12 +405,13 @@ onMounted(async () => {
         <thead>
           <tr>
             <th class="col-check"><input type="checkbox" :checked="filteredStudents.length > 0 && filteredStudents.every((s) => selectedIds.has(s.profile.id))" @change="filteredStudents.forEach((s) => toggleSelect(s.profile.id))" /></th>
-            <th>学员</th>
-            <th>完成进度</th>
-            <th>打卡</th>
-            <th>答题</th>
+            <th class="sortable" @click="toggleSort('name')">学员 <span class="sort-arrow" :class="{ active: sortKey === 'name', asc: sortDir === 'asc' }">⇅</span></th>
+            <th>邮箱</th>
+            <th class="sortable" @click="toggleSort('percent')">完成进度 <span class="sort-arrow" :class="{ active: sortKey === 'percent', asc: sortDir === 'asc' }">⇅</span></th>
+            <th class="sortable" @click="toggleSort('streak')">打卡 <span class="sort-arrow" :class="{ active: sortKey === 'streak', asc: sortDir === 'asc' }">⇅</span></th>
+            <th class="sortable" @click="toggleSort('quiz')">答题 <span class="sort-arrow" :class="{ active: sortKey === 'quiz', asc: sortDir === 'asc' }">⇅</span></th>
             <th>课程权限</th>
-            <th>最后学习</th>
+            <th class="sortable" @click="toggleSort('lastActive')">最后学习 <span class="sort-arrow" :class="{ active: sortKey === 'lastActive', asc: sortDir === 'asc' }">⇅</span></th>
             <th>状态</th>
             <th></th>
           </tr>
@@ -393,10 +422,11 @@ onMounted(async () => {
             <td class="col-name" @click="viewDetail(s)">
               <strong>
                 <span v-if="s.profile.is_member" class="member-crown">👑</span>
-                {{ s.profile.nickname || s.profile.email }}
+                {{ s.profile.nickname || s.profile.email.split('@')[0] }}
               </strong>
               <small>{{ new Date(s.profile.created_at).toLocaleDateString('zh-CN') }} 注册</small>
             </td>
+            <td class="col-email muted" @click="viewDetail(s)">{{ s.profile.email }}</td>
             <td class="col-progress" @click="viewDetail(s)">
               <div class="tbl-bar"><div class="tbl-bar-fill" :style="{ width: s.percent + '%' }"></div></div>
               <span class="tbl-pct">{{ s.percent }}%</span>
@@ -420,10 +450,10 @@ onMounted(async () => {
               <span v-else-if="s.percent === 100" class="badge-done">毕业</span>
               <span v-else class="badge-active">活跃</span>
             </td>
-            <td @click="viewDetail(s)"><span class="detail-link">详情 →</span></td>
+            <td><button class="detail-btn" @click="viewDetail(s)">详情</button></td>
           </tr>
           <tr v-if="filteredStudents.length === 0">
-            <td colspan="9" class="no-result">没有匹配的学员</td>
+            <td colspan="10" class="no-result">没有匹配的学员</td>
           </tr>
         </tbody>
       </table>
@@ -499,4 +529,37 @@ onMounted(async () => {
 
 <style scoped>
 @import './dashboard-shared.css';
+
+/* 邮箱列 */
+.col-email { font-size: 0.78rem; color: var(--vp-c-text-2); white-space: nowrap; }
+
+/* 详情按钮 */
+.detail-btn {
+  padding: 0.3rem 0.85rem;
+  border-radius: 8px;
+  border: 1px solid var(--vp-c-divider);
+  background: var(--vp-c-bg);
+  color: var(--vp-c-text-2);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.detail-btn:hover {
+  background: var(--vp-c-brand-1);
+  color: #fff;
+  border-color: var(--vp-c-brand-1);
+}
+
+/* 可排序表头 */
+.sortable { cursor: pointer; user-select: none; }
+.sortable:hover { color: var(--vp-c-brand-1) !important; }
+.sort-arrow {
+  font-size: 0.65rem;
+  opacity: 0.3;
+  margin-left: 0.15rem;
+}
+.sort-arrow.active { opacity: 1; color: var(--vp-c-brand-1); }
+.sort-arrow.active.asc::after { content: ' ↑'; }
+.sort-arrow.active:not(.asc)::after { content: ' ↓'; }
 </style>

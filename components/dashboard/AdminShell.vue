@@ -14,7 +14,6 @@ import StudentsPage from './StudentsPage.vue'
 import LearningPage from './LearningPage.vue'
 import VisitsPage from './VisitsPage.vue'
 import MembersPage from './MembersPage.vue'
-import AccessPage from './AccessPage.vue'
 import CommentsPage from './CommentsPage.vue'
 
 const isMounted = ref(false)
@@ -25,6 +24,15 @@ const sidebarCollapsed = ref(false) // 桌面端折叠
 const mobileSidebarOpen = ref(false) // 移动端展开
 const currentPage = ref('overview')
 const refreshKey = ref(0)
+
+// 日间/夜间模式
+const isDark = ref(true) // VitePress 默认跟随系统，后台默认用深色侧边栏
+function toggleTheme() {
+  isDark.value = !isDark.value
+  if (typeof document !== 'undefined') {
+    document.documentElement.classList.toggle('dark', isDark.value)
+  }
+}
 
 // 导航分组
 const navGroups = [
@@ -41,7 +49,6 @@ const navGroups = [
     items: [
       { key: 'students', label: '学员管理', icon: '👥' },
       { key: 'members', label: '会员管理', icon: '👑' },
-      { key: 'access', label: '课程授权', icon: '🔑' },
     ],
   },
   {
@@ -69,7 +76,7 @@ const currentIcon = computed(() => {
 
 const pageComponents = {
   overview: OverviewPage, students: StudentsPage, learning: LearningPage,
-  visits: VisitsPage, members: MembersPage, access: AccessPage, comments: CommentsPage,
+  visits: VisitsPage, members: MembersPage, comments: CommentsPage,
 }
 const currentComponent = computed(() => pageComponents[currentPage.value])
 
@@ -98,6 +105,8 @@ function switchPage(key) {
 
 onMounted(() => {
   isMounted.value = true
+  // 读取当前 VitePress 的 dark 模式状态
+  isDark.value = document.documentElement.classList.contains('dark')
   checkAdmin()
 })
 </script>
@@ -183,9 +192,14 @@ onMounted(() => {
             <span class="topbar-icon">{{ currentIcon }}</span>
             <h1 class="topbar-title">{{ currentTitle }}</h1>
           </div>
-          <button class="topbar-refresh" @click="refreshKey++">
-            <span>🔄</span> 刷新
-          </button>
+          <div class="topbar-actions">
+            <button class="topbar-refresh" @click="refreshKey++">
+              <span>🔄</span> 刷新
+            </button>
+            <button class="topbar-theme" :title="isDark ? '切换日间' : '切换夜间'" @click="toggleTheme">
+              {{ isDark ? '☀️' : '🌙' }}
+            </button>
+          </div>
         </div>
 
         <!-- 页面内容 -->
@@ -203,6 +217,16 @@ onMounted(() => {
 
 <style scoped>
 /* ===== 全屏根容器 ===== */
+/* 后台统一品牌色：#272843（深蓝灰），覆盖 VitePress 默认的浅蓝 */
+.admin-root {
+  --vp-c-brand-1: #272843;
+  --vp-c-brand-2: #3d3e5c;
+  --vp-c-brand-3: #54557a;
+  --vp-c-brand-soft: rgba(39, 40, 67, 0.08);
+  --vp-button-brand-bg: #272843;
+  --vp-button-brand-hover-bg: #3d3e5c;
+  --vp-button-brand-border: #272843;
+}
 /* 不用 fixed（会被父容器 transform 破坏），用 100vw/100vh + 负 margin 撑满 */
 .admin-root {
   width: 100vw;
@@ -396,6 +420,7 @@ onMounted(() => {
 .topbar-left { display: flex; align-items: center; gap: 0.6rem; }
 .topbar-icon { font-size: 1.3rem; }
 .topbar-title { margin: 0; font-size: 1.25rem; font-weight: 700; color: var(--vp-c-text-1); }
+.topbar-actions { display: flex; align-items: center; gap: 0.5rem; }
 .topbar-refresh {
   display: flex;
   align-items: center;
@@ -409,6 +434,20 @@ onMounted(() => {
   cursor: pointer;
   transition: all 0.15s;
 }
+.topbar-theme {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--vp-c-divider);
+  background: var(--vp-c-bg);
+  font-size: 1.05rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.topbar-theme:hover { border-color: var(--vp-c-brand-2); }
 .topbar-refresh:hover {
   color: var(--vp-c-brand-1);
   border-color: var(--vp-c-brand-2);
