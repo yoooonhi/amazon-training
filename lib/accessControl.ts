@@ -77,14 +77,14 @@ export function isLevelAccessible(
   return false
 }
 
-// ===== 技能补给站：会员可见 =====
+// ===== 技能补给站：登录可见 =====
 // 技能课路径前缀
 export const SKILL_PATH_PREFIX = '/content/skills/'
 
 /**
  * 技能补给站中免费公开的课（slug 白名单）。
- * 只有列在这里的课对所有访客开放；其余技能课需会员才能访问。
- * 默认只开放第一课，后续新增的技能课都默认需要会员。
+ * 只有列在这里的课对所有访客开放；其余技能课需登录后才可访问。
+ * 默认只开放第一课，后续新增的技能课都默认需要登录。
  */
 export const PUBLIC_SKILL_SLUGS = ['domain-basics']
 
@@ -119,15 +119,16 @@ export function getSkillSlug(path: string): string | null {
 /**
  * 判断某技能课是否对指定角色开放。
  * - 导师：全部开放
- * - 会员（is_member）：全部开放
+ * - 已登录（任意角色，含免费用户）：全部开放
  * - 白名单（PUBLIC_SKILL_SLUGS）：对所有访客开放
- * - 其余（未登录、免费登录用户）：不可访问
+ * - 其余（未登录访客）：不可访问
  */
 export function isSkillAccessible(
   path: string,
   profile: any | null | undefined
 ): boolean {
-  if (isMember(profile)) return true
+  if (isMentorRole(profile?.role)) return true
+  if (profile?.role) return true // 任意已登录用户
   const slug = getSkillSlug(path)
   if (slug && PUBLIC_SKILL_SLUGS.includes(slug)) return true
   return false
@@ -135,17 +136,17 @@ export function isSkillAccessible(
 
 /**
  * 判断某路径是否对指定角色开放。
- * 便捷组合：getLevelByPath + isLevelAccessible（主课程） + 技能课会员校验。
+ * 便捷组合：getLevelByPath + isLevelAccessible（主课程） + 技能课登录校验。
  *
  * profile 为当前用户的完整 profile（含 role、is_member、accessLevels）。
- * 兼容旧调用：若只传了 role，主课程判定仍可用；技能站则按非会员处理。
+ * 兼容旧调用：若只传了 role，主课程判定仍可用。
  */
 export function isPathAccessible(
   path: string,
   profile?: any | null,
   accessLevels?: string[] | null
 ): boolean {
-  // 技能补给站：会员可见
+  // 技能补给站：登录可见
   if (isSkillPath(path)) {
     return isSkillAccessible(path, profile)
   }

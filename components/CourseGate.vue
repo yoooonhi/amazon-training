@@ -108,24 +108,19 @@ onMounted(() => {
     </div>
   </div>
 
-  <!-- 技能补给站被拦截：会员专享（仅内容区，保留侧边栏与导航） -->
+  <!-- 技能补给站被拦截：需登录（仅内容区，保留侧边栏与导航） -->
   <div v-else-if="isMounted && isSkillBlocked" class="course-gate">
     <div class="gate-card">
-      <div class="gate-icon">👑</div>
-      <h2 class="gate-title">会员专享内容</h2>
-      <p class="gate-desc" v-if="!isLoggedIn">
+      <div class="gate-icon">🔐</div>
+      <h2 class="gate-title">登录后查看</h2>
+      <p class="gate-desc">
         这是技能补给站的进阶内容。<br />
-        升级会员即可解锁全部技能课程。
-      </p>
-      <p class="gate-desc" v-else>
-        你当前是免费用户。<br />
-        升级会员即可解锁全部技能补给站内容。
+        免费注册 / 登录后即可解锁全部技能课程。
       </p>
       <div class="gate-actions">
-        <button v-if="!isLoggedIn" class="gate-btn gate-btn-primary" @click="openAuthPanel">免费注册 / 登录</button>
-        <span v-else class="gate-member-hint">👑 联系导师开通会员解锁</span>
+        <button class="gate-btn gate-btn-primary" @click="openAuthPanel">免费注册 / 登录</button>
       </div>
-      <p class="gate-hint">会员可访问全部技能补给站内容。</p>
+      <p class="gate-hint">已登录用户可访问全部技能补给站内容。</p>
     </div>
   </div>
 </template>
@@ -182,16 +177,6 @@ onMounted(() => {
 .gate-btn-primary {
   background: var(--vp-c-brand-1);
   color: #fff;
-}
-.gate-member-hint {
-  display: inline-block;
-  padding: 0.55rem 1.25rem;
-  border-radius: 8px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #b45309;
-  background: rgba(255, 193, 7, 0.12);
-  border: 1px solid rgba(255, 193, 7, 0.35);
 }
 .gate-hint {
   margin: 1.25rem 0 0;
