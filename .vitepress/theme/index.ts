@@ -12,7 +12,6 @@ import ProfitCalculator from '../../components/ProfitCalculator.vue'
 import ModalDialog from '../../components/ModalDialog.vue'
 import CourseGate from '../../components/CourseGate.vue'
 import SiteFooter from '../../components/SiteFooter.vue'
-import SiblingNav from '../../components/SiblingNav.vue'
 import { recordVisit, recordLastLesson } from '../../lib/visitTracker'
 import { setupSidebarGuard } from '../../lib/sidebarGuard'
 import './custom.css'
@@ -24,7 +23,6 @@ export default {
       'nav-bar-content-after': () => h(AuthPanel),
       'doc-before': () => h(CourseGate),
       'doc-after': () => [h(Comments), h(SiteFooter)],
-      'aside-outline-before': () => h(SiblingNav),
       'layout-bottom': () => h(ModalDialog),
     })
   },
