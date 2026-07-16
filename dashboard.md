@@ -15,15 +15,15 @@ title: 管理员后台
 .VPDoc:has(.vp-doc._dashboard) .container .content {
   max-width: 100% !important;
 }
-/* dashboard 正文区 80% 居中 */
+/* dashboard 正文区 95% 居中（后台需要更宽的空间） */
 .VPDoc:has(.vp-doc._dashboard) .content-container {
-  max-width: 80% !important;
+  max-width: 95% !important;
   margin: 0 auto !important;
 }
 </style>
 
 <script setup>
-import MentorDashboard from './components/MentorDashboard.vue'
+import AdminShell from './components/dashboard/AdminShell.vue'
 import { onMounted } from 'vue'
 // dashboard 页面：隐藏右侧大纲栏，让内容居中显示（用 JS 限定在本页执行，不泄漏到全局）
 onMounted(() => {
@@ -32,4 +32,4 @@ onMounted(() => {
 })
 </script>
 
-<MentorDashboard />
+<AdminShell />
