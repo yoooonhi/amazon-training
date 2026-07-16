@@ -80,12 +80,15 @@ function applySkillVisibility() {
       || PUBLIC_SKILL_SLUGS.includes(slug)
       || (loggedIn && !isMemberOnly)
     // 去掉可能残留的标记（🔒 或 👑）后再按需添加
-    textEl.textContent = textEl.textContent.replace(/^[🔒👑]\s*/, '')
+    // 注意：emoji 是 surrogate pair（占2个UTF-16单元），+' '共3个单元
+    let text = textEl.textContent
+    if (text.startsWith('🔒 ') || text.startsWith('👑 ')) text = text.slice(3)
+    textEl.textContent = text
     delete textEl.dataset.skillLocked
     if (!unlocked) {
       // 会员专属课用 👑，普通受保护课用 🔒
       const icon = isMemberOnly ? '👑' : '🔒'
-      textEl.textContent = icon + ' ' + textEl.textContent
+      textEl.textContent = icon + ' ' + text
       textEl.dataset.skillLocked = '1'
     }
   })
