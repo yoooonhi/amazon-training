@@ -57,7 +57,8 @@ function applyVisibility() {
   applySkillVisibility()
 }
 
-// 技能补给站：非会员/未登录时给受保护课项加 🔒。
+// 技能补给站：非会员/未登录时给受保护课项加标记。
+// 会员专属课用 👑，普通受保护课用 🔒。
 // 技能课是侧边栏里的链接项，结构为 .VPSidebarItem 内的 <a href>。
 function applySkillVisibility() {
   const links = [
@@ -71,19 +72,20 @@ function applySkillVisibility() {
     const textEl = (a.querySelector('.text') as HTMLElement) || a
     const href = a.getAttribute('href') || ''
     const slug = href.slice(SKILL_PATH_PREFIX.length).replace(/\/+$/, '').split('/')[0]
+    const isMemberOnly = MEMBER_SKILL_SLUGS.includes(slug)
     // 会员专属课：非会员加锁（含免费登录用户）
     // 普通技能课：未登录加锁，已登录解锁
     // 白名单课：所有人解锁
     const unlocked = member
       || PUBLIC_SKILL_SLUGS.includes(slug)
-      || (loggedIn && !MEMBER_SKILL_SLUGS.includes(slug))
-    // 去掉可能残留的锁标记后再按需添加
-    if (textEl.dataset.skillLocked === '1') {
-      textEl.textContent = textEl.textContent.replace(/🔒\s*/, '')
-      delete textEl.dataset.skillLocked
-    }
+      || (loggedIn && !isMemberOnly)
+    // 去掉可能残留的标记（🔒 或 👑）后再按需添加
+    textEl.textContent = textEl.textContent.replace(/^[🔒👑]\s*/, '')
+    delete textEl.dataset.skillLocked
     if (!unlocked) {
-      textEl.textContent = '🔒 ' + textEl.textContent
+      // 会员专属课用 👑，普通受保护课用 🔒
+      const icon = isMemberOnly ? '👑' : '🔒'
+      textEl.textContent = icon + ' ' + textEl.textContent
       textEl.dataset.skillLocked = '1'
     }
   })

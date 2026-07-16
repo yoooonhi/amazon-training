@@ -34,6 +34,10 @@
 html.doc-gated .vp-doc {
   display: none;
 }
+/* 门控时隐藏右侧大纲栏（不让无权限用户看到课程小标题） */
+html.doc-gated .aside {
+  display: none !important;
+}
 
 /* ===== 右侧栏（aside）：VitePress 默认 1280px 才显示，降低到 1024px ===== */
 /* 覆盖 VitePress 的 scoped 样式，让右侧大纲在更窄屏幕也显示 */
