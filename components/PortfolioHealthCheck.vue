@@ -125,6 +125,12 @@ const totalScore = computed(() => {
   return +(s * 0.35 + r * 0.35 + l * 0.30).toFixed(1)
 })
 
+// 是否已填写任何数据（控制总分区域显示——没填时不显示分数）
+const hasAnyInput = computed(() => {
+  return [...Object.values(structure), ...Object.values(resource), ...Object.values(lifecycle)]
+    .some(v => v !== null && v !== '')
+})
+
 const healthLevel = computed(() => {
   const t = totalScore.value
   if (t >= 4.0) return { label: '健康', icon: '✅', color: '#16a34a', advice: '保持现状，小幅优化' }
@@ -291,7 +297,7 @@ function reset() {
     </div>
 
     <!-- 总分 -->
-    <div class="phc-total" :style="{ borderColor: healthLevel.color }">
+    <div v-if="hasAnyInput" class="phc-total" :style="{ borderColor: healthLevel.color }">
       <div class="phc-total-left">
         <span class="phc-total-label">产品线健康度总分</span>
         <span class="phc-total-num" :style="{ color: healthLevel.color }">{{ totalScore }}</span>
@@ -304,9 +310,12 @@ function reset() {
         <span class="phc-total-advice">{{ healthLevel.advice }}</span>
       </div>
     </div>
+    <div v-else class="phc-total phc-total-empty">
+      <span class="phc-total-placeholder">📊 在上方填写数据后，这里会自动显示健康度总分和评级</span>
+    </div>
 
     <!-- 权重明细 -->
-    <div class="phc-breakdown">
+    <div v-if="hasAnyInput" class="phc-breakdown">
       <span>结构 35% × {{ structureScore.score }} = {{ +(structureScore.score * 0.35).toFixed(1) }}</span>
       <span>资源 35% × {{ resourceScore.score }} = {{ +(resourceScore.score * 0.35).toFixed(1) }}</span>
       <span>生命周期 30% × {{ lifecycleScore.score }} = {{ +(lifecycleScore.score * 0.30).toFixed(1) }}</span>
@@ -505,6 +514,14 @@ function reset() {
 }
 .phc-breakdown span {
   font-size: 0.75rem;
+  color: var(--vp-c-text-3);
+}
+.phc-total-empty {
+  border-color: var(--vp-c-divider) !important;
+  justify-content: center;
+}
+.phc-total-placeholder {
+  font-size: 0.85rem;
   color: var(--vp-c-text-3);
 }
 
