@@ -15,6 +15,7 @@ import LearningPage from './LearningPage.vue'
 import VisitsPage from './VisitsPage.vue'
 import MembersPage from './MembersPage.vue'
 import CommentsPage from './CommentsPage.vue'
+import ModalDialog from '../ModalDialog.vue'
 
 const isMounted = ref(false)
 const loading = ref(true)
@@ -217,6 +218,9 @@ onMounted(() => {
         </div>
       </div>
     </div>
+
+    <!-- 全局对话框（modalConfirm/modalAlert 渲染出口，必须挂载否则按钮调用无反应）-->
+    <ModalDialog />
   </div>
 </template>
 
