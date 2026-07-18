@@ -62,21 +62,6 @@ export default defineConfig({
                 { text: 'Excel 三大神器（运营向）', link: '/content/skills/excel-for-ops' },
           ],
         },
-        // ===== 实战手册（独立参考栏目，仅管理员可见，内测中）=====
-        // 规则：当前内测阶段，只有 mentor / admin 可访问（见 lib/accessControl.ts 的 isPlaybookPath）。
-        // 未来要开放时，改 isPlaybookAccessible 加条件即可。
-        {
-          text: '📚 广告打法手册（内测）',
-          collapsed: true,
-          items: [
-            { text: '手册首页 · 16 种打法总览', link: '/content/playbooks/ads-16-tactics/' },
-            { text: '第1节 · 小预算捡漏组合', link: '/content/playbooks/ads-16-tactics/01-low-budget-bargain' },
-            { text: '第2节 · ASIN 定位与流量卡位', link: '/content/playbooks/ads-16-tactics/02-asin-targeting' },
-            { text: '第3节 · 自动广告精细化', link: '/content/playbooks/ads-16-tactics/03-auto-ads-refinement' },
-            { text: '第4节 · 关键词排名冲刺与风险教育 ⚠️', link: '/content/playbooks/ads-16-tactics/04-ranking-push-and-risk' },
-            { text: '第5节 · 旺季与综合打法', link: '/content/playbooks/ads-16-tactics/05-peak-season-combo' },
-          ],
-        },
         // ===== 入门课（7个模块）=====
         {
           text: '入门课',
@@ -386,6 +371,22 @@ export default defineConfig({
                 { text: '4.5 风险预警与应急预案（实操）', link: '/content/expert/e4-risk-management/05-risk-playbook-practice' },
               ],
             },
+          ],
+        },
+        // ===== 实战手册（独立参考栏目，仅管理员可见，内测中）=====
+        // 规则：当前内测阶段，只有 mentor / admin 可访问（见 lib/accessControl.ts 的 isPlaybookPath）。
+        // 标题不带 emoji 锁标——锁标由 sidebarGuard.ts 按角色动态加（管理员去锁，其他人加 🔒）。
+        // 未来要开放时，改 isPlaybookAccessible 加条件即可。
+        {
+          text: '广告打法手册',
+          collapsed: true,
+          items: [
+            { text: '手册首页 · 16 种打法总览', link: '/content/playbooks/ads-16-tactics/' },
+            { text: '第1节 · 小预算捡漏组合', link: '/content/playbooks/ads-16-tactics/01-low-budget-bargain' },
+            { text: '第2节 · ASIN 定位与流量卡位', link: '/content/playbooks/ads-16-tactics/02-asin-targeting' },
+            { text: '第3节 · 自动广告精细化', link: '/content/playbooks/ads-16-tactics/03-auto-ads-refinement' },
+            { text: '第4节 · 关键词排名冲刺与风险教育 ⚠️', link: '/content/playbooks/ads-16-tactics/04-ranking-push-and-risk' },
+            { text: '第5节 · 旺季与综合打法', link: '/content/playbooks/ads-16-tactics/05-peak-season-combo' },
           ],
         },
       ],

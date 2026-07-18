@@ -112,18 +112,38 @@ function applySkillVisibility() {
 }
 
 // 实战手册（playbooks）：仅管理员可见。
-// 非管理员时给所有手册链接项加 🔒 标记（包括首页和子项）。
-// 手册是侧边栏里的链接项，结构与技能课一致（.VPSidebarItem 内的 <a href>）。
+// 处理两类元素：
+//  1. 手册分组标题（「广告打法手册」）：非管理员加 🔒，管理员去锁
+//  2. 手册内所有链接项：非管理员加 🔒，管理员去锁
+// 分组标题不含「初级/中级/高级/进阶」关键字，applyLevelVisibility 不会处理它，
+// 必须在这里单独处理，否则管理员也会看到带锁的标题（但他们实际能访问）。
 function applyPlaybookVisibility() {
-  const links = [
+  const mentor = isMentorRole(currentRole)
+
+  // (1) 处理手册分组标题
+  //     标题文本不含 emoji 锁标（config.ts 里只写「广告打法手册」）
+  //     找到包含手册链接的 level-0 分组，向上回溯到它的标题
+  const handbookLinks = [
     ...document.querySelectorAll<HTMLAnchorElement>(
       '.VPSidebar a[href^="' + PLAYBOOK_PATH_PREFIX + '"]'
     ),
   ]
-  const mentor = isMentorRole(currentRole)
-  links.forEach((a) => {
+  const processedTitles = new WeakSet()
+  handbookLinks.forEach((a) => {
+    // 沿 DOM 向上找 level-0 分组容器
+    const section = (a.closest('.VPSidebarItem.level-0') as HTMLElement) || null
+    if (!section || processedTitles.has(section)) return
+    processedTitles.add(section)
+    const titleEl = section.querySelector('.item > .text') as HTMLElement | null
+    if (!titleEl) return
+    let text = titleEl.textContent || ''
+    if (text.startsWith('🔒 ') || text.startsWith('👑 ')) text = text.slice(3)
+    titleEl.textContent = mentor ? text : '🔒 ' + text
+  })
+
+  // (2) 处理手册内所有链接项
+  handbookLinks.forEach((a) => {
     const textEl = (a.querySelector('.text') as HTMLElement) || a
-    // 去掉可能残留的标记（🔒 或 👑）后再按需添加
     let text = textEl.textContent || ''
     if (text.startsWith('🔒 ') || text.startsWith('👑 ')) text = text.slice(3)
     textEl.textContent = text
