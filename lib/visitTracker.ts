@@ -9,6 +9,7 @@ const LAST_LESSON_KEY = 'amazon-training-last-lesson'
 const DAY_MS = 24 * 60 * 60 * 1000
 
 // 所有课程内容目录前缀（classifyPage 和记录最后位置共用）
+// 注意：含 playbooks（实战手册），其 lessonId 也在 pathToLessonId 映射表里
 const CONTENT_PREFIXES = [
   '/content/modules/',
   '/content/beginner/',
@@ -16,6 +17,7 @@ const CONTENT_PREFIXES = [
   '/content/advanced/',
   '/content/expert/',
   '/content/skills/',
+  '/content/playbooks/',
 ]
 
 // 获取或生成访客永久 ID

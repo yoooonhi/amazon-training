@@ -3,7 +3,10 @@ import { ref, computed, onMounted } from 'vue'
 import { authState, supabase } from '../lib/supabase'
 import { curriculum, skillLessons } from '../lib/curriculum'
 import { getLastLesson } from '../lib/visitTracker'
-import { getLevelByPath, isLevelAccessible, isMentorRole } from '../lib/accessControl'
+import {
+  getLevelByPath, isLevelAccessible, isMentorRole,
+  isPlaybookPath, isPlaybookAccessible,
+} from '../lib/accessControl'
 
 const isMounted = ref(false)
 const lastLesson = ref(null) // { path, lessonId, ts }
@@ -30,6 +33,12 @@ const lessonLabel = computed(() => {
 // 是否应该显示卡片
 const shouldShow = computed(() => {
   if (!lastLesson.value) return false
+  // 实战手册（playbooks）：不进「继续学习」。
+  // 手册是参考工具不是学习路径，且当前内测仅管理员可见——
+  // 即便管理员访问过，也不在首页「继续学习」里展示，避免误导。
+  // 这一条同时防御门控绕过：非管理员 localStorage 里若残留 playbook 路径，
+  // 直接不显示，避免点击后绕过 CourseGate。
+  if (isPlaybookPath(lastLesson.value.path)) return false
   // 检查这节课当前用户是否有权访问
   const level = getLevelByPath(lastLesson.value.path)
   return isLevelAccessible(level, role.value, accessLevels.value)
