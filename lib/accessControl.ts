@@ -1,7 +1,7 @@
 /**
  * 课程权限控制
  *
- * 两套机制：
+ * 三套机制：
  * 1. 主课程五级体系：入门 / 初级 / 中级 / 高级 / 进阶
  *    - 入门：全体学员可见
  *    - 其余等级：仅管理员（mentor / admin）可见，内测阶段
@@ -11,6 +11,11 @@
  *    - 第一课（domain-basics）对所有访客公开
  *    - 其余技能课（及后续新增的）需登录后才可访问
  *    - 控制白名单见 PUBLIC_SKILL_SLUGS
+ *
+ * 3. 实战手册（playbooks）：仅管理员可见
+ *    - 独立参考栏目，不进五级体系，不占学习进度
+ *    - 当前为内测阶段，只有 mentor / admin 可访问
+ *    - 未来要开放时，改 isPlaybookAccessible 加条件即可
  *
  * 管理员始终可访问所有内容。
  */
@@ -146,9 +151,34 @@ export function isSkillAccessible(
   return false
 }
 
+// ===== 实战手册（playbooks）：仅管理员可见 =====
+// 独立参考栏目，不进五级体系，不占学习进度。
+// 当前为内测阶段：只有 mentor / admin 可访问。
+// 未来要开放时，改 isPlaybookAccessible 加条件即可。
+export const PLAYBOOK_PATH_PREFIX = '/content/playbooks/'
+
+/**
+ * 判断路径是否属于实战手册栏目。
+ */
+export function isPlaybookPath(path: string): boolean {
+  return path.startsWith(PLAYBOOK_PATH_PREFIX)
+}
+
+/**
+ * 判断实战手册是否对当前用户开放。
+ * - 管理员（mentor / admin）：可访问
+ * - 其余（含付费会员、免费用户、游客）：拦截
+ *
+ * 这是手册的"仅管理员可见"档——比技能站（登录可见）
+ * 和会员专属（付费会员可见）都更严，符合"内测"语义。
+ */
+export function isPlaybookAccessible(profile: any | null | undefined): boolean {
+  return isMentorRole(profile?.role)
+}
+
 /**
  * 判断某路径是否对指定角色开放。
- * 便捷组合：getLevelByPath + isLevelAccessible（主课程） + 技能课登录校验。
+ * 便捷组合：getLevelByPath + isLevelAccessible（主课程） + 技能课登录校验 + 手册管理员校验。
  *
  * profile 为当前用户的完整 profile（含 role、is_member、accessLevels）。
  * 兼容旧调用：若只传了 role，主课程判定仍可用。
@@ -158,6 +188,10 @@ export function isPathAccessible(
   profile?: any | null,
   accessLevels?: string[] | null
 ): boolean {
+  // 实战手册：仅管理员可见
+  if (isPlaybookPath(path)) {
+    return isPlaybookAccessible(profile)
+  }
   // 技能补给站：登录可见
   if (isSkillPath(path)) {
     return isSkillAccessible(path, profile)

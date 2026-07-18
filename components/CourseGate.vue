@@ -4,6 +4,7 @@ import { authState, supabase } from '../lib/supabase'
 import {
   getLevelByPath, isLevelAccessible, isMentorRole,
   isSkillPath, isSkillAccessible, getSkillSlug, MEMBER_SKILL_SLUGS,
+  isPlaybookPath, isPlaybookAccessible,
 } from '../lib/accessControl'
 
 const isMounted = ref(false)
@@ -22,6 +23,12 @@ const blockedLevel = computed(() => {
   return level // 被拦截的等级
 })
 
+// 判断当前页面是否是实战手册（playbooks），且当前用户不是管理员
+const isPlaybookBlocked = computed(() => {
+  if (!isPlaybookPath(currentPath.value)) return false
+  return !isPlaybookAccessible(profile.value)
+})
+
 // 判断当前页面是否是需要会员才能访问的技能课
 const isSkillBlocked = computed(() => {
   if (!isSkillPath(currentPath.value)) return false
@@ -36,7 +43,7 @@ const isMemberSkillBlocked = computed(() => {
 })
 
 // 是否处于拦截状态（任一遮罩显示）
-const isBlocked = computed(() => isMounted.value && (blockedLevel.value || isSkillBlocked.value))
+const isBlocked = computed(() => isMounted.value && (blockedLevel.value || isSkillBlocked.value || isPlaybookBlocked.value))
 
 // 被拦截时给 <html> 加 class，隐藏课程正文 .vp-doc（保留侧边栏与导航）
 function syncGateClass() {
@@ -102,8 +109,21 @@ onMounted(() => {
 </script>
 
 <template>
+  <!-- 实战手册被拦截：内测中，仅管理员可见 -->
+  <div v-if="isMounted && isPlaybookBlocked" class="course-gate">
+    <div class="gate-card">
+      <div class="gate-icon">🔒</div>
+      <h2 class="gate-title">广告打法手册 · 内测中</h2>
+      <p class="gate-desc">
+        本手册正在内测阶段，暂未开放。<br />
+        测试通过后将逐步开放，敬请期待。
+      </p>
+      <p v-if="isLoggedIn" class="gate-hint">此手册当前仅限管理员访问。</p>
+    </div>
+  </div>
+
   <!-- 主课程被拦截：内测中（仅内容区，保留侧边栏与导航） -->
-  <div v-if="isMounted && blockedLevel" class="course-gate">
+  <div v-else-if="isMounted && blockedLevel" class="course-gate">
     <div class="gate-card">
       <div class="gate-icon">🔒</div>
       <h2 class="gate-title">{{ blockedLevel }}课程 · 内测中</h2>

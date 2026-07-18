@@ -363,6 +363,14 @@ export const pathToLessonId: Record<string, string> = {
   'system-shortcuts': 'skill-shortcuts',
   'browser-shortcuts': 'skill-browser',
   'excel-for-ops': 'skill-excel',
+  // ===== 实战手册（playbooks，独立栏目，仅管理员可见）=====
+  // 不进入 curriculum 主数组、不参与 publicLessons/totalLessons 统计
+  'ads-16-tactics/index': 'pb-ads-00',
+  'ads-16-tactics/01-low-budget-bargain': 'pb-ads-01',
+  'ads-16-tactics/02-asin-targeting': 'pb-ads-02',
+  'ads-16-tactics/03-auto-ads-refinement': 'pb-ads-03',
+  'ads-16-tactics/04-ranking-push-and-risk': 'pb-ads-04',
+  'ads-16-tactics/05-peak-season-combo': 'pb-ads-05',
 }
 
 // ===== 技能补给站：独立栏目（登录可见，不参与五级体系）=====
@@ -377,6 +385,19 @@ export const skillLessons: { lessonId: string; title: string }[] = [
   { lessonId: 'skill-excel', title: 'Excel 三大神器（运营向）' },
 ]
 
+// ===== 实战手册（playbooks）：独立栏目（仅管理员可见，不参与五级体系）=====
+// 仅用于 ContinueCard 等按 lessonId 反查标题的场景。
+// 刻意不进入 curriculum 主数组，以免污染进度统计（publicLessons/totalLessons）
+// 与管理员看板；其访问门控走 accessControl 里的 isPlaybookPath 那一套，与等级无关。
+export const playbookLessons: { lessonId: string; title: string }[] = [
+  { lessonId: 'pb-ads-00', title: '广告打法手册 · 首页' },
+  { lessonId: 'pb-ads-01', title: '第1节 · 小预算捡漏组合' },
+  { lessonId: 'pb-ads-02', title: '第2节 · ASIN 定位与流量卡位' },
+  { lessonId: 'pb-ads-03', title: '第3节 · 自动广告精细化' },
+  { lessonId: 'pb-ads-04', title: '第4节 · 关键词排名冲刺与风险教育' },
+  { lessonId: 'pb-ads-05', title: '第5节 · 旺季与综合打法' },
+]
+
 // 课程内容的目录前缀（getLessonIdByPath 用）
 const CONTENT_PREFIXES = [
   'content/modules/',
@@ -385,6 +406,7 @@ const CONTENT_PREFIXES = [
   'content/advanced/',
   'content/expert/',
   'content/skills/',
+  'content/playbooks/',
 ]
 
 // 根据页面相对路径推导 lessonId（Comments 组件零侵入注入用）

@@ -18,6 +18,7 @@ import { authState, supabase } from './supabase'
 import {
   publicLevels, isMentorRole, isMember,
   SKILL_PATH_PREFIX, PUBLIC_SKILL_SLUGS, MEMBER_SKILL_SLUGS,
+  PLAYBOOK_PATH_PREFIX,
 } from './accessControl'
 
 // 受保护等级的关键字（出现在侧边栏分组标题里的）
@@ -67,6 +68,7 @@ function lockTitle(titleEl: Element, level: string) {
 function applyVisibility() {
   applyLevelVisibility()
   applySkillVisibility()
+  applyPlaybookVisibility()
 }
 
 // 技能补给站：非会员/未登录时给受保护课项加标记。
@@ -105,6 +107,30 @@ function applySkillVisibility() {
     } else if (isMemberOnly) {
       // 会员专属课即使已解锁也保留 👑，让会员感受到专属身份
       textEl.textContent = '👑 ' + text
+    }
+  })
+}
+
+// 实战手册（playbooks）：仅管理员可见。
+// 非管理员时给所有手册链接项加 🔒 标记（包括首页和子项）。
+// 手册是侧边栏里的链接项，结构与技能课一致（.VPSidebarItem 内的 <a href>）。
+function applyPlaybookVisibility() {
+  const links = [
+    ...document.querySelectorAll<HTMLAnchorElement>(
+      '.VPSidebar a[href^="' + PLAYBOOK_PATH_PREFIX + '"]'
+    ),
+  ]
+  const mentor = isMentorRole(currentRole)
+  links.forEach((a) => {
+    const textEl = (a.querySelector('.text') as HTMLElement) || a
+    // 去掉可能残留的标记（🔒 或 👑）后再按需添加
+    let text = textEl.textContent || ''
+    if (text.startsWith('🔒 ') || text.startsWith('👑 ')) text = text.slice(3)
+    textEl.textContent = text
+    delete textEl.dataset.playbookLocked
+    if (!mentor) {
+      textEl.textContent = '🔒 ' + text
+      textEl.dataset.playbookLocked = '1'
     }
   })
 }
