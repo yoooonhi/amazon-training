@@ -52,20 +52,41 @@ export default {
     app.component('ReplenishmentCalculator', ReplenishmentCalculator)
     app.component('ZoomableImage', ZoomableImage)
 
+    // 底部栏交互：滚到接近底部时，侧边栏淡出、footer 横跨全宽滑入（如飞书效果）
+    let scrollTimer: number | undefined
+    const checkBottom = () => {
+      if (typeof window === 'undefined') return
+      const scrollY = window.scrollY + window.innerHeight
+      const docHeight = document.documentElement.scrollHeight
+      // 距底部小于 120px 时触发（footer 约 89px + 一点提前量）
+      const atBottom = scrollY >= docHeight - 120
+      document.documentElement.classList.toggle('at-bottom', atBottom)
+    }
+
     // 网站访问埋点：首次加载记一次 + SPA 路由切换时按 24h 合并规则记录
     // onAfterRouteChanged 在每次页面切换时触发，但 recordVisit 内部会判断
     // 距上次记录是否满 24h，不满则跳过，实现"刷新/跳转不算新访问"
-    if (router) {
-      router.onAfterRouteChanged = () => {
-        recordVisit()
-        // 记录用户最后学习的课程位置（仅课程页才记）
-        recordLastLesson()
-        // 路由切换后重新检查侧边栏可见性（角色可能已变）
-        setupSidebarGuard()
-        // 路由切换后把选中的侧边栏项滚动到可见区（居中）
-        scrollSidebarActive()
-      }
+    //
+    // ⚠️ 注意：onAfterRouteChanged 只能赋值一次！之前文件里有两个赋值，
+    // 第二个会覆盖第一个，导致埋点/侧边栏守卫/滚动等全部在路由切换时失效。
+    // 所有路由切换后的逻辑必须集中在这一个回调里。
+    const onAfterRouteChanged = () => {
+      if (typeof window === 'undefined') return // SSR 环境跳过
+      recordVisit()
+      // 记录用户最后学习的课程位置（仅课程页才记）
+      recordLastLesson()
+      // 路由切换后重新检查侧边栏可见性（角色可能已变）
+      setupSidebarGuard()
+      // 路由切换后把选中的侧边栏项滚动到可见区（居中）
+      scrollSidebarActive()
+      // 路由切换后重置并重新检查底部栏状态（短页面可能一开始就在底部）
+      document.documentElement.classList.remove('at-bottom')
+      setTimeout(checkBottom, 300)
     }
+    if (router) {
+      router.onAfterRouteChanged = onAfterRouteChanged
+    }
+
     // 首次进入记一次（onAfterRouteChanged 不会在首次加载时触发）
     recordVisit()
     recordLastLesson()
@@ -74,29 +95,13 @@ export default {
     // 首次加载也滚一次（直接进某个深链课时，active 项可能在视口外）
     scrollSidebarActive()
 
-    // 底部栏交互：滚到接近底部时，侧边栏淡出、footer 横跨全宽滑入（如飞书效果）
+    // 首次加载时也要检查底部栏状态（短页面可能一开始就在底部）
+    setTimeout(checkBottom, 500)
     if (typeof window !== 'undefined') {
-      let scrollTimer: number | undefined
-      const checkBottom = () => {
-        const scrollY = window.scrollY + window.innerHeight
-        const docHeight = document.documentElement.scrollHeight
-        // 距底部小于 120px 时触发（footer 约 89px + 一点提前量）
-        const atBottom = scrollY >= docHeight - 120
-        document.documentElement.classList.toggle('at-bottom', atBottom)
-      }
       window.addEventListener('scroll', () => {
         if (scrollTimer) cancelAnimationFrame(scrollTimer)
         scrollTimer = requestAnimationFrame(checkBottom)
       }, { passive: true })
-      // 页面加载和路由切换后也要检查（短页面可能一开始就在底部）
-      setTimeout(checkBottom, 500)
-      if (router) {
-        router.onAfterRouteChanged = () => {
-          // 路由切换后重置并重新检查
-          document.documentElement.classList.remove('at-bottom')
-          setTimeout(checkBottom, 300)
-        }
-      }
     }
   },
 } satisfies Theme
