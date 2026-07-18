@@ -19,7 +19,7 @@ import ProgressTracker from '../../components/ProgressTracker.vue'
 
 先看全景，建立整体认知。下图把亚马逊运营拆成 **5 步主流程（横向链条）** 和 **7 大日常模块（纵向并行）**，每个模块都标注了对应课程。先看懂"做什么"，再点进对应课程学"怎么做"。
 
-<img src="/images/ops-panorama.svg" alt="亚马逊运营全景图：5步主流程 + 7大运营模块" style="width:100%;max-width:1100px;border:1px solid var(--vp-c-divider);border-radius:12px;margin:1rem 0;" />
+<ZoomableImage src="/images/ops-panorama.svg" alt="亚马逊运营全景图：5步主流程 + 7大运营模块" max-width="1100px" />
 
 > **怎么用这张图**：① 横向是「做产品」的先后顺序；② 纵向 7 个模块是「日常要并行管的事」；③ 每个模块右侧标注了对应课程。任何一个模块掉链子，整体业绩都会塌方——**运营的本质是「不漏环」，不是「单点强」**。
 
