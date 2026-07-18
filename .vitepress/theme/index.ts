@@ -18,6 +18,7 @@ import ZoomableImage from '../../components/ZoomableImage.vue'
 import AdminShell from '../../components/dashboard/AdminShell.vue'
 import { recordVisit, recordLastLesson } from '../../lib/visitTracker'
 import { setupSidebarGuard } from '../../lib/sidebarGuard'
+import { scrollSidebarActive } from '../../lib/scrollSidebarActive'
 import './custom.css'
 
 // dashboard 页面用全屏后台布局，跳过 VitePress 的导航/侧边栏/底部栏
@@ -61,6 +62,8 @@ export default {
         recordLastLesson()
         // 路由切换后重新检查侧边栏可见性（角色可能已变）
         setupSidebarGuard()
+        // 路由切换后把选中的侧边栏项滚动到可见区（居中）
+        scrollSidebarActive()
       }
     }
     // 首次进入记一次（onAfterRouteChanged 不会在首次加载时触发）
@@ -68,6 +71,8 @@ export default {
     recordLastLesson()
     // 侧边栏权限守卫：非管理员隐藏受保护等级的侧边栏分组
     setupSidebarGuard()
+    // 首次加载也滚一次（直接进某个深链课时，active 项可能在视口外）
+    scrollSidebarActive()
 
     // 底部栏交互：滚到接近底部时，侧边栏淡出、footer 横跨全宽滑入（如飞书效果）
     if (typeof window !== 'undefined') {
