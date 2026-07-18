@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1080" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
-  <rect width="1400" height="1080" fill="#fafafa"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1040" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <rect width="1400" height="1040" fill="#fafafa"/>
 
   <!-- 标题 -->
   <text x="700" y="50" text-anchor="middle" font-size="32" font-weight="700" fill="#23289e">亚马逊运营全景图</text>
@@ -9,113 +9,83 @@
   <text x="700" y="125" text-anchor="middle" font-size="14" font-weight="600" fill="#888" letter-spacing="2">整 体 运 营 流 程</text>
 
   <!-- 5 步骤圆角胶囊，等距分布 -->
-  <!-- 步骤1 选品 -->
   <rect x="60" y="145" width="220" height="56" rx="28" fill="#23289e"/>
   <text x="170" y="180" text-anchor="middle" font-size="18" font-weight="700" fill="#fff">① 选品</text>
-  <!-- 箭头1 -->
   <text x="305" y="180" font-size="22" fill="#23289e">→</text>
-  <!-- 步骤2 上架测款 -->
   <rect x="335" y="145" width="220" height="56" rx="28" fill="#23289e"/>
   <text x="445" y="180" text-anchor="middle" font-size="18" font-weight="700" fill="#fff">② 上架测款</text>
-  <!-- 箭头2 -->
   <text x="580" y="180" font-size="22" fill="#23289e">→</text>
-  <!-- 步骤3 优化Listing -->
   <rect x="610" y="145" width="220" height="56" rx="28" fill="#23289e"/>
   <text x="720" y="180" text-anchor="middle" font-size="18" font-weight="700" fill="#fff">③ 优化 Listing</text>
-  <!-- 箭头3 -->
   <text x="855" y="180" font-size="22" fill="#23289e">→</text>
-  <!-- 步骤4 广告拉升 -->
   <rect x="885" y="145" width="220" height="56" rx="28" fill="#23289e"/>
   <text x="995" y="180" text-anchor="middle" font-size="18" font-weight="700" fill="#fff">④ 广告拉升</text>
-  <!-- 箭头4 -->
   <text x="1130" y="180" font-size="22" fill="#23289e">→</text>
-  <!-- 步骤5 稳定放量 -->
   <rect x="1160" y="145" width="220" height="56" rx="28" fill="#16a34a"/>
   <text x="1270" y="180" text-anchor="middle" font-size="18" font-weight="700" fill="#fff">⑤ 稳定放量</text>
 
   <!-- 分隔线 -->
   <line x1="60" y1="230" x2="1340" y2="230" stroke="#e5e7eb" stroke-width="2" stroke-dasharray="4 4"/>
 
-  <!-- 中部：7 大运营模块（左：模块卡 / 右：子步骤 + 课程对应） -->
+  <!-- 中部：7 大运营模块（左：模块卡 / 右：子步骤单行 + 课程对应） -->
   <text x="60" y="265" font-size="14" font-weight="600" fill="#888" letter-spacing="2">7 大 运 营 模 块</text>
 
-  <!-- ============ 模块 1：选品 ============ -->
+  <!-- 模块 1：选品 -->
   <rect x="60" y="285" width="180" height="80" rx="10" fill="#23289e"/>
   <text x="150" y="318" text-anchor="middle" font-size="20" font-weight="700" fill="#fff">选品</text>
   <text x="150" y="345" text-anchor="middle" font-size="13" fill="#c7d2fe">入门2 · 选品与采购</text>
-
   <rect x="260" y="285" width="1080" height="80" rx="8" fill="#fff" stroke="#e5e7eb" stroke-width="1.5"/>
-  <text x="285" y="318" font-size="14" fill="#444">市场调研 → 需求分析 → 竞品分析 → 利润测算 →</text>
-  <text x="285" y="345" font-size="14" fill="#444">供应链筛选 → 样品 + 合规 → 首单 + FBA 备货</text>
-  <text x="1325" y="332" text-anchor="end" font-size="12" font-weight="600" fill="#16a34a">7 步</text>
+  <text x="285" y="332" font-size="14" fill="#444">市场调研 → 需求分析 → 竞品分析 → 利润测算 → 供应链筛选 → 样品 + 合规 → 首单 + FBA 备货</text>
 
-  <!-- ============ 模块 2：Listing 运营 ============ -->
+  <!-- 模块 2：Listing 运营 -->
   <rect x="60" y="380" width="180" height="80" rx="10" fill="#23289e"/>
   <text x="150" y="413" text-anchor="middle" font-size="20" font-weight="700" fill="#fff">Listing 运营</text>
   <text x="150" y="440" text-anchor="middle" font-size="13" fill="#c7d2fe">入门3 + 初级2</text>
-
   <rect x="260" y="380" width="1080" height="80" rx="8" fill="#fff" stroke="#e5e7eb" stroke-width="1.5"/>
-  <text x="285" y="413" font-size="14" fill="#444">关键词调研 → 标题五点描述 → 主图 / A+ / 视频 →</text>
-  <text x="285" y="440" font-size="14" fill="#444">类目与后台属性 → 上架检查 + SEO 优化</text>
-  <text x="1325" y="427" text-anchor="end" font-size="12" font-weight="600" fill="#16a34a">5 步</text>
+  <text x="285" y="427" font-size="14" fill="#444">关键词调研 → 标题五点描述 → 主图 / A+ / 视频 → 类目与后台属性 → 上架检查 + SEO 优化</text>
 
-  <!-- ============ 模块 3：广告运营 ============ -->
+  <!-- 模块 3：广告运营 -->
   <rect x="60" y="475" width="180" height="80" rx="10" fill="#23289e"/>
   <text x="150" y="508" text-anchor="middle" font-size="20" font-weight="700" fill="#fff">广告运营</text>
   <text x="150" y="535" text-anchor="middle" font-size="13" fill="#c7d2fe">入门5 + 初级1 + 手册</text>
-
   <rect x="260" y="475" width="1080" height="80" rx="8" fill="#fff" stroke="#e5e7eb" stroke-width="1.5"/>
-  <text x="285" y="508" font-size="14" fill="#444">自动测词 → 手动分层（Broad / Phrase / Exact）→</text>
-  <text x="285" y="535" font-size="14" fill="#444">否定 + 出价调整 → 预算节奏 → ACOS / TACOS 复盘</text>
-  <text x="1325" y="522" text-anchor="end" font-size="12" font-weight="600" fill="#16a34a">5 步</text>
+  <text x="285" y="522" font-size="14" fill="#444">自动测词 → 手动分层（Broad / Phrase / Exact）→ 否定 + 出价调整 → 预算节奏 → ACOS / TACOS 复盘</text>
 
-  <!-- ============ 模块 4：促销活动 ============ -->
+  <!-- 模块 4：促销活动 -->
   <rect x="60" y="570" width="180" height="80" rx="10" fill="#23289e"/>
   <text x="150" y="603" text-anchor="middle" font-size="20" font-weight="700" fill="#fff">促销活动</text>
   <text x="150" y="630" text-anchor="middle" font-size="13" fill="#c7d2fe">入门6 + 初级4</text>
-
   <rect x="260" y="570" width="1080" height="80" rx="8" fill="#fff" stroke="#e5e7eb" stroke-width="1.5"/>
-  <text x="285" y="603" font-size="14" fill="#444">Coupon 优惠券 → 秒杀 / 7 天促销 → 大促规划 →</text>
-  <text x="285" y="630" font-size="14" fill="#444">站内 + 站外联动</text>
-  <text x="1325" y="617" text-anchor="end" font-size="12" font-weight="600" fill="#16a34a">4 步</text>
+  <text x="285" y="617" font-size="14" fill="#444">Coupon 优惠券 → 秒杀 / 7 天促销 → 大促规划 → 站内 + 站外联动</text>
 
-  <!-- ============ 模块 5：数据分析 ============ -->
+  <!-- 模块 5：数据分析 -->
   <rect x="60" y="665" width="180" height="80" rx="10" fill="#23289e"/>
   <text x="150" y="698" text-anchor="middle" font-size="20" font-weight="700" fill="#fff">数据分析</text>
   <text x="150" y="725" text-anchor="middle" font-size="13" fill="#c7d2fe">中级4 · 数据看板</text>
-
   <rect x="260" y="665" width="1080" height="80" rx="8" fill="#fff" stroke="#e5e7eb" stroke-width="1.5"/>
-  <text x="285" y="698" font-size="14" fill="#444">流量分析 → 转化率 → 广告数据 → 库存补货 → 利润复盘</text>
-  <text x="1325" y="712" text-anchor="end" font-size="12" font-weight="600" fill="#16a34a">5 步</text>
+  <text x="285" y="712" font-size="14" fill="#444">流量分析 → 转化率 → 广告数据 → 库存补货 → 利润复盘</text>
 
-  <!-- ============ 模块 6：转化率打造 ============ -->
+  <!-- 模块 6：转化率打造 -->
   <rect x="60" y="760" width="180" height="80" rx="10" fill="#23289e"/>
   <text x="150" y="793" text-anchor="middle" font-size="20" font-weight="700" fill="#fff">转化率打造</text>
-  <text x="150" y="820" text-anchor="middle" font-size="13" fill="#c7d2fe">入门3 + 初级1/2</text>
-
+  <text x="150" y="820" text-anchor="middle" font-size="13" fill="#c7d2fe">入门3 + 初级2</text>
   <rect x="260" y="760" width="1080" height="80" rx="8" fill="#fff" stroke="#e5e7eb" stroke-width="1.5"/>
-  <text x="285" y="793" font-size="14" fill="#444">主图点击率优化 → 卖点提炼 → Review / Q&amp;A 管理 →</text>
-  <text x="285" y="820" font-size="14" fill="#444">价格 / 促销 A/B 测试</text>
-  <text x="1325" y="807" text-anchor="end" font-size="12" font-weight="600" fill="#16a34a">4 步</text>
+  <text x="285" y="807" font-size="14" fill="#444">主图点击率优化 → 卖点提炼 → Review / Q&amp;A 管理 → 价格 / 促销 A/B 测试</text>
 
-  <!-- ============ 模块 7：日常运营 ============ -->
+  <!-- 模块 7：日常运营 -->
   <rect x="60" y="855" width="180" height="80" rx="10" fill="#23289e"/>
   <text x="150" y="888" text-anchor="middle" font-size="20" font-weight="700" fill="#fff">日常运营</text>
   <text x="150" y="915" text-anchor="middle" font-size="13" fill="#c7d2fe">入门7 · 判断力</text>
-
   <rect x="260" y="855" width="1080" height="80" rx="8" fill="#fff" stroke="#e5e7eb" stroke-width="1.5"/>
-  <text x="285" y="888" font-size="14" fill="#444">每日工作流 → 优先级判断 → 数据可信度 →</text>
-  <text x="285" y="915" font-size="14" fill="#444">跟卖 / Buy Box 防御 → 退货异常 → 决策复盘</text>
-  <text x="1325" y="902" text-anchor="end" font-size="12" font-weight="600" fill="#16a34a">6 步</text>
+  <text x="285" y="902" font-size="14" fill="#444">每日工作流 → 优先级判断 → 数据可信度 → 跟卖 / Buy Box → 退货异常 → 决策复盘</text>
 
   <!-- 分隔线 -->
-  <line x1="60" y1="965" x2="1340" y2="965" stroke="#e5e7eb" stroke-width="2" stroke-dasharray="4 4"/>
+  <line x1="60" y1="955" x2="1340" y2="955" stroke="#e5e7eb" stroke-width="2" stroke-dasharray="4 4"/>
 
   <!-- 底部：图例 + 提醒 -->
-  <text x="60" y="1000" font-size="14" font-weight="600" fill="#888" letter-spacing="2">怎 么 用 这 张 图</text>
-  <text x="60" y="1030" font-size="14" fill="#555">① 横向链条是「主流程」——做产品的先后顺序； ② 纵向 7 个模块是「日常要并行管的 7 件事」； ③ 每个模块右侧标注了对应课程，按需深入学。</text>
-  <text x="60" y="1058" font-size="13" fill="#dc2626" font-weight="600">⚠ 红线：任何一个模块掉链子，整体业绩都会塌方。运营的本质是「不漏环」而不是「单点强」。</text>
+  <text x="60" y="990" font-size="13" fill="#555">横向链条是「主流程」（做产品的先后顺序）；纵向 7 个模块是「日常并行管的事」；每个模块右侧标注了对应课程。</text>
+  <text x="60" y="1015" font-size="13" fill="#dc2626" font-weight="600">⚠ 红线：任何一个模块掉链子，整体业绩都会塌方。运营的本质是「不漏环」而不是「单点强」。</text>
 
   <!-- 底部装饰条 -->
-  <rect x="0" y="1065" width="1400" height="15" fill="#23289e"/>
+  <rect x="0" y="1025" width="1400" height="15" fill="#23289e"/>
 </svg>
