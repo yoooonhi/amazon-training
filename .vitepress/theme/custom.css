@@ -93,3 +93,26 @@ html.doc-gated .aside {
     border-radius: 6px;
   }
 }
+
+/* ===== 技能补给站：课程徽章（限免/会员）=====
+ * 由 sidebarGuard.ts 给侧边栏 .text 元素加 data-skill-badge，
+ * 这里用 ::after 渲染成小圆角徽章，贴在标题文字右侧。
+ * 锁定态（未解锁）仍走 emoji 🔒/👑，跟主课程一致。
+ */
+.VPSidebar .VPSidebarItem .text[data-skill-badge]::after {
+  display: inline-block;
+  margin-left: 0.4rem;
+  padding: 0.05rem 0.35rem;
+  border-radius: 3px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  line-height: 1.4;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+/* 限免：绿色 */
+.VPSidebar .VPSidebarItem .text[data-skill-badge="free"]::after {
+  content: "免费";
+  color: #16a34a;
+  background: rgba(22, 163, 74, 0.12);
+}

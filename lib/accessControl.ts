@@ -101,6 +101,19 @@ export const PUBLIC_SKILL_SLUGS = ['domain-basics']
 export const MEMBER_SKILL_SLUGS = ['excel-for-ops']
 
 /**
+ * 限时免费的技能课（slug 列表）。
+ * 这些课现在免费可学（登录后即可），区别于「会员专属」（excel-for-ops）。
+ * 侧边栏会给这些课标「限免」标识。
+ * 注意：不要把会员专属课放进来（语义冲突）。
+ */
+export const LIMITED_FREE_SKILL_SLUGS = [
+  'phishing-detection',
+  'system-shortcuts',
+  'browser-shortcuts',
+]
+// domain-basics 是全员公开（连游客都能看），不算「限免」，保持纯净标题
+
+/**
  * 判断是否为付费会员。
  * - 管理员 / 管理员：视为会员（避免被技能站门控拦截）
  * - profile.is_member === true：付费会员

@@ -17,7 +17,7 @@
 import { authState, supabase } from './supabase'
 import {
   publicLevels, isMentorRole, isMember,
-  SKILL_PATH_PREFIX, PUBLIC_SKILL_SLUGS, MEMBER_SKILL_SLUGS,
+  SKILL_PATH_PREFIX, PUBLIC_SKILL_SLUGS, MEMBER_SKILL_SLUGS, LIMITED_FREE_SKILL_SLUGS,
   PLAYBOOK_PATH_PREFIX,
 } from './accessControl'
 
@@ -87,26 +87,40 @@ function applySkillVisibility() {
     const href = a.getAttribute('href') || ''
     const slug = href.slice(SKILL_PATH_PREFIX.length).replace(/\/+$/, '').split('/')[0]
     const isMemberOnly = MEMBER_SKILL_SLUGS.includes(slug)
+    const isLimitedFree = LIMITED_FREE_SKILL_SLUGS.includes(slug)
     // 会员专属课：非会员加锁（含免费登录用户）
     // 普通技能课：未登录加锁，已登录解锁
     // 白名单课：所有人解锁
     const unlocked = member
       || PUBLIC_SKILL_SLUGS.includes(slug)
       || (loggedIn && !isMemberOnly)
-    // 去掉可能残留的标记（🔒 或 👑）后再按需添加
-    // 注意：emoji 是 surrogate pair（占2个UTF-16单元），+' '共3个单元
-    let text = textEl.textContent
+    // 清掉残留的 emoji 前缀（旧版本会往 textContent 塞 🔒/👑/🧧限免，升级后改用 data-attr）
+    let text = textEl.textContent || ''
     if (text.startsWith('🔒 ') || text.startsWith('👑 ')) text = text.slice(3)
+    if (text.startsWith('🧧限免 ')) text = text.slice(5)
     textEl.textContent = text
+    // 清掉旧 data 标记
     delete textEl.dataset.skillLocked
+    delete textEl.dataset.skillBadge
     if (!unlocked) {
-      // 被拦截：会员专属课用 👑，普通受保护课用 🔒
-      const icon = isMemberOnly ? '👑' : '🔒'
-      textEl.textContent = icon + ' ' + text
-      textEl.dataset.skillLocked = '1'
+      // 被拦截：
+      //   会员专属课 → 👑（点进去提示升级会员）
+      //   限时免费课 → 绿色「免费」徽章（点进去提示登录，注册后即可免费学）
+      //   其他锁定课 → 🔒
+      if (isLimitedFree) {
+        textEl.dataset.skillBadge = 'free'
+        textEl.dataset.skillLocked = '1'
+      } else {
+        const icon = isMemberOnly ? '👑' : '🔒'
+        textEl.textContent = icon + ' ' + text
+        textEl.dataset.skillLocked = '1'
+      }
     } else if (isMemberOnly) {
-      // 会员专属课即使已解锁也保留 👑，让会员感受到专属身份
+      // 会员专属课：已解锁后保留 👑 emoji（会员尊享感）
       textEl.textContent = '👑 ' + text
+    } else if (isLimitedFree) {
+      // 限时免费课：已解锁后用绿色「免费」徽章
+      textEl.dataset.skillBadge = 'free'
     }
   })
 }
