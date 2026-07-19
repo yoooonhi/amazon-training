@@ -7,6 +7,7 @@
  * 不显示站点顶部导航、底部栏、课程侧边栏。
  */
 import { ref, computed, onMounted } from 'vue'
+import { useData } from 'vitepress'
 import { supabase } from '../../lib/supabase'
 
 import OverviewPage from './OverviewPage.vue'
@@ -26,13 +27,12 @@ const mobileSidebarOpen = ref(false) // 移动端展开
 const currentPage = ref('overview')
 const refreshKey = ref(0)
 
-// 日间/夜间模式
-const isDark = ref(true) // VitePress 默认跟随系统，后台默认用深色侧边栏
+// 日间/夜间模式：复用 VitePress 官方 appearance 状态，
+// 这样切换会自动持久化到 localStorage 并同步到全站所有页面，
+// 而不是只在后台临时改 class（刷新/跳走就丢）。
+const { isDark } = useData()
 function toggleTheme() {
   isDark.value = !isDark.value
-  if (typeof document !== 'undefined') {
-    document.documentElement.classList.toggle('dark', isDark.value)
-  }
 }
 
 // 导航分组
@@ -111,8 +111,6 @@ function switchPage(key) {
 
 onMounted(() => {
   isMounted.value = true
-  // 读取当前 VitePress 的 dark 模式状态
-  isDark.value = document.documentElement.classList.contains('dark')
   checkAdmin()
 })
 </script>
@@ -146,17 +144,19 @@ onMounted(() => {
         class="admin-nav"
         :class="{ collapsed: sidebarCollapsed, 'mobile-open': mobileSidebarOpen }"
       >
-        <!-- Logo 区 -->
+        <!-- Logo 区（含折叠按钮，置于同一 flex 行内自然垂直对齐） -->
         <div class="nav-logo" @click="switchPage('overview')">
           <span class="nav-logo-icon" v-html="icons.logo"></span>
           <span v-if="!sidebarCollapsed" class="nav-logo-text">运营后台</span>
+          <button
+            class="nav-collapse-btn"
+            :title="sidebarCollapsed ? '展开' : '收起'"
+            @click.stop="sidebarCollapsed = !sidebarCollapsed"
+          >
+            <span v-if="sidebarCollapsed">▶</span>
+            <span v-else>◀</span>
+          </button>
         </div>
-
-        <!-- 折叠按钮（桌面端） -->
-        <button class="nav-collapse-btn" @click="sidebarCollapsed = !sidebarCollapsed">
-          <span v-if="sidebarCollapsed">▶</span>
-          <span v-else>◀</span>
-        </button>
 
         <!-- 导航分组 -->
         <nav class="nav-body">
@@ -289,55 +289,61 @@ onMounted(() => {
   overflow: hidden;
 }
 
-/* ===== 左侧深色导航 ===== */
+/* ===== 左侧导航（深/浅色自适应） =====
+   原本按「永远深色」设计，文字/边框硬编码成白色系，浅色模式下
+   背景变浅后白字糊成一团。现全部改用 VitePress 主题变量。*/
 .admin-nav {
   width: 220px;
   flex-shrink: 0;
-  background: var(--vp-c-bg-alt, #1a1a2e);
+  background: var(--vp-c-bg-alt);
   display: flex;
   flex-direction: column;
-  border-right: 1px solid rgba(255,255,255,0.06);
+  border-right: 1px solid var(--vp-c-divider);
   transition: width 0.2s ease;
   overflow: hidden;
 }
 .admin-nav.collapsed { width: 64px; }
 
+/* Logo 区与右侧 .content-topbar 用同一高度（72px），
+   保证两侧底部分隔线在同一水平线上。 */
 .nav-logo {
   display: flex;
   align-items: center;
   gap: 0.65rem;
-  padding: 1.1rem 1.25rem;
+  height: 72px;
+  padding: 0 1.25rem;
+  box-sizing: border-box;
   cursor: pointer;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid var(--vp-c-divider);
   flex-shrink: 0;
 }
-.nav-logo-icon { font-size: 1.4rem; color: #818cf8; display: inline-flex; }
+.nav-logo-icon { font-size: 1.3rem; color: var(--vp-c-brand-1); display: inline-flex; }
 .nav-logo-text {
   font-size: 1rem;
   font-weight: 700;
   color: var(--vp-c-text-1);
   white-space: nowrap;
+  margin-right: auto; /* 推折叠按钮到最右，展开时才显示文字故占位 */
 }
 
 .nav-collapse-btn {
-  position: absolute;
-  right: 8px;
-  top: 20px;
   width: 26px;
   height: 26px;
+  flex-shrink: 0;
   border-radius: 7px;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(255,255,255,0.05);
-  color: rgba(255,255,255,0.7);
+  border: 1px solid var(--vp-c-divider);
+  background: var(--vp-c-default-soft, transparent);
+  color: var(--vp-c-text-2);
   font-size: 0.6rem;
   cursor: pointer;
-  z-index: 10;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.nav-collapse-btn:hover { background: rgba(255,255,255,0.12); color: #fff; }
-.admin-nav { position: relative; }
+.nav-collapse-btn:hover { background: var(--vp-c-default-soft, rgba(125,125,125,0.08)); color: var(--vp-c-text-1); }
+/* 收起态：图标居中显示，隐藏文字与按钮留白 */
+.admin-nav.collapsed .nav-logo { justify-content: center; padding: 1.1rem 0.5rem; }
+.admin-nav.collapsed .nav-collapse-btn { margin: 0 auto; }
 
 .nav-body {
   flex: 1;
@@ -352,7 +358,7 @@ onMounted(() => {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: rgba(255,255,255,0.3);
+  color: var(--vp-c-text-3);
   padding: 1rem 0.75rem 0.4rem;
 }
 
@@ -364,7 +370,7 @@ onMounted(() => {
   border-radius: 8px;
   border: none;
   background: transparent;
-  color: rgba(255,255,255,0.6);
+  color: var(--vp-c-text-2);
   font-size: 0.86rem;
   cursor: pointer;
   text-align: left;
@@ -374,12 +380,12 @@ onMounted(() => {
   white-space: nowrap;
 }
 .nav-link:hover {
-  background: rgba(255,255,255,0.06);
-  color: rgba(255,255,255,0.9);
+  background: var(--vp-c-default-soft, rgba(125,125,125,0.08));
+  color: var(--vp-c-text-1);
 }
 .nav-link.active {
-  background: rgba(99, 102, 241, 0.22);
-  color: #fff;
+  background: var(--vp-c-brand-soft);
+  color: var(--vp-c-brand-1);
   font-weight: 600;
   position: relative;
 }
@@ -391,14 +397,14 @@ onMounted(() => {
   bottom: 6px;
   width: 3px;
   border-radius: 0 3px 3px 0;
-  background: #818cf8;
+  background: var(--vp-c-brand-1);
 }
 .nav-link-icon { font-size: 1.1rem; flex-shrink: 0; width: 1.4rem; text-align: center; }
 .nav-link-text { overflow: hidden; }
 
 .nav-footer {
   padding: 0.65rem;
-  border-top: 1px solid rgba(255,255,255,0.06);
+  border-top: 1px solid var(--vp-c-divider);
   flex-shrink: 0;
 }
 .nav-home-link {
@@ -407,14 +413,14 @@ onMounted(() => {
   gap: 0.7rem;
   padding: 0.55rem 0.75rem;
   border-radius: 8px;
-  color: rgba(255,255,255,0.45);
+  color: var(--vp-c-text-3);
   font-size: 0.82rem;
   text-decoration: none;
   transition: all 0.15s;
 }
 .nav-home-link:hover {
-  background: rgba(255,255,255,0.06);
-  color: rgba(255,255,255,0.8);
+  background: var(--vp-c-default-soft, rgba(125,125,125,0.08));
+  color: var(--vp-c-text-1);
 }
 
 /* ===== 右侧主区域 ===== */
@@ -432,7 +438,9 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 2rem;
+  height: 72px;
+  padding: 0 2rem;
+  box-sizing: border-box;
   border-bottom: 1px solid var(--vp-c-divider);
   flex-shrink: 0;
   background: var(--vp-c-bg);
