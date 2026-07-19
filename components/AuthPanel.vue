@@ -16,6 +16,31 @@ const loading = ref(false)
 const errorMsg = ref('')
 const infoMsg = ref('')
 
+// HoverCard 延时控制：进入延时短（防误触），离开延时短（跟手收起）
+let enterTimer
+let leaveTimer
+const ENTER_DELAY = 200
+const LEAVE_DELAY = 200
+
+// 鼠标移入：清掉离开计时，等 200ms 后展开（避免鼠标扫过触发）
+function onMenuEnter() {
+  clearTimeout(leaveTimer)
+  enterTimer = window.setTimeout(() => {
+    showUserMenu.value = true
+  }, ENTER_DELAY)
+}
+
+// 鼠标移出：清掉进入计时，等 200ms 后收起
+// 注意：不要用 document.activeElement 做"焦点在卡片内就不收起"的判断——
+// 一旦用户点过卡片里的输入框/按钮，焦点会一直留在 .nav-user 内，导致移出后永不收起。
+// 打字时鼠标本身就在卡片上（mouseleave 不会触发），不需要额外保护。
+function onMenuLeave() {
+  clearTimeout(enterTimer)
+  leaveTimer = window.setTimeout(() => {
+    showUserMenu.value = false
+  }, LEAVE_DELAY)
+}
+
 // 是否为付费会员（管理员也视为会员）
 const isMemberUser = computed(() => isMemberOf(currentProfile.value))
 
@@ -119,19 +144,32 @@ function displayName() {
 
 <template>
   <div v-if="isMounted" class="nav-auth">
-    <!-- 已登录：右上角用户菜单 -->
-    <div v-if="currentUser" class="nav-user" @click="showUserMenu = !showUserMenu">
+    <!-- 已登录：右上角用户菜单（hover 展开卡片，移动端点击展开） -->
+    <div
+      v-if="currentUser"
+      class="nav-user"
+      @mouseenter="onMenuEnter"
+      @mouseleave="onMenuLeave"
+      @click="showUserMenu = !showUserMenu"
+    >
       <span class="nav-avatar">👤</span>
       <span class="nav-username">{{ displayName() }}</span>
       <span v-if="currentProfile?.role === 'mentor'" class="nav-role">管理员</span>
       <span v-else-if="isMemberUser" class="nav-member">VIP 会员</span>
 
-      <!-- 下拉菜单 -->
+      <!-- HoverCard（只展示 + 操作，定位跟原来的下拉一致） -->
       <Transition name="dropdown">
         <div v-if="showUserMenu" class="user-dropdown" @click.stop>
           <div class="dropdown-header">
-            <span class="dropdown-email">{{ currentUser.email }}</span>
-            <span v-if="currentProfile?.role !== 'mentor' && isMemberUser" class="dropdown-member">👑 付费会员</span>
+            <div class="dropdown-avatar">👤</div>
+            <div class="dropdown-id">
+              <div class="dropdown-name-row">
+                <span class="dropdown-name">{{ displayName() }}</span>
+                <span v-if="currentProfile?.role === 'mentor'" class="dropdown-role-tag">管理员</span>
+                <span v-else-if="isMemberUser" class="dropdown-member">👑 会员</span>
+              </div>
+              <div class="dropdown-email">{{ currentUser.email }}</div>
+            </div>
           </div>
           <a v-if="currentProfile?.role === 'mentor'" href="/dashboard" class="dropdown-item">
             📊 管理员后台
@@ -244,14 +282,13 @@ function displayName() {
   box-shadow: 0 1px 2px rgba(245, 158, 11, 0.35);
 }
 .dropdown-member {
-  display: inline-block;
-  margin-top: 0.25rem;
-  font-size: 0.72rem;
+  flex-shrink: 0;
+  font-size: 0.65rem;
   font-weight: 600;
   color: #b45309;
   background: rgba(255, 193, 7, 0.14);
-  padding: 0.1rem 0.45rem;
-  border-radius: 4px;
+  padding: 0.05rem 0.35rem;
+  border-radius: 3px;
 }
 
 /* 下拉菜单 */
@@ -268,12 +305,59 @@ function displayName() {
   z-index: 1000;
 }
 .dropdown-header {
-  padding: 0.5rem 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem;
   margin-bottom: 0.2rem;
+  border-bottom: 1px solid var(--vp-c-divider);
+}
+.dropdown-avatar {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  background: var(--vp-c-brand-soft, rgba(52, 81, 178, 0.08));
+}
+.dropdown-id {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+.dropdown-name-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+}
+.dropdown-name {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--vp-c-text-1);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .dropdown-email {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: var(--vp-c-text-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dropdown-role-tag {
+  flex-shrink: 0;
+  font-size: 0.6rem;
+  font-weight: 600;
+  padding: 0.05rem 0.3rem;
+  border-radius: 3px;
+  background: #ff9900;
+  color: #fff;
 }
 .dropdown-item {
   display: flex;
@@ -295,9 +379,8 @@ function displayName() {
 }
 .dropdown-logout {
   color: #ef4444;
-  border-top: 1px solid var(--vp-c-divider);
-  margin-top: 0.3rem;
-  border-radius: 0 0 6px 6px;
+  margin-top: 0.2rem;
+  border-radius: 6px;
 }
 .nickname-row {
   flex-direction: row;
