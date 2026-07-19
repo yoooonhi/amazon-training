@@ -6,6 +6,9 @@ export default defineConfig({
   lang: 'zh-CN',
   lastUpdated: true,
   cleanUrls: true,
+  // 默认夜间模式：首次访问强制深色；用户手动切日间后记到 localStorage，
+  // 后续按用户选择。优于跟随系统（原默认 auto 会因系统浅色而进入日间）。
+  appearance: 'dark',
 
   sitemap: {
     hostname: 'https://www.pipishou.top',
