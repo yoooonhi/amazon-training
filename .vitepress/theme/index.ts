@@ -12,6 +12,7 @@ import Comments from '../../components/Comments.vue'
 import ProfitCalculator from '../../components/ProfitCalculator.vue'
 import ModalDialog from '../../components/ModalDialog.vue'
 import CourseGate from '../../components/CourseGate.vue'
+import RemoteLesson from '../../components/RemoteLesson.vue'
 import PortfolioHealthCheck from '../../components/PortfolioHealthCheck.vue'
 import ReplenishmentCalculator from '../../components/ReplenishmentCalculator.vue'
 import ZoomableImage from '../../components/ZoomableImage.vue'
@@ -51,6 +52,7 @@ export default {
     app.component('PortfolioHealthCheck', PortfolioHealthCheck)
     app.component('ReplenishmentCalculator', ReplenishmentCalculator)
     app.component('ZoomableImage', ZoomableImage)
+    app.component('RemoteLesson', RemoteLesson)
 
     // 底部栏交互：滚到接近底部时，侧边栏淡出、footer 横跨全宽滑入（如飞书效果）
     let scrollTimer: number | undefined

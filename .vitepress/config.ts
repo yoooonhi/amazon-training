@@ -26,6 +26,9 @@ export default defineConfig({
     hostname: 'https://www.pipishou.top',
   },
 
+  // 排除内容归档目录（方案 2 迁移前的原始 md 备份，不参与构建、不进 HTML）
+  srcExclude: ['.archive/**/*'],
+
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' }],
     // Open Graph：分享到微信/微博/Twitter 的卡片

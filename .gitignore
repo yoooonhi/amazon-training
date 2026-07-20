@@ -4,3 +4,7 @@ node_modules
 .DS_Store
 *.log
 .zcode/
+.archive/
+# 本地敏感配置（service_role key 等）
+.env
+.env.local
