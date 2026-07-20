@@ -4,7 +4,7 @@ import { authState, supabase } from '../lib/supabase'
 import {
   getLevelByPath, isLevelAccessible, isMentorRole,
   isSkillPath, isSkillAccessible, getSkillSlug, MEMBER_SKILL_SLUGS,
-  isPlaybookPath, isPlaybookAccessible,
+  isPlaybookPath, isPlaybookAccessible, isPathAccessible,
 } from '../lib/accessControl'
 
 const isMounted = ref(false)
@@ -12,6 +12,9 @@ const role = ref(null) // 当前用户角色
 const accessLevels = ref([]) // 当前用户被管理员授权的等级
 const profile = ref(null) // 当前用户完整 profile（含 is_member）
 const currentPath = ref('')
+// 权限是否已校验完成（getSession/profile 拉取结束）。
+// 在此之前不显示拦截卡（避免授权用户刷新时闪现「内测中」），也不放行受保护页正文。
+const authResolved = ref(false)
 
 const isLoggedIn = computed(() => role.value !== null)
 
@@ -42,15 +45,33 @@ const isMemberSkillBlocked = computed(() => {
   return slug ? MEMBER_SKILL_SLUGS.includes(slug) : false
 })
 
-// 是否处于拦截状态（任一遮罩显示）
-const isBlocked = computed(() => isMounted.value && (blockedLevel.value || isSkillBlocked.value || isPlaybookBlocked.value))
+// 当前页面在「游客视角」下是否本就公开（首页、入门课、domain-basics 等）。
+// 这种页面 transformHead 不会注入预隐藏脚本，HTML 初始就是可见的，
+// 这里用来判断「放行时是否需要主动去掉 doc-gated」——公开页本来就没人加它。
+const isPublicPage = computed(() => isPathAccessible(currentPath.value, undefined, undefined))
 
-// 被拦截时给 <html> 加 class，隐藏课程正文 .vp-doc（保留侧边栏与导航）
+// 是否处于拦截状态（任一遮罩显示）。
+// 必须等 authResolved：未授权用户在权限未明时也先别急着弹拦截卡，
+// 否则授权用户刷新时会先闪一下「内测中」。
+const isBlocked = computed(() => isMounted.value && authResolved.value && (blockedLevel.value || isSkillBlocked.value || isPlaybookBlocked.value))
+
+// 控制 <html> 上的 doc-gated class，决定 .vp-doc 正文是否可见。
+// 反转后的语义：
+//   - 公开页：确保没有 doc-gated（覆盖 SPA 从受保护页跳入、残留 class 的场景）
+//   - 受保护页：transformHead 已在渲染前注入 doc-gated；这里只在「确定放行」时移除
 function syncGateClass() {
   if (typeof document === 'undefined') return
-  document.documentElement.classList.toggle('doc-gated', !!isBlocked.value)
+  if (isPublicPage.value) {
+    document.documentElement.classList.remove('doc-gated')
+    return
+  }
+  // 受保护页：权限校验完成且未拦截，才移除 doc-gated 让正文显示
+  const shouldHideDoc = !(authResolved.value && !isBlocked.value)
+  document.documentElement.classList.toggle('doc-gated', shouldHideDoc)
 }
 watch(isBlocked, syncGateClass)
+watch(authResolved, syncGateClass)
+watch(currentPath, syncGateClass)
 
 // 弹出登录/注册面板（触发导航栏 AuthPanel 打开）
 function openAuthPanel() {
@@ -75,7 +96,11 @@ onMounted(() => {
   syncGateClass()
 
   // 订阅全局登录状态
-  authState.onChange((_user, profile) => updateRole(profile))
+  authState.onChange((_user, profile) => {
+    updateRole(profile)
+    // authState 推来的 profile 一定来自已就绪的 session，标记为已校验
+    authResolved.value = true
+  })
 
   // 首次挂载补拉一次 session（处理页面直接刷新的情况）
   supabase.auth.getSession().then(async ({ data }) => {
@@ -89,6 +114,7 @@ onMounted(() => {
     } else {
       updateRole(null)
     }
+    authResolved.value = true
   })
 
   // SPA 路由切换时刷新路径
@@ -109,8 +135,17 @@ onMounted(() => {
 </script>
 
 <template>
+  <!-- 权限校验进行中：受保护页正文已被 doc-gated 藏掉，这里给一个低调的加载态，
+       避免用户看到一片空白。校验完成后此分支自动消失，显示拦截卡或正文。 -->
+  <div v-if="isMounted && !isPublicPage && !authResolved" class="course-gate">
+    <div class="gate-card gate-card-loading">
+      <div class="gate-loading-dot"></div>
+      <p class="gate-loading-text">正在校验访问权限…</p>
+    </div>
+  </div>
+
   <!-- 实战手册被拦截：内测中，仅管理员可见 -->
-  <div v-if="isMounted && isPlaybookBlocked" class="course-gate">
+  <div v-else-if="authResolved && isPlaybookBlocked" class="course-gate">
     <div class="gate-card">
       <div class="gate-icon">🔒</div>
       <h2 class="gate-title">广告打法手册 · 内测中</h2>
@@ -123,7 +158,7 @@ onMounted(() => {
   </div>
 
   <!-- 主课程被拦截：内测中（仅内容区，保留侧边栏与导航） -->
-  <div v-else-if="isMounted && blockedLevel" class="course-gate">
+  <div v-else-if="authResolved && blockedLevel" class="course-gate">
     <div class="gate-card">
       <div class="gate-icon">🔒</div>
       <h2 class="gate-title">{{ blockedLevel }}课程 · 内测中</h2>
@@ -136,7 +171,7 @@ onMounted(() => {
   </div>
 
   <!-- 会员专属技能课被拦截 -->
-  <div v-else-if="isMounted && isSkillBlocked && isMemberSkillBlocked" class="course-gate">
+  <div v-else-if="authResolved && isSkillBlocked && isMemberSkillBlocked" class="course-gate">
     <div class="gate-card">
       <div class="gate-icon">👑</div>
       <h2 class="gate-title">会员专享内容</h2>
@@ -157,7 +192,7 @@ onMounted(() => {
   </div>
 
   <!-- 技能补给站被拦截：需登录（仅内容区，保留侧边栏与导航） -->
-  <div v-else-if="isMounted && isSkillBlocked" class="course-gate">
+  <div v-else-if="authResolved && isSkillBlocked" class="course-gate">
     <div class="gate-card">
       <div class="gate-icon">🔐</div>
       <h2 class="gate-title">登录后查看</h2>
@@ -240,5 +275,28 @@ onMounted(() => {
   margin: 1.25rem 0 0;
   font-size: 0.78rem;
   color: var(--vp-c-text-3);
+}
+
+/* 权限校验中的低调加载态（避免受保护页刷新时一片空白） */
+.gate-card-loading {
+  padding: 2rem 2rem;
+  opacity: 0.8;
+}
+.gate-loading-text {
+  margin: 0.75rem 0 0;
+  font-size: 0.82rem;
+  color: var(--vp-c-text-2);
+}
+.gate-loading-dot {
+  width: 10px;
+  height: 10px;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: var(--vp-c-brand-1);
+  animation: gate-pulse 1s ease-in-out infinite;
+}
+@keyframes gate-pulse {
+  0%, 100% { opacity: 0.3; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.1); }
 }
 </style>

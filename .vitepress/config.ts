@@ -1,4 +1,16 @@
 import { defineConfig } from 'vitepress'
+import { isPathAccessible } from '../lib/accessControl'
+
+/**
+ * 把 VitePress 的 relativePath（如 'content/beginner/foo.md'）
+ * 转成运行时 URL 路径（如 '/content/beginner/foo'）。
+ * accessControl 的判定都基于路径前缀，无需精确到文件名。
+ */
+function toUrlPath(relativePath: string): string {
+  let p = '/' + relativePath.replace(/\.md$/, '')
+  p = p.replace(/\/index$/, '/')
+  return p
+}
 
 export default defineConfig({
   title: '亚马逊运营训练营',
@@ -412,6 +424,36 @@ export default defineConfig({
         },
       },
     },
+  },
+
+  /**
+   * 防内容闪现（FOUC）：构建时为「游客视角下不可访问」的页面注入一段同步脚本，
+   * 在浏览器解析 <body> 之前就给 <html> 加上 .doc-gated，让 CSS 第一帧就把
+   * .vp-doc 藏掉。等 CourseGate.vue 完成权限校验后，再决定去 class（放行）
+   * 还是保留（拦截卡）。
+   *
+   * 判定口径与 accessControl.ts 完全一致：用「游客视角」（profile=undefined）
+   * 跑一次 isPathAccessible，能放行的页（如首页、入门课、domain-basics）
+   * 不注入脚本，避免误伤。
+   *
+   * 注意：这只能消除「刷新闪现」，不能防住「看源码/curl/禁 CSS」——
+   * 内容仍在 SSR HTML 里。要彻底防泄漏需把受保护内容移到后端 API。
+   */
+  async transformHead(context) {
+    // VitePress 1.6 的 TransformContext.page 是 relativePath 字符串（如 'content/beginner/foo.md'）
+    const relativePath = typeof context.page === 'string' ? context.page : context.page?.relativePath
+    // 非 content 页（首页、dashboard、404 等）一律不处理
+    if (!relativePath || !relativePath.startsWith('content/')) return
+    const urlPath = toUrlPath(relativePath)
+    // 游客视角下能访问的页，无需预隐藏
+    if (isPathAccessible(urlPath, undefined, undefined)) return
+
+    // 受保护页：注入同步 inline 脚本，浏览器解析 <head> 时同步执行，
+    // 在渲染 <body> 前就给 <html> 加上 doc-gated，CSS 第一帧即隐藏正文。
+    // HeadConfig 元组：[tag, attrs, children?]
+    return [
+      ['script', {}, `document.documentElement.classList.add('doc-gated')`],
+    ]
   },
 
   vite: { server: { host: '127.0.0.1', port: 5173 } },

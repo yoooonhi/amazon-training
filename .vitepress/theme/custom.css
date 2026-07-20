@@ -29,8 +29,13 @@
   align-items: center;
 }
 
-/* 课程门控：被拦截时隐藏课程正文（.vp-doc），只保留 CourseGate 提示卡。
-   侧边栏与顶部导航不受影响。class 由 CourseGate.vue 在拦截时加到 <html>。 */
+/* 课程门控：doc-gated 时隐藏课程正文（.vp-doc）与右侧大纲，只保留 CourseGate 提示卡。
+   侧边栏与顶部导航不受影响。
+
+   class 的添加时机（防内容闪现 FOUC）：
+   - 受保护页（游客不可访问）：.vitepress/config.ts 的 transformHead 在构建时往 HTML
+     注入一行同步脚本，浏览器解析 <body> 前就给 <html> 加上 doc-gated，第一帧即隐藏。
+   - CourseGate.vue 挂载后，权限校验完成且放行时才移除 doc-gated；拦截或校验中保持隐藏。 */
 html.doc-gated .vp-doc {
   display: none;
 }
