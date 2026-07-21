@@ -24,6 +24,7 @@ const CURRICULUM_PATH = 'lib/curriculum.ts'
 //    path 格式与 pathToLessonId 的 key 一致（去掉 content/ 前缀和 .md）
 // ============================================================
 const CONTENT_DIRS = ['modules', 'beginner', 'intermediate', 'advanced', 'expert', 'skills', 'playbooks']
+const SUB_PREFIXES = ['modules/', 'beginner/', 'intermediate/', 'advanced/', 'expert/', 'skills/', 'playbooks/', '']
 const pathToTitle = {} // 'm4-ads/04-be-acos' → 'BE ACOS'
 
 function walkDir(dir) {
@@ -87,6 +88,23 @@ const pathToLessonId = {}
 let m
 while ((m = pathLessonRe.exec(pathToLessonIdBlock[0]))) {
   pathToLessonId[m[1]] = m[2]
+}
+
+// 2c. lessonId → 课程页 URL：遍历实际 md 文件，按 lessonId 反查
+//     allMd 里的路径形如 /abs/content/modules/m4-ads/04-be-acos.md，
+//     去掉 content/<sub>/ 前缀和 .md 后得到 pathToLessonId 的 key（其 key 不含
+//     modules/ beginner/ 等子目录前缀），进而拿到 lessonId。
+//     URL = /content/<相对 content/ 的完整路径>
+const lessonIdToUrl = {}
+for (const file of allMd) {
+  const relFull = file.replace(CONTENT_ROOT + '/', '').replace(/\.md$/, '')
+  // 尝试去掉子目录前缀，得到 pathToLessonId 认的 key
+  let lid = null
+  for (const sp of SUB_PREFIXES) {
+    const key = relFull.startsWith(sp) ? relFull.slice(sp.length) : relFull
+    if (pathToLessonId[key]) { lid = pathToLessonId[key]; break }
+  }
+  if (lid) lessonIdToUrl[lid] = '/content/' + relFull
 }
 
 // 2b. curriculum 数组：解析 level/week/lessons 三元组（靠顺序，模块号=同 level 内第几个）
@@ -159,7 +177,6 @@ if (pbBlock) {
 // 主课（入门 + 受保护等级）：pathToLessonId 反查
 // pathToLessonId 的 key 格式因栏目而异（见上方注释），pathToTitle 的 key 统一含
 // 子目录前缀（如 'modules/m1-platform/01-x'）。所以用前缀尝试匹配。
-const SUB_PREFIXES = ['modules/', 'beginner/', 'intermediate/', 'advanced/', 'expert/', 'skills/', 'playbooks/', '']
 for (const [path, lid] of Object.entries(pathToLessonId)) {
   if (pathToTitle[path]) {
     lessonTitles[lid] = pathToTitle[path]
@@ -200,6 +217,10 @@ function genBlock() {
     .sort()
     .map((k) => `  '${k}': '${lessonNumber[k]}',`)
     .join('\n')
+  const urlLines = Object.keys(lessonIdToUrl)
+    .sort()
+    .map((k) => `  '${k}': '${lessonIdToUrl[k]}',`)
+    .join('\n')
   return `${BEGIN}
 // lessonId → 真实课名（从各 .md 的 title: frontmatter 扫描得来）
 // 重新生成：node scripts/gen-lesson-titles.mjs
@@ -210,6 +231,12 @@ ${titlesLines}
 // lessonId → 课序号（如 'm4-04' → '5.4'），用于后台展示
 export const lessonNumbers: Record<string, string> = {
 ${numbersLines}
+}
+
+// lessonId → 课程页 URL（如 'm4-04' → '/content/modules/m4-ads/04-be-acos'）
+// 用于后台点击课程名跳转到对应课程页
+export const lessonIdToUrl: Record<string, string> = {
+${urlLines}
 }
 ${END}`
 }
@@ -236,6 +263,7 @@ const missing = Object.keys(pathToLessonId)
 console.log(`✓ 生成完成`)
 console.log(`  课名映射：${Object.keys(lessonTitles).length} 条`)
 console.log(`  课序号映射：${Object.keys(lessonNumber).length} 条`)
+console.log(`  课程URL映射：${Object.keys(lessonIdToUrl).length} 条`)
 console.log(`  写入：${CURRICULUM_PATH}`)
 if (missing.length > 0) {
   console.log(`  ⚠ 以下主课未找到 title（md 可能缺 frontmatter）：`)

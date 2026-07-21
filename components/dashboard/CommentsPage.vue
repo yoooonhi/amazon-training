@@ -5,7 +5,7 @@
  */
 import { ref, computed, reactive, onMounted } from 'vue'
 import { supabase } from '../../lib/supabase'
-import { getLessonLabel } from '../../lib/curriculum'
+import { getLessonLabel, getLessonUrl } from '../../lib/curriculum'
 import { modalConfirm, modalAlert } from '../../lib/modal'
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
@@ -189,7 +189,14 @@ onMounted(loadData)
     <div v-else class="cm-list">
       <div v-for="c in filteredComments" :key="c.id" class="cm-item" :class="{ pinned: c.is_pinned, reply: c.parent_id }">
         <div class="cm-meta">
-          <span class="cm-lesson">{{ c.lessonLabel }}</span>
+          <a
+            v-if="getLessonUrl(c.lesson_id)"
+            class="cm-lesson cm-lesson-link"
+            :href="getLessonUrl(c.lesson_id)"
+            target="_blank"
+            :title="`查看「${c.lessonLabel}」课程问答`"
+          >{{ c.lessonLabel }} ↗</a>
+          <span v-else class="cm-lesson">{{ c.lessonLabel }}</span>
           <span v-if="c.is_pinned" class="cm-tag pin">📌 置顶</span>
           <span v-if="c.is_featured" class="cm-tag feat">⭐ 精选</span>
           <span class="cm-author" :class="{ admin: isAdminAuthor(c) }">
@@ -220,6 +227,8 @@ onMounted(loadData)
 .cm-item.pinned { border-color: var(--vp-c-brand-2); border-left-color: var(--vp-c-brand-1); background: var(--vp-c-brand-soft, rgba(52,81,178,0.04)); }
 .cm-meta { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.35rem; font-size: 0.78rem; }
 .cm-lesson { font-weight: 600; color: var(--vp-c-brand-1); }
+.cm-lesson-link { text-decoration: none; cursor: pointer; transition: opacity 0.15s; }
+.cm-lesson-link:hover { opacity: 0.75; text-decoration: underline; }
 .cm-tag { font-size: 0.7rem; font-weight: 600; padding: 0.05rem 0.35rem; border-radius: 3px; }
 .cm-tag.pin { color: var(--vp-c-brand-1); }
 .cm-tag.feat { color: #d97706; }

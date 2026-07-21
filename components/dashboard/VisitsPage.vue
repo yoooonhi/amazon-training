@@ -5,6 +5,7 @@
  */
 import { ref, computed, onMounted } from 'vue'
 import { supabase } from '../../lib/supabase'
+import { getLessonIdByUrl, getLessonLabel } from '../../lib/curriculum'
 
 const loading = ref(true)
 const visits = ref([])
@@ -81,6 +82,13 @@ function shortenPath(p) {
   return p.replace('/content/', '').replace(/\/$/, '')
 }
 
+// 访问 URL → 可读课名（课序号 + 课名），反查不到回退到路径简写
+function pathLabel(p) {
+  const lid = getLessonIdByUrl(p)
+  if (lid) return getLessonLabel(lid)
+  return shortenPath(p)
+}
+
 onMounted(loadData)
 </script>
 
@@ -111,7 +119,7 @@ onMounted(loadData)
         <div v-else class="path-list">
           <div v-for="(p, i) in topPaths" :key="i" class="path-item">
             <span class="path-rank">{{ i + 1 }}</span>
-            <span class="path-name">{{ shortenPath(p.path) }}</span>
+            <span class="path-name">{{ pathLabel(p.path) }}</span>
             <div class="path-bar-wrap"><div class="path-bar-fill" :style="{ width: (p.count / maxPath * 100) + '%' }"></div></div>
             <span class="path-count">{{ p.count }}</span>
           </div>
