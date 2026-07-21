@@ -169,10 +169,10 @@ onMounted(loadData)
           <thead>
             <tr>
               <th>课程</th>
-              <th class="sortable" @click="toggleSort('helpful')">👍 有帮助 <span :class="['sort-arrow', { active: sortKey === 'helpful' }]">{{ sortKey === 'helpful' ? (sortDir === 'desc' ? '↓' : '↑') : '↕' }}</span></th>
-              <th class="sortable" @click="toggleSort('unhelpful')">👎 无帮助 <span :class="['sort-arrow', { active: sortKey === 'unhelpful' }]">{{ sortKey === 'unhelpful' ? (sortDir === 'desc' ? '↓' : '↑') : '↕' }}</span></th>
+              <th class="sortable num-head" @click="toggleSort('helpful')">👍 有帮助 <span :class="['sort-arrow', { active: sortKey === 'helpful' }]">{{ sortKey === 'helpful' ? (sortDir === 'desc' ? '↓' : '↑') : '↕' }}</span></th>
+              <th class="sortable num-head" @click="toggleSort('unhelpful')">👎 无帮助 <span :class="['sort-arrow', { active: sortKey === 'unhelpful' }]">{{ sortKey === 'unhelpful' ? (sortDir === 'desc' ? '↓' : '↑') : '↕' }}</span></th>
               <th class="sortable" @click="toggleSort('helpfulRate')">帮助率 <span :class="['sort-arrow', { active: sortKey === 'helpfulRate' }]">{{ sortKey === 'helpfulRate' ? (sortDir === 'desc' ? '↓' : '↑') : '↕' }}</span></th>
-              <th class="sortable" @click="toggleSort('total')">合计 <span :class="['sort-arrow', { active: sortKey === 'total' }]">{{ sortKey === 'total' ? (sortDir === 'desc' ? '↓' : '↑') : '↕' }}</span></th>
+              <th class="sortable num-head" @click="toggleSort('total')">合计 <span :class="['sort-arrow', { active: sortKey === 'total' }]">{{ sortKey === 'total' ? (sortDir === 'desc' ? '↓' : '↑') : '↕' }}</span></th>
             </tr>
           </thead>
           <tbody>
@@ -234,6 +234,7 @@ onMounted(loadData)
 .sort-arrow.active { color: var(--vp-c-brand-1); font-weight: 700; }
 
 .fb-lesson { color: var(--vp-c-text-1); }
+.num-head { text-align: right; white-space: nowrap; }
 .num-cell { font-weight: 700; text-align: right; white-space: nowrap; }
 .fb-rate-wrap { display: flex; align-items: center; gap: 0.5rem; min-width: 140px; }
 .fb-rate-bar { flex: 1; height: 14px; background: var(--dash-track); border-radius: 4px; overflow: hidden; }
