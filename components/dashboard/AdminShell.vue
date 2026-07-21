@@ -17,6 +17,7 @@ import VisitsPage from './VisitsPage.vue'
 import MembersPage from './MembersPage.vue'
 import CommentsPage from './CommentsPage.vue'
 import ContentEditorPage from './ContentEditorPage.vue'
+import FeedbackPage from './FeedbackPage.vue'
 import ModalDialog from '../ModalDialog.vue'
 
 const isMounted = ref(false)
@@ -44,6 +45,7 @@ const navGroups = [
       { key: 'overview', label: '数据概览', icon: '📊' },
       { key: 'learning', label: '学习分析', icon: '📈' },
       { key: 'visits', label: '访问分析', icon: '🌐' },
+      { key: 'feedback', label: '反馈分析', icon: '📢' },
     ],
   },
   {
@@ -85,7 +87,7 @@ const icons = {
 const pageComponents = {
   overview: OverviewPage, students: StudentsPage, learning: LearningPage,
   visits: VisitsPage, members: MembersPage, comments: CommentsPage,
-  content: ContentEditorPage,
+  content: ContentEditorPage, feedback: FeedbackPage,
 }
 const currentComponent = computed(() => pageComponents[currentPage.value])
 

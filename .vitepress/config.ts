@@ -80,6 +80,18 @@ export default defineConfig({
                 { text: 'Excel 三大神器（运营向）', link: '/content/skills/excel-for-ops' },
           ],
         },
+        // ===== AI 工作流（2026 新增，限免登录可见）=====
+        // 横切模块，贯穿 Listing/广告/选品/运营。门控走 LIMITED_FREE_SKILL_SLUGS（登录可见）。
+        {
+          text: '🤖 AI 工作流',
+          collapsed: true,
+          items: [
+            { text: 'AI 生图工作流（亚马逊合规版）', link: '/content/skills/ai-image-workflow' },
+            { text: 'AI 文案与 Rufus 问答覆盖', link: '/content/skills/ai-listing-rufus' },
+            { text: 'AI 选品与关键词反查', link: '/content/skills/ai-selection-keywords' },
+            { text: 'AI 广告与运营提效', link: '/content/skills/ai-ads-ops' },
+          ],
+        },
         // ===== 入门课（7个模块）=====
         {
           text: '入门课',

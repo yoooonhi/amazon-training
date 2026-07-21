@@ -9,6 +9,7 @@ import LessonCheck from '../../components/LessonCheck.vue'
 import SelfTest from '../../components/SelfTest.vue'
 import AuthPanel from '../../components/AuthPanel.vue'
 import Comments from '../../components/Comments.vue'
+import LessonFeedback from '../../components/LessonFeedback.vue'
 import ProfitCalculator from '../../components/ProfitCalculator.vue'
 import ModalDialog from '../../components/ModalDialog.vue'
 import CourseGate from '../../components/CourseGate.vue'
@@ -38,7 +39,7 @@ export default {
     return h(DefaultTheme.Layout, null, {
       'nav-bar-content-after': () => h(AuthPanel),
       'doc-before': () => h(CourseGate),
-      'doc-after': () => [h(Comments)],
+      'doc-after': () => [h(LessonFeedback), h(Comments)],
       'layout-bottom': () => h(ModalDialog),
     })
   },
@@ -48,6 +49,7 @@ export default {
     app.component('LessonCheck', LessonCheck)
     app.component('SelfTest', SelfTest)
     app.component('AuthPanel', AuthPanel)
+    app.component('LessonFeedback', LessonFeedback)
     app.component('ProfitCalculator', ProfitCalculator)
     app.component('PortfolioHealthCheck', PortfolioHealthCheck)
     app.component('ReplenishmentCalculator', ReplenishmentCalculator)

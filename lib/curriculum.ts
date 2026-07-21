@@ -363,6 +363,11 @@ export const pathToLessonId: Record<string, string> = {
   'system-shortcuts': 'skill-shortcuts',
   'browser-shortcuts': 'skill-browser',
   'excel-for-ops': 'skill-excel',
+  // ===== AI 工作流（2026 新增，限免登录可见）=====
+  'ai-image-workflow': 'skill-ai-image',
+  'ai-listing-rufus': 'skill-ai-rufus',
+  'ai-selection-keywords': 'skill-ai-keywords',
+  'ai-ads-ops': 'skill-ai-ops',
   // ===== 实战手册（playbooks，独立栏目，仅管理员可见）=====
   // 不进入 curriculum 主数组、不参与 publicLessons/totalLessons 统计
   'ads-16-tactics/index': 'pb-ads-00',
@@ -383,6 +388,11 @@ export const skillLessons: { lessonId: string; title: string }[] = [
   { lessonId: 'skill-shortcuts', title: '电脑快捷键基础（Windows + Mac）' },
   { lessonId: 'skill-browser', title: '浏览器快捷键实战' },
   { lessonId: 'skill-excel', title: 'Excel 三大神器（运营向）' },
+  // ===== AI 工作流（2026 新增，限免登录可见）=====
+  { lessonId: 'skill-ai-image', title: 'AI 生图工作流（亚马逊合规版）' },
+  { lessonId: 'skill-ai-rufus', title: 'AI 文案与 Rufus 问答覆盖' },
+  { lessonId: 'skill-ai-keywords', title: 'AI 选品与关键词反查' },
+  { lessonId: 'skill-ai-ops', title: 'AI 广告与运营提效' },
 ]
 
 // ===== 实战手册（playbooks）：独立栏目（仅管理员可见，不参与五级体系）=====

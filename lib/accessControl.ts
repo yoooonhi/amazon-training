@@ -110,6 +110,11 @@ export const LIMITED_FREE_SKILL_SLUGS = [
   'phishing-detection',
   'system-shortcuts',
   'browser-shortcuts',
+  // ===== AI 工作流（2026 新增，限免登录可见）=====
+  'ai-image-workflow',
+  'ai-listing-rufus',
+  'ai-selection-keywords',
+  'ai-ads-ops',
 ]
 // domain-basics 是全员公开（连游客都能看），不算「限免」，保持纯净标题
 

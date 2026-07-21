@@ -98,6 +98,52 @@ description: 写出能说服买家下单又能帮 A9 理解产品的亚马逊五
 - **不要保证性收益**："100% satisfaction guaranteed" 在很多类目算违规。
 - **不要写竞品对比**："Better than Sony" 这种会侵权。
 
+## 2026 进阶：为 AI 购物助手写五点（语义场景化写法）
+
+> 这一小节是 2026 年新增内容。先学好上面的"卖点先行 + 大写小标题 + 具体数字"基础写法（A9 友好），再来看怎么为 AI 助手优化。
+
+### 为什么要改写法
+
+3.1 课讲过，2026 年 5 月亚马逊把 Rufus 并入了 Alexa for Shopping，AI 嵌入了主搜索栏。买家现在可以直接问："best earbuds for small ears while running"。AI 会去读你的五点、评论、QA 来组织回答。
+
+问题在于：**老式写法是写给 A9 看的（堆关键词），新式写法要写给 AI 看（讲场景和事实）**。
+
+### 老式 vs 新式（蓝牙耳机示例）
+
+❌ **老式写法（A9 时代，正在失效）**——全是形容词，没有场景：
+> Wireless Earbuds, Bluetooth Headphones, Noise Cancelling Ear Buds, Deep Bass, Long Battery, Premium Sound Quality
+
+为什么不行：全是主观形容词（"premium""deep"），AI 没法验证，也没告诉买家"什么时候用、谁适合用"。
+
+✅ **新式写法（AI 时代，合格）**——可验证的事实 + 场景 + 人群：
+> Wireless earbuds with 8-hour battery (24h with case). IPX5 sweat-resistant for running and gym. Secure-fit tips for small ears. Touch controls. Includes 3 ear-tip sizes.
+
+为什么好：每一条都是可验证的事实参数（8 小时、IPX5、3 个耳套），且明确讲了场景（running, gym）和人群（small ears）。
+
+### 合格的 5 条规则
+
+1. **只写可验证的事实参数**——续航 8 小时、IPX5、含 3 个耳套、不锈钢 304。AI 只认事实，拒绝"最好用/最耐用"这类主观形容词。
+
+2. **必带使用场景词（scenario）**——for running, for gym, for office, for travel, for kids。这是 AI 知识图谱的核心。
+
+3. **必带适用人群词（audience）**——for kids, for seniors, for travelers, for small ears。告诉 AI"谁该买这个"。
+
+4. **必带功能/用途词（function）**——noise cancelling, touch controls, leak-proof, fast charging。告诉 AI"这东西能干什么"。
+
+5. **每条事实参数尽量配一张图/一段视频佐证**——AI 会优先采信有视觉证据的卖点。
+
+### 老式写法 ≠ 删掉，而是升级
+
+不是让你推翻上面教的"全大写小标题 + 卖点先行 + 具体数字"——那套仍然是对的（A9 友好、买家易读）。升级的方法是：**在小标题后面的说明里，把形容词换成可验证的事实 + 场景 + 人群**。
+
+```
+升级前：[PREMIUM SOUND] Enjoy premium quality sound with deep bass.
+升级后：[PREMIUM SOUND] 10mm drivers deliver deep bass; 3 EQ modes for
+        music, podcasts, and calls; ideal for commuting and office use.
+```
+
+> 一句话总结：**A9 看关键词，AI 看场景和事实。两者都要满足。** 把每条五点写成"可验证的事实 + 使用场景 + 适用人群"，就同时讨好两边。
+
 ## 实操要点
 
 1. **先列清单**：把产品的所有卖点写在一张纸上，挑出 5 个最重要的，按"买家最关心程度"排序。
@@ -116,7 +162,7 @@ description: 写出能说服买家下单又能帮 A9 理解产品的亚马逊五
 3. 检查：每条有没有具体数字？第 1 条是不是最吸引人的卖点？第 5 条有没有讲包装/质保？
 4. 自查有没有踩合规红线（夸大、医疗承诺、竞品对比）。
 
-<LessonCheck lessonId="m2-03" :items="['我能按 核心卖点+支撑卖点+保障 的顺序排五条', '我每条都用全大写小标题开头、并配具体数字', '我知道哪些夸大说法会触发合规审核']" />
+<LessonCheck lessonId="m2-03" :items="['我能按 核心卖点+支撑卖点+保障 的顺序排五条', '我每条都用全大写小标题开头、并配具体数字', '我知道哪些夸大说法会触发合规审核', '我明白 AI 时代要把形容词换成可验证的事实+场景+人群，同时讨好 A9 和 AI 助手']" />
 
 ## 自测题
 
