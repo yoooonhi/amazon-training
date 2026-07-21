@@ -5,7 +5,7 @@
  */
 import { ref, computed, reactive, onMounted } from 'vue'
 import { supabase } from '../../lib/supabase'
-import { curriculum } from '../../lib/curriculum'
+import { getLessonLabel } from '../../lib/curriculum'
 import { modalConfirm, modalAlert } from '../../lib/modal'
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
@@ -57,11 +57,9 @@ async function loadData() {
   loading.value = false
 }
 
+// lessonId → 可读标签（课序号 + 课名）
 function lessonTitle(id) {
-  for (const w of curriculum) {
-    if (w.lessons.includes(id)) return `${w.level}${w.week} · ${id}`
-  }
-  return id
+  return getLessonLabel(id)
 }
 
 const commentLessons = computed(() => {

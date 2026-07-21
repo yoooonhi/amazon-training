@@ -8,7 +8,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { supabase } from '../../lib/supabase'
 import { LEVELS, isMentorRole } from '../../lib/accessControl'
-import { curriculum, totalLessons } from '../../lib/curriculum'
+import { totalLessons, getLessonLabel } from '../../lib/curriculum'
 import { modalConfirm, modalAlert } from '../../lib/modal'
 
 const GRANTABLE_LEVELS = LEVELS.filter((l) => l !== '入门')
@@ -132,11 +132,9 @@ async function viewDetail(student) {
   detailQuiz.value = quiz || []
 }
 
+// lessonId → 可读标签（课序号 + 课名）
 function lessonTitle(lessonId) {
-  for (const w of curriculum) {
-    if (w.lessons.includes(lessonId)) return `${w.level}${w.week} · ${lessonId}`
-  }
-  return lessonId
+  return getLessonLabel(lessonId)
 }
 
 async function getMentorId() {

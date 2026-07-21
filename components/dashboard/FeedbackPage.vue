@@ -12,7 +12,7 @@
  */
 import { ref, computed, reactive, onMounted } from 'vue'
 import { supabase } from '../../lib/supabase'
-import { curriculum, skillLessons, playbookLessons } from '../../lib/curriculum'
+import { getLessonLabel } from '../../lib/curriculum'
 
 const loading = ref(true)
 const allFeedback = ref([]) // 原始反馈（含 user_id）
@@ -22,19 +22,9 @@ const filter = reactive({ lesson: 'all', choice: 'all' })
 const sortKey = ref('helpfulRate') // helpfulRate | total | helpful | unhelpful
 const sortDir = ref('desc')
 
-// ---- lessonId → 可读标题 ----
-// curriculum 只覆盖五级主课；技能课 / 实战手册单独补一张表
-const titleMap = computed(() => {
-  const m = {}
-  for (const w of curriculum) {
-    for (const id of w.lessons) m[id] = `${w.level}${w.week}·${id}`
-  }
-  for (const s of skillLessons) m[s.lessonId] = s.title
-  for (const p of playbookLessons) m[p.lessonId] = p.title
-  return m
-})
+// lessonId → 可读标签（课序号 + 课名，如 '5.4 BE ACOS'）
 function lessonLabel(id) {
-  return titleMap.value[id] || id
+  return getLessonLabel(id)
 }
 
 async function loadData() {

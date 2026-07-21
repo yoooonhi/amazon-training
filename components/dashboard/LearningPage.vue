@@ -7,7 +7,7 @@
  */
 import { ref, computed, onMounted } from 'vue'
 import { supabase } from '../../lib/supabase'
-import { curriculum, totalLessons } from '../../lib/curriculum'
+import { totalLessons, getLessonLabel } from '../../lib/curriculum'
 
 const loading = ref(true)
 const overallCorrectRate = ref(0)
@@ -108,11 +108,9 @@ const maxDaily = computed(() =>
   Math.max(1, ...dailyCompletions.value.map((d) => d.count))
 )
 
+// lessonId → 可读标签（课序号 + 课名）
 function lessonLabel(id) {
-  for (const w of curriculum) {
-    if (w.lessons.includes(id)) return `${w.level}${w.week}·${id}`
-  }
-  return id
+  return getLessonLabel(id)
 }
 
 function diffColor(rate) {
