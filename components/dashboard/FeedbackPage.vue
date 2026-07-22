@@ -224,9 +224,10 @@ onMounted(loadData)
 .sort-arrow.active { color: var(--vp-c-brand-1); font-weight: 700; }
 
 .fb-lesson { color: var(--vp-c-text-1); }
-.num-head { text-align: right; white-space: nowrap; }
+/* 用 .rank-table 前缀提高特异性，覆盖 shared.css 里 .rank-table th { text-align: left } */
+.rank-table th.num-head { text-align: right; white-space: nowrap; }
+.rank-table th.fb-rate-head { text-align: right; white-space: nowrap; }
 .num-cell { font-weight: 700; text-align: right; white-space: nowrap; }
-.fb-rate-head { white-space: nowrap; }
 .fb-rate-wrap { display: flex; align-items: center; gap: 0.5rem; justify-content: flex-end; }
 .fb-rate-bar { width: 90px; height: 14px; background: var(--dash-track); border-radius: 4px; overflow: hidden; flex-shrink: 0; }
 .fb-rate-fill { height: 100%; border-radius: 4px; transition: width 0.3s; }
