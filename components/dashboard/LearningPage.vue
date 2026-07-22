@@ -193,7 +193,7 @@ onMounted(loadData)
         <div v-if="lessonDifficulty.length === 0" class="empty-hint">暂无足够数据</div>
         <div v-else class="diff-list">
           <div v-for="(l, i) in lessonDifficulty.slice(0, 10)" :key="i" class="diff-item">
-            <span class="diff-name">{{ lessonLabel(l.lessonId) }}</span>
+            <span class="diff-name" :title="lessonLabel(l.lessonId)">{{ lessonLabel(l.lessonId) }}</span>
             <div class="diff-bar-wrap">
               <div class="diff-bar-fill" :style="{ width: l.correctRate + '%', background: diffColor(l.correctRate) }"></div>
             </div>
