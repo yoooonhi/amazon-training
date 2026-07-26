@@ -424,7 +424,7 @@ export default defineConfig({
 
     socialLinks: [],
     footer: {
-      message: '亚马逊运营训练营 · 边学边实战 · 联系站长：<a href="mailto:yoonhi_@outlook.com" style="color:var(--vp-c-text-2);text-decoration:none">yoonhi_@outlook.com</a>',
+      message: '亚马逊运营训练营 · 边学边实战 · 联系邮箱：<a href="mailto:yoonhi_@outlook.com" style="color:var(--vp-c-text-2);text-decoration:none">yoonhi_@outlook.com</a> · 添加微信：<span id="wechat-id" style="color:var(--vp-c-brand-1);cursor:pointer;text-decoration:underline dashed var(--vp-c-brand-1) 1px;text-underline-offset:3px" title="点击查看微信二维码">WJSXRQS_</span>',
       copyright: ''
     },
     outline: { level: [2, 3], label: '本课目录' },

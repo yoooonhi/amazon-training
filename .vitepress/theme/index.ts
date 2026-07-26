@@ -17,6 +17,7 @@ import RemoteLesson from '../../components/RemoteLesson.vue'
 import PortfolioHealthCheck from '../../components/PortfolioHealthCheck.vue'
 import ReplenishmentCalculator from '../../components/ReplenishmentCalculator.vue'
 import ZoomableImage from '../../components/ZoomableImage.vue'
+import WechatQrModal from '../../components/WechatQrModal.vue'
 import AdminShell from '../../components/dashboard/AdminShell.vue'
 import { recordVisit, recordLastLesson } from '../../lib/visitTracker'
 import { setupSidebarGuard } from '../../lib/sidebarGuard'
@@ -40,7 +41,7 @@ export default {
       'nav-bar-content-after': () => h(AuthPanel),
       'doc-before': () => h(CourseGate),
       'doc-after': () => [h(LessonFeedback), h(Comments)],
-      'layout-bottom': () => h(ModalDialog),
+      'layout-bottom': () => [h(WechatQrModal), h(ModalDialog)],
     })
   },
   enhanceApp({ app, router }) {
@@ -58,6 +59,11 @@ export default {
 
     // 底部栏交互：滚到接近底部时，侧边栏淡出、footer 横跨全宽滑入（如飞书效果）
     let scrollTimer: number | undefined
+    // 通知 WechatQrModal 重新绑定 #wechat-id 点击（footer 重渲染后需重新绑）
+    const rebindWechat = () => {
+      if (typeof window === 'undefined') return
+      window.dispatchEvent(new Event('wechat-qr-rebind'))
+    }
     const checkBottom = () => {
       if (typeof window === 'undefined') return
       const scrollY = window.scrollY + window.innerHeight
@@ -86,6 +92,9 @@ export default {
       // 路由切换后重置并重新检查底部栏状态（短页面可能一开始就在底部）
       document.documentElement.classList.remove('at-bottom')
       setTimeout(checkBottom, 300)
+      // 路由切换后 footer 重渲染，重新绑定微信二维码点击事件
+      setTimeout(rebindWechat, 300)
+      setTimeout(rebindWechat, 1200)
     }
     if (router) {
       router.onAfterRouteChanged = onAfterRouteChanged
