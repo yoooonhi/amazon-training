@@ -4,8 +4,9 @@ import { authState, supabase } from '../lib/supabase'
 import {
   getLevelByPath, isLevelAccessible, isMentorRole,
   isSkillPath, isSkillAccessible, getSkillSlug, MEMBER_SKILL_SLUGS,
-  isPlaybookPath, isPlaybookAccessible, isPathAccessible,
+  isPlaybookPath, isPlaybookAccessible, isPathAccessible, extractPlaybookSlug,
 } from '../lib/accessControl'
+import { PLAYBOOK_SLUGS } from '../lib/curriculum'
 
 const isMounted = ref(false)
 const role = ref(null) // 当前用户角色
@@ -26,10 +27,17 @@ const blockedLevel = computed(() => {
   return level // 被拦截的等级
 })
 
-// 判断当前页面是否是实战手册（playbooks），且当前用户不是管理员
+// 判断当前页面是否是实战手册（playbooks），且当前用户无权访问（既非管理员、也未被授权该手册）
 const isPlaybookBlocked = computed(() => {
   if (!isPlaybookPath(currentPath.value)) return false
-  return !isPlaybookAccessible(profile.value)
+  return !isPlaybookAccessible(currentPath.value, profile.value)
+})
+
+// 当前被拦截的手册信息（标题 + 价格），用于拦截卡展示
+const currentPlaybook = computed(() => {
+  const slug = extractPlaybookSlug(currentPath.value)
+  if (!slug) return null
+  return PLAYBOOK_SLUGS.find((p) => p.slug === slug) || null
 })
 
 // 判断当前页面是否是需要会员才能访问的技能课
@@ -76,6 +84,36 @@ watch(currentPath, syncGateClass)
 // 弹出登录/注册面板（触发导航栏 AuthPanel 打开）
 function openAuthPanel() {
   window.dispatchEvent(new CustomEvent('open-auth-panel'))
+}
+
+// 复制邮箱到剪贴板（不弹邮件客户端）
+const emailCopied = ref(false)
+async function copyEmail() {
+  const email = 'yoonhi_@outlook.com'
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(email)
+    } else {
+      const ta = document.createElement('textarea')
+      ta.value = email
+      ta.style.position = 'fixed'
+      ta.style.opacity = '0'
+      document.body.appendChild(ta)
+      ta.select()
+      document.execCommand('copy')
+      document.body.removeChild(ta)
+    }
+    emailCopied.value = true
+    setTimeout(() => (emailCopied.value = false), 1500)
+  } catch (e) {
+    emailCopied.value = false
+  }
+}
+
+// 弹出微信二维码（复用 footer 的 WechatQrModal：触发 #wechat-id 的 click）
+function openWechat() {
+  const el = document.getElementById('wechat-id')
+  if (el) el.click()
 }
 
 function updateRole(p) {
@@ -144,16 +182,31 @@ onMounted(() => {
     </div>
   </div>
 
-  <!-- 实战手册被拦截：内测中，仅管理员可见 -->
+  <!-- 实战手册被拦截：付费解锁（展示价格 + 收款码 + 联系方式） -->
   <div v-else-if="authResolved && isPlaybookBlocked" class="course-gate">
-    <div class="gate-card">
-      <div class="gate-icon">🔒</div>
-      <h2 class="gate-title">广告打法手册 · 内测中</h2>
+    <div class="gate-card gate-card-playbook">
+      <div class="gate-icon">👑</div>
+      <h2 class="gate-title">{{ currentPlaybook?.title || '实战手册' }}</h2>
+      <p class="gate-price">限时尝鲜价 <span class="price-num">¥{{ currentPlaybook?.price || '' }}</span></p>
       <p class="gate-desc">
-        本手册正在内测阶段，暂未开放。<br />
-        测试通过后将逐步开放，敬请期待。
+        这是实战手册栏目，付费后由站长为你单独开通阅读权限。
       </p>
-      <p v-if="isLoggedIn" class="gate-hint">此手册当前仅限管理员访问。</p>
+      <div class="gate-pay">
+        <img class="gate-qr" src="/images/payment-qr.png" alt="收款二维码" />
+        <div class="gate-pay-steps">
+          <p class="step"><strong>① 扫码付款</strong> ¥{{ currentPlaybook?.price || '' }}</p>
+          <p class="step"><strong>② 联系站长</strong> 开通权限</p>
+          <p class="step muted">开通后即可阅读全部章节</p>
+        </div>
+      </div>
+      <div class="gate-contact">
+        <button class="contact-item contact-btn" @click="copyEmail">
+          📧 {{ emailCopied ? '已复制 ✓' : 'yoonhi_@outlook.com' }}
+        </button>
+        <span class="contact-divider">·</span>
+        <button class="contact-item contact-btn contact-wechat" @click="openWechat">💬 微信 WJSXRQS_</button>
+      </div>
+      <p class="gate-hint">付款后发送截图 + 你的注册邮箱，站长会为你开通对应手册。</p>
     </div>
   </div>
 
@@ -274,6 +327,91 @@ onMounted(() => {
 .gate-hint {
   margin: 1.25rem 0 0;
   font-size: 0.78rem;
+  color: var(--vp-c-text-3);
+}
+
+/* 实战手册付费拦截卡 */
+.gate-card-playbook {
+  max-width: 420px;
+}
+.gate-price {
+  margin: 0.25rem 0 0.5rem;
+  font-size: 0.9rem;
+  color: var(--vp-c-text-2);
+}
+.gate-price .price-num {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--vp-c-brand-1);
+  margin-left: 0.25rem;
+}
+/* 收款码 + 步骤 横向排列 */
+.gate-pay {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin: 1rem 0 0.5rem;
+  padding: 1rem;
+  border-radius: 12px;
+  background: var(--vp-c-bg-soft-up, var(--vp-c-bg-soft));
+  border: 1px solid var(--vp-c-divider);
+}
+.gate-qr {
+  width: 130px;
+  height: 130px;
+  object-fit: contain;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+.gate-pay-steps {
+  text-align: left;
+  flex: 1;
+}
+.gate-pay-steps .step {
+  margin: 0 0 0.5rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--vp-c-text-1);
+}
+.gate-pay-steps .step:last-child {
+  margin-bottom: 0;
+}
+.gate-pay-steps .step.muted {
+  font-size: 0.76rem;
+  color: var(--vp-c-text-3);
+}
+/* 联系方式行 */
+.gate-contact {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  font-size: 0.82rem;
+}
+.gate-contact .contact-item {
+  color: var(--vp-c-brand-1);
+  text-decoration: none;
+}
+/* 邮箱/微信按钮：去掉默认 button 样式，看起来像链接 */
+.gate-contact .contact-btn {
+  background: none;
+  border: none;
+  padding: 0.25rem 0.4rem;
+  border-radius: 6px;
+  font: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.gate-contact .contact-btn:hover {
+  background: var(--vp-c-bg-soft-up, var(--vp-c-bg-soft));
+  text-decoration: underline;
+}
+.gate-contact .contact-wechat {
+  cursor: pointer;
+}
+.gate-contact .contact-divider {
   color: var(--vp-c-text-3);
 }
 

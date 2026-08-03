@@ -97,19 +97,21 @@ export const PUBLIC_SKILL_SLUGS = ['domain-basics']
  * 会员专属的技能课（slug 白名单）。
  * 只有付费会员（is_member）或管理员可访问；免费登录用户和游客被拦截。
  * 要把某门技能课设为会员专属，把它的 slug 加到这个数组里。
+ * （当前为空——所有技能课均已免费/登录可见，无会员专属课。）
  */
-export const MEMBER_SKILL_SLUGS = ['excel-for-ops']
+export const MEMBER_SKILL_SLUGS: string[] = []
 
 /**
  * 限时免费的技能课（slug 列表）。
- * 这些课现在免费可学（登录后即可），区别于「会员专属」（excel-for-ops）。
+ * 这些课现在免费可学（登录后即可）。
  * 侧边栏会给这些课标「限免」标识。
- * 注意：不要把会员专属课放进来（语义冲突）。
+ * 注意：不要把会员专属课（MEMBER_SKILL_SLUGS）放进来（语义冲突）。
  */
 export const LIMITED_FREE_SKILL_SLUGS = [
   'phishing-detection',
   'system-shortcuts',
   'browser-shortcuts',
+  'excel-for-ops',
   // ===== AI 工作流（2026 新增，限免登录可见）=====
   'ai-image-workflow',
   'ai-listing-rufus',
@@ -169,10 +171,10 @@ export function isSkillAccessible(
   return false
 }
 
-// ===== 实战手册（playbooks）：仅管理员可见 =====
+// ===== 实战手册（playbooks）：管理员全开 + 按手册单独授权 =====
 // 独立参考栏目，不进五级体系，不占学习进度。
-// 当前为内测阶段：只有 mentor / admin 可访问。
-// 未来要开放时，改 isPlaybookAccessible 加条件即可。
+// 权限：管理员（mentor/admin）始终全开；普通学员需在后台被单独授权某本手册才能访问。
+// 授权数据存于 playbook_access 表（key: user_id + playbook slug），通过 profile.playbookAccess 传入。
 export const PLAYBOOK_PATH_PREFIX = '/content/playbooks/'
 
 /**
@@ -183,22 +185,44 @@ export function isPlaybookPath(path: string): boolean {
 }
 
 /**
- * 判断实战手册是否对当前用户开放。
- * - 管理员（mentor / admin）：可访问
- * - 其余（含付费会员、免费用户、游客）：拦截
- *
- * 这是手册的"仅管理员可见"档——比技能站（登录可见）
- * 和会员专属（付费会员可见）都更严，符合"内测"语义。
+ * 从路径中提取手册 slug。
+ *   /content/playbooks/ads-16-tactics/01-xxx   → ads-16-tactics
+ *   /content/playbooks/ops-experience/         → ops-experience
+ * 提取失败返回 null。
  */
-export function isPlaybookAccessible(profile: any | null | undefined): boolean {
-  return isMentorRole(profile?.role)
+export function extractPlaybookSlug(path: string): string | null {
+  if (!path) return null
+  // 去掉前缀后取第一段（到下一个 / 之前）
+  const rest = path.startsWith(PLAYBOOK_PATH_PREFIX)
+    ? path.slice(PLAYBOOK_PATH_PREFIX.length)
+    : path
+  const slug = rest.split('/')[0]
+  return slug || null
+}
+
+/**
+ * 判断「某本手册」是否对当前用户开放。
+ * - 管理员（mentor / admin）：所有手册全开
+ * - 普通用户：仅当 profile.playbookAccess 里包含该手册 slug 时放行
+ *
+ * @param path 当前页面路径（用于定位是哪本手册）
+ * @param profile 用户 profile（含 role、playbookAccess）
+ */
+export function isPlaybookAccessible(
+  path: string,
+  profile?: any | null
+): boolean {
+  if (isMentorRole(profile?.role)) return true
+  const slug = extractPlaybookSlug(path)
+  if (!slug) return false
+  return (profile?.playbookAccess || []).includes(slug)
 }
 
 /**
  * 判断某路径是否对指定角色开放。
- * 便捷组合：getLevelByPath + isLevelAccessible（主课程） + 技能课登录校验 + 手册管理员校验。
+ * 便捷组合：getLevelByPath + isLevelAccessible（主课程） + 技能课登录校验 + 手册授权校验。
  *
- * profile 为当前用户的完整 profile（含 role、is_member、accessLevels）。
+ * profile 为当前用户的完整 profile（含 role、is_member、accessLevels、playbookAccess）。
  * 兼容旧调用：若只传了 role，主课程判定仍可用。
  */
 export function isPathAccessible(
@@ -206,9 +230,9 @@ export function isPathAccessible(
   profile?: any | null,
   accessLevels?: string[] | null
 ): boolean {
-  // 实战手册：仅管理员可见
+  // 实战手册：管理员全开 + 按手册授权
   if (isPlaybookPath(path)) {
-    return isPlaybookAccessible(profile)
+    return isPlaybookAccessible(path, profile)
   }
   // 技能补给站：登录可见
   if (isSkillPath(path)) {

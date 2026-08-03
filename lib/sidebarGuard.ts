@@ -29,6 +29,7 @@ const PROTECTED_KEYWORDS = ['初级', '中级', '高级', '进阶'].filter(
 let currentRole: string | null | undefined = undefined // undefined = 还没查过
 let currentAccessLevels: string[] = [] // 当前用户被授权的等级
 let currentIsMember = false // 当前用户是否为付费会员
+let currentPlaybookAccess: string[] = [] // 当前用户被授权的实战手册 slug
 let installedWatcher = false
 
 // 取侧边栏所有 level-0 分组标题元素
@@ -125,18 +126,26 @@ function applySkillVisibility() {
   })
 }
 
-// 实战手册（playbooks）：仅管理员可见。
+// 实战手册（playbooks）：管理员全开 + 按手册单独授权。
 // 处理两类元素：
-//  1. 手册分组标题（「广告打法手册」）：非管理员加 🔒，管理员去锁
-//  2. 手册内所有链接项：非管理员加 🔒，管理员去锁
+//  1. 手册分组标题（「广告打法手册」等）：管理员或该手册已授权 → 去锁；否则加 🔒
+//  2. 手册内所有链接项：同上，按链接 href 里的 slug 逐个判断
 // 分组标题不含「初级/中级/高级/进阶」关键字，applyLevelVisibility 不会处理它，
-// 必须在这里单独处理，否则管理员也会看到带锁的标题（但他们实际能访问）。
+// 必须在这里单独处理。
 function applyPlaybookVisibility() {
   const mentor = isMentorRole(currentRole)
 
-  // (1) 处理手册分组标题
-  //     标题文本不含 emoji 锁标（config.ts 里只写「广告打法手册」）
-  //     找到包含手册链接的 level-0 分组，向上回溯到它的标题
+  // 从手册链接的 href 里提取 slug，并判断该手册对当前用户是否可访问
+  const slugFromHref = (href: string): string | null => {
+    if (!href || !href.includes(PLAYBOOK_PATH_PREFIX)) return null
+    const rest = href.split(PLAYBOOK_PATH_PREFIX)[1] || ''
+    return rest.split('/')[0] || null
+  }
+  const canAccessSlug = (slug: string | null): boolean => {
+    if (!slug) return false
+    return mentor || currentPlaybookAccess.includes(slug)
+  }
+
   const handbookLinks = [
     ...document.querySelectorAll<HTMLAnchorElement>(
       '.VPSidebar a[href^="' + PLAYBOOK_PATH_PREFIX + '"]'
@@ -150,20 +159,23 @@ function applyPlaybookVisibility() {
     processedTitles.add(section)
     const titleEl = section.querySelector('.item > .text') as HTMLElement | null
     if (!titleEl) return
+    // 分组标题始终保留 👑 标识（无论是否授权，都体现「付费专享」定位）
+    // 先去掉残留的 emoji 前缀，再统一加回 👑，避免重复叠加
     let text = titleEl.textContent || ''
     if (text.startsWith('🔒 ') || text.startsWith('👑 ')) text = text.slice(3)
-    titleEl.textContent = mentor ? text : '🔒 ' + text
+    titleEl.textContent = '👑 ' + text
   })
 
-  // (2) 处理手册内所有链接项
+  // 处理手册内所有链接项（按各自 href 的 slug 判断）
   handbookLinks.forEach((a) => {
     const textEl = (a.querySelector('.text') as HTMLElement) || a
     let text = textEl.textContent || ''
     if (text.startsWith('🔒 ') || text.startsWith('👑 ')) text = text.slice(3)
     textEl.textContent = text
     delete textEl.dataset.playbookLocked
-    if (!mentor) {
-      textEl.textContent = '🔒 ' + text
+    const slug = slugFromHref(a.getAttribute('href') || '')
+    if (!canAccessSlug(slug)) {
+      textEl.textContent = '👑 ' + text
       textEl.dataset.playbookLocked = '1'
     }
   })
@@ -206,9 +218,9 @@ function applyLevelVisibility() {
   })
 }
 
-async function loadRole(): Promise<{ role: string | null; accessLevels: string[]; isMember: boolean }> {
+async function loadRole(): Promise<{ role: string | null; accessLevels: string[]; isMember: boolean; playbookAccess: string[] }> {
   const { data: session } = await supabase.auth.getSession()
-  if (!session.session?.user) return { role: null, accessLevels: [], isMember: false }
+  if (!session.session?.user) return { role: null, accessLevels: [], isMember: false, playbookAccess: [] }
   const { data: profile } = await supabase
     .from('profiles')
     .select('role, is_member')
@@ -223,10 +235,20 @@ async function loadRole(): Promise<{ role: string | null; accessLevels: string[]
       .eq('user_id', session.session.user.id)
     if (!aErr && accessRows) accessLevels = accessRows.map((r: any) => r.level)
   } catch { /* 静默降级 */ }
+  // 拉实战手册授权（playbook_access，与 course_access 同构）
+  let playbookAccess: string[] = []
+  try {
+    const { data: pbRows, error: pbErr } = await supabase
+      .from('playbook_access')
+      .select('playbook')
+      .eq('user_id', session.session.user.id)
+    if (!pbErr && pbRows) playbookAccess = pbRows.map((r: any) => r.playbook)
+  } catch { /* 静默降级 */ }
   return {
     role: profile?.role || null,
     accessLevels,
     isMember: isMember(profile),
+    playbookAccess,
   }
 }
 
@@ -246,13 +268,15 @@ export async function setupSidebarGuard() {
       currentRole = profile?.role || null
       currentAccessLevels = profile?.accessLevels || []
       currentIsMember = isMember(profile)
+      currentPlaybookAccess = profile?.playbookAccess || []
       applyVisibility()
     })
     // 首次补拉
-    loadRole().then(({ role, accessLevels, isMember: member }) => {
+    loadRole().then(({ role, accessLevels, isMember: member, playbookAccess }) => {
       currentRole = role
       currentAccessLevels = accessLevels
       currentIsMember = member
+      currentPlaybookAccess = playbookAccess
       applyVisibility()
     })
   }

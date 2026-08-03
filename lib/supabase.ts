@@ -47,8 +47,21 @@ supabase.auth.onAuthStateChange(async (event, session) => {
     } catch {
       // course_access 表不存在时静默降级
     }
-    // 把授权等级挂到 profile 上，各组件通过 authState.onChange 自动获取
-    authState.set(session.user, { ...profile, accessLevels })
+    // 拉该用户的实战手册授权（playbook_access，与 course_access 同构）
+    let playbookAccess: string[] = []
+    try {
+      const { data: pbRows, error: pbErr } = await supabase
+        .from('playbook_access')
+        .select('playbook')
+        .eq('user_id', session.user.id)
+      if (!pbErr && pbRows) {
+        playbookAccess = pbRows.map((r: any) => r.playbook)
+      }
+    } catch {
+      // playbook_access 表不存在时静默降级
+    }
+    // 把授权等级 + 手册授权挂到 profile 上，各组件通过 authState.onChange 自动获取
+    authState.set(session.user, { ...profile, accessLevels, playbookAccess })
   } else {
     authState.set(null, null)
   }

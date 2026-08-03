@@ -8,7 +8,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { supabase } from '../../lib/supabase'
 import { LEVELS, isMentorRole } from '../../lib/accessControl'
-import { totalLessons, getLessonLabel } from '../../lib/curriculum'
+import { totalLessons, getLessonLabel, PLAYBOOK_SLUGS } from '../../lib/curriculum'
 import { modalConfirm, modalAlert } from '../../lib/modal'
 
 const GRANTABLE_LEVELS = LEVELS.filter((l) => l !== '入门')
@@ -30,6 +30,10 @@ const selectedIds = ref(new Set())
 const batchLevels = ref(new Set())
 const batchDropdownOpen = ref(false)
 const accessBusy = ref(false)
+
+// 实战手册授权
+const playbookAccessMap = ref({})
+const playbookBusy = ref(false)
 
 // 会员管理
 const memberBusy = ref(false)
@@ -62,12 +66,26 @@ async function loadData() {
     if (!res.error) allAccess = res.data
   } catch {}
 
+  // 实战手册授权（playbook_access，与 course_access 同构）
+  let allPlaybookAccess = null
+  try {
+    const pbRes = await supabase.from('playbook_access').select('user_id, playbook')
+    if (!pbRes.error) allPlaybookAccess = pbRes.data
+  } catch {}
+
   const aMap = {}
   ;(allAccess || []).forEach((r) => {
     if (!aMap[r.user_id]) aMap[r.user_id] = []
     aMap[r.user_id].push(r.level)
   })
   accessMap.value = aMap
+
+  const pbMap = {}
+  ;(allPlaybookAccess || []).forEach((r) => {
+    if (!pbMap[r.user_id]) pbMap[r.user_id] = []
+    pbMap[r.user_id].push(r.playbook)
+  })
+  playbookAccessMap.value = pbMap
 
   students.value = profiles.map((p) => {
     const prog =
@@ -104,6 +122,7 @@ async function loadData() {
       daysSinceActive,
       isStale: daysSinceActive !== null && daysSinceActive >= 3,
       accessLevels: sortLevels(aMap[p.id] || []),
+      playbookAccess: pbMap[p.id] || [],
     }
   })
   loading.value = false
@@ -181,6 +200,49 @@ async function toggleAccess(student, level) {
     accessMap.value[student.profile.id] = student.accessLevels
   } finally {
     accessBusy.value = false
+  }
+}
+
+// 实战手册授权开关（结构与 toggleAccess 一致，操作 playbook_access 表）
+async function togglePlaybook(student, slug, title) {
+  if (playbookBusy.value) return
+  const has = student.playbookAccess.includes(slug)
+  const action = has ? '取消' : '授权'
+  const ok = await modalConfirm(
+    `确定为「${student.profile.nickname || student.profile.email}」${action}「${title}」手册阅读权限？`,
+    '实战手册授权'
+  )
+  if (!ok) return
+  playbookBusy.value = true
+  try {
+    const mentorId = await getMentorId()
+    if (has) {
+      const { error } = await supabase
+        .from('playbook_access')
+        .delete()
+        .eq('user_id', student.profile.id)
+        .eq('playbook', slug)
+      if (error) {
+        await modalAlert('取消失败: ' + error.message, '出错了')
+        return
+      }
+      student.playbookAccess = student.playbookAccess.filter((s) => s !== slug)
+    } else {
+      const { error } = await supabase
+        .from('playbook_access')
+        .upsert(
+          { user_id: student.profile.id, playbook: slug, granted_by: mentorId },
+          { onConflict: 'user_id,playbook' }
+        )
+      if (error) {
+        await modalAlert('授权失败: ' + error.message, '出错了')
+        return
+      }
+      student.playbookAccess = [...student.playbookAccess, slug]
+    }
+    playbookAccessMap.value[student.profile.id] = student.playbookAccess
+  } finally {
+    playbookBusy.value = false
   }
 }
 
@@ -498,6 +560,19 @@ onMounted(async () => {
           <span class="access-level-name">{{ lv }}</span>
           <button class="access-switch" :class="{ on: selectedStudent.accessLevels.includes(lv) }" :disabled="accessBusy" @click="toggleAccess(selectedStudent, lv)">
             {{ selectedStudent.accessLevels.includes(lv) ? '已授权 ✓' : '未授权' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 实战手册授权 -->
+    <div class="access-panel">
+      <h3>📘 实战手册授权</h3>
+      <div class="access-toggles">
+        <div v-for="pb in PLAYBOOK_SLUGS" :key="pb.slug" class="access-toggle-item">
+          <span class="access-level-name">{{ pb.title }}</span>
+          <button class="access-switch" :class="{ on: selectedStudent.playbookAccess.includes(pb.slug) }" :disabled="playbookBusy" @click="togglePlaybook(selectedStudent, pb.slug, pb.title)">
+            {{ selectedStudent.playbookAccess.includes(pb.slug) ? '已授权 ✓' : '未授权' }}
           </button>
         </div>
       </div>

@@ -419,6 +419,21 @@ export default defineConfig({
             { text: '第5节 · 旺季与综合打法', link: '/content/playbooks/ads-16-tactics/05-peak-season-combo' },
           ],
         },
+        // ===== 运营实战经验（独立参考栏目，仅管理员可见，内测中）=====
+        // 与广告打法手册同级、同权限（见 lib/accessControl.ts 的 isPlaybookPath，
+        // /content/playbooks/ 前缀自动按 playbook 权限拦截，无需额外改 accessControl）。
+        {
+          text: '「真实」运营实战经验',
+          collapsed: true,
+          items: [
+            { text: '课程首页 · 销冠经验拆解', link: '/content/playbooks/ops-experience/' },
+            { text: '第1节 · 销冠做对了什么', link: '/content/playbooks/ops-experience/01-what-top-seller-got-right' },
+            { text: '第2节 · 六个必须警惕的风险点 ⭐', link: '/content/playbooks/ops-experience/02-six-pitfalls' },
+            { text: '第3节 · 阶段运营 SOP 与转化诊断', link: '/content/playbooks/ops-experience/03-stage-sop-and-diagnosis' },
+            { text: '第4节 · 把经验改写成决策规则', link: '/content/playbooks/ops-experience/04-from-experience-to-rules' },
+            { text: '第5节 · 训练机制与判断标准', link: '/content/playbooks/ops-experience/05-training-and-judgment' },
+          ],
+        },
       ],
     },
 

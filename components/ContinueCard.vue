@@ -5,7 +5,7 @@ import { curriculum, skillLessons } from '../lib/curriculum'
 import { getLastLesson } from '../lib/visitTracker'
 import {
   getLevelByPath, isLevelAccessible, isMentorRole,
-  isPlaybookPath, isPlaybookAccessible,
+  isPlaybookPath,
 } from '../lib/accessControl'
 
 const isMounted = ref(false)

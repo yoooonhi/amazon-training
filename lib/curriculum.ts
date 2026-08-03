@@ -376,6 +376,13 @@ export const pathToLessonId: Record<string, string> = {
   'ads-16-tactics/03-auto-ads-refinement': 'pb-ads-03',
   'ads-16-tactics/04-ranking-push-and-risk': 'pb-ads-04',
   'ads-16-tactics/05-peak-season-combo': 'pb-ads-05',
+  // ===== 运营实战经验（playbooks 栏目，与广告打法手册同级同权限）=====
+  'ops-experience/index': 'pb-ops-00',
+  'ops-experience/01-what-top-seller-got-right': 'pb-ops-01',
+  'ops-experience/02-six-pitfalls': 'pb-ops-02',
+  'ops-experience/03-stage-sop-and-diagnosis': 'pb-ops-03',
+  'ops-experience/04-from-experience-to-rules': 'pb-ops-04',
+  'ops-experience/05-training-and-judgment': 'pb-ops-05',
 }
 
 // ===== 技能补给站：独立栏目（登录可见，不参与五级体系）=====
@@ -406,6 +413,21 @@ export const playbookLessons: { lessonId: string; title: string }[] = [
   { lessonId: 'pb-ads-03', title: '第3节 · 自动广告精细化' },
   { lessonId: 'pb-ads-04', title: '第4节 · 关键词排名冲刺与风险教育' },
   { lessonId: 'pb-ads-05', title: '第5节 · 旺季与综合打法' },
+  // ===== 运营实战经验（与广告打法手册同级同权限）=====
+  { lessonId: 'pb-ops-00', title: '「真实」运营实战经验 · 首页' },
+  { lessonId: 'pb-ops-01', title: '第1节 · 销冠做对了什么' },
+  { lessonId: 'pb-ops-02', title: '第2节 · 六个必须警惕的风险点' },
+  { lessonId: 'pb-ops-03', title: '第3节 · 阶段运营 SOP 与转化诊断' },
+  { lessonId: 'pb-ops-04', title: '第4节 · 把经验改写成决策规则' },
+  { lessonId: 'pb-ops-05', title: '第5节 · 训练机制与判断标准' },
+]
+
+// 实战手册 slug 清单（后台授权 UI + accessControl 校验 + 拦截页定价共用）
+// 与 playbookLessons 的 slug 保持一致；新增手册时这里加一条即可。
+// price：单本手册的解锁价格（用于拦截页展示，单位元）。
+export const PLAYBOOK_SLUGS: { slug: string; title: string; price: string }[] = [
+  { slug: 'ads-16-tactics', title: '广告打法手册', price: '2.99' },
+  { slug: 'ops-experience', title: '「真实」运营实战经验', price: '3.99' },
 ]
 
 // 课程内容的目录前缀（getLessonIdByPath 用）
@@ -604,6 +626,12 @@ export const lessonTitles: Record<string, string> = {
   'pb-ads-03': "第3节 · 自动广告精细化（四组拆分/阶梯竞价/标签/关键词调研）",
   'pb-ads-04': "第4节 · 关键词排名冲刺与风险教育（⚠️含违规打法）",
   'pb-ads-05': "第5节 · 旺季与综合打法（流量七分/海王/竞品投放）",
+  'pb-ops-00': "「真实」运营实战经验 · 销冠经验拆解",
+  'pb-ops-01': "第1节 · 销冠做对了什么（可复制的四点 + 四种隐性能力）",
+  'pb-ops-02': "第2节 · 六个必须警惕的风险点（销冠经验纠偏）⭐",
+  'pb-ops-03': "第3节 · 阶段运营 SOP 与转化诊断",
+  'pb-ops-04': "第4节 · 把经验改写成决策规则（五问法 + 五字段决策卡）",
+  'pb-ops-05': "第5节 · 训练机制与判断标准（盲测回放 + 影子运营 + 30天计划）",
   'skill-ai-image': "AI 生图工作流（亚马逊合规版）",
   'skill-ai-keywords': "AI 选品与关键词反查",
   'skill-ai-ops': "AI 广告与运营提效",
@@ -761,6 +789,12 @@ export const lessonNumbers: Record<string, string> = {
   'pb-ads-03': '手册4',
   'pb-ads-04': '手册5',
   'pb-ads-05': '手册6',
+  'pb-ops-00': '手册7',
+  'pb-ops-01': '手册8',
+  'pb-ops-02': '手册9',
+  'pb-ops-03': '手册10',
+  'pb-ops-04': '手册11',
+  'pb-ops-05': '手册12',
   'skill-ai-image': '技能6',
   'skill-ai-keywords': '技能8',
   'skill-ai-ops': '技能9',
@@ -919,6 +953,12 @@ export const lessonIdToUrl: Record<string, string> = {
   'pb-ads-03': '/content/playbooks/ads-16-tactics/03-auto-ads-refinement',
   'pb-ads-04': '/content/playbooks/ads-16-tactics/04-ranking-push-and-risk',
   'pb-ads-05': '/content/playbooks/ads-16-tactics/05-peak-season-combo',
+  'pb-ops-00': '/content/playbooks/ops-experience/index',
+  'pb-ops-01': '/content/playbooks/ops-experience/01-what-top-seller-got-right',
+  'pb-ops-02': '/content/playbooks/ops-experience/02-six-pitfalls',
+  'pb-ops-03': '/content/playbooks/ops-experience/03-stage-sop-and-diagnosis',
+  'pb-ops-04': '/content/playbooks/ops-experience/04-from-experience-to-rules',
+  'pb-ops-05': '/content/playbooks/ops-experience/05-training-and-judgment',
   'skill-ai-image': '/content/skills/ai-image-workflow',
   'skill-ai-keywords': '/content/skills/ai-selection-keywords',
   'skill-ai-ops': '/content/skills/ai-ads-ops',
