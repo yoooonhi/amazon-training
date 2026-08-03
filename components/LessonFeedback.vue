@@ -25,6 +25,7 @@ const submitting = ref(false)
 const myChoice = ref(null)       // null=未提交 / true=有帮助 / false=无帮助（从库回显）
 const justSubmitted = ref(false) // 刚提交成功（用于显示绿色 ✓ 成功提示）
 const toast = ref('')            // 操作后的轻提示文案（取消/已切换）
+const stats = ref({ helpful: 0, unhelpful: 0 }) // 全课统计（所有人可见）
 
 // --------------------------------------------------------
 // 3. 加载当前用户在本课的反馈（回显已选状态）
@@ -51,6 +52,25 @@ async function loadMyFeedback() {
     errorMsg.value = '反馈状态加载失败：' + (e.message || e)
   } finally {
     loading.value = false
+  }
+}
+
+// 加载本课的反馈统计（所有人可见：有帮助/无帮助总数）
+async function loadStats() {
+  if (!lessonId.value) return
+  try {
+    const { data, error } = await supabase
+      .from('lesson_feedback_stats')
+      .select('helpful_count, unhelpful_count')
+      .eq('lesson_id', lessonId.value)
+      .maybeSingle()
+    if (error) throw error
+    stats.value = {
+      helpful: data?.helpful_count || 0,
+      unhelpful: data?.unhelpful_count || 0,
+    }
+  } catch {
+    // 视图未建时静默降级（统计不显示，不影响投票功能）
   }
 }
 
@@ -124,6 +144,8 @@ async function submit(helpful) {
     await loadMyFeedback()
   } finally {
     submitting.value = false
+    // 无论取消/切换/新增，统计数都变了，刷新
+    loadStats()
   }
 }
 
@@ -140,11 +162,14 @@ onMounted(() => {
     currentUser.value = data.session?.user || null
     await loadMyFeedback()
   })
+  // 统计数与登录无关，所有人都能看，单独加载
+  loadStats()
 })
 
 // SPA 切课时重新加载本课反馈状态（避免竞态）
 watch(lessonId, async () => {
   await loadMyFeedback()
+  await loadStats()
 })
 </script>
 
@@ -169,6 +194,7 @@ watch(lessonId, async () => {
       >
         <span class="feedback-thumb" v-html="thumbSvg"></span>
         <span class="feedback-label">有帮助</span>
+        <span v-if="stats.helpful > 0" class="feedback-count">· {{ stats.helpful }}</span>
       </button>
       <button
         type="button"
@@ -180,6 +206,7 @@ watch(lessonId, async () => {
       >
         <span class="feedback-thumb flip" v-html="thumbSvg"></span>
         <span class="feedback-label">无帮助</span>
+        <span v-if="stats.unhelpful > 0" class="feedback-count">· {{ stats.unhelpful }}</span>
       </button>
     </div>
 
@@ -282,6 +309,11 @@ watch(lessonId, async () => {
 .feedback-label {
   font-size: 0.85rem;
   font-weight: 600;
+}
+.feedback-count {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--vp-c-text-3);
 }
 
 .feedback-success {

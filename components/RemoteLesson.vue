@@ -20,7 +20,7 @@
  *   注意：本组件只在客户端运行（壳用 <ClientOnly> 包裹），SSR 阶段不输出任何内容，
  *        因此正文永远不会进 SSR HTML —— 这是方案 2 防泄漏的关键。
  */
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, nextTick } from 'vue'
 import { supabase, supabaseUrl, supabaseAnonKey } from '../lib/supabase'
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
@@ -167,6 +167,56 @@ async function loadAndRender() {
     s.type === 'html' ? { type: 'html', html: renderMd(s.md) } : s
   )
   loading.value = false
+  // 渲染完成后，扫描正文 H2/H3，动态填充右侧「本课目录」大纲
+  // （VitePress 原生 outline 只认 SSR markdown，对 RemoteLesson 异步内容无效，需手动补）
+  await nextTick()
+  buildOutline()
+}
+
+// 扫描 .remote-lesson-content 里的 H2/H3，生成大纲并注入右侧 aside
+function buildOutline() {
+  const content = document.querySelector('.remote-lesson-content')
+  if (!content) return
+  const headings = [...content.querySelectorAll('h2, h3')]
+  if (headings.length === 0) return
+  // 给每个标题加 id（用于锚点跳转；marked 默认不加，VitePress 的锚点逻辑也不覆盖这里）
+  headings.forEach((h, i) => {
+    if (!h.id) {
+      const text = (h.textContent || '').trim()
+      h.id = 'rl-h-' + i + '-' + text.toLowerCase().replace(/[^\w\u4e00-\u9fa5]+/g, '-').replace(/^-|-$/g, '')
+    }
+  })
+  // 找右侧大纲容器：VitePress 的 VPDocOutline 在 .aside .VPDocOutline
+  const aside = document.querySelector('.VPDoc .aside')
+  if (!aside) return
+  // 先清掉 VitePress 原生（空）的 outline，避免重复
+  const existing = aside.querySelector('.rl-outline')
+  if (existing) existing.remove()
+  // 构建大纲 DOM
+  const wrap = document.createElement('div')
+  wrap.className = 'rl-outline'
+  const title = document.createElement('div')
+  title.className = 'rl-outline-title'
+  title.textContent = '本课目录'
+  wrap.appendChild(title)
+  const list = document.createElement('ul')
+  list.className = 'rl-outline-list'
+  headings.forEach((h) => {
+    const li = document.createElement('li')
+    li.className = 'rl-outline-item level-' + h.tagName.toLowerCase()
+    const a = document.createElement('a')
+    a.href = '#' + h.id
+    a.textContent = h.textContent
+    a.addEventListener('click', (e) => {
+      e.preventDefault()
+      h.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    })
+    li.appendChild(a)
+    list.appendChild(li)
+  })
+  wrap.appendChild(list)
+  aside.innerHTML = ''
+  aside.appendChild(wrap)
 }
 
 onMounted(loadAndRender)

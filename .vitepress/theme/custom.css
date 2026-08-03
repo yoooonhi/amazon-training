@@ -121,3 +121,47 @@ html.doc-gated .aside {
   color: #16a34a;
   background: rgba(22, 163, 74, 0.12);
 }
+
+/* ===== RemoteLesson 动态大纲（右侧「本课目录」）=====
+   VitePress 原生 outline 只认 SSR markdown，对 RemoteLesson 异步内容无效，
+   RemoteLesson 渲染完后手动扫描 H2/H3 生成大纲注入 .aside。 */
+.rl-outline {
+  position: sticky;
+  top: 84px;
+  max-height: calc(100vh - 128px);
+  overflow-y: auto;
+  padding-left: 16px;
+  font-size: 0.8125rem;
+}
+.rl-outline-title {
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: var(--vp-c-text-1);
+  margin-bottom: 0.6rem;
+}
+.rl-outline-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border-left: 1px solid var(--vp-c-divider);
+}
+.rl-outline-item {
+  line-height: 1.6;
+}
+.rl-outline-item a {
+  display: block;
+  padding: 0.25rem 0 0.25rem 0.75rem;
+  color: var(--vp-c-text-2);
+  text-decoration: none;
+  border-left: 1px solid transparent;
+  margin-left: -1px;
+  transition: color 0.15s;
+}
+.rl-outline-item.level-h3 a {
+  padding-left: 1.5rem;
+  font-size: 0.78rem;
+}
+.rl-outline-item a:hover {
+  color: var(--vp-c-brand-1);
+  border-left-color: var(--vp-c-brand-1);
+}
