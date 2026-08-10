@@ -83,12 +83,6 @@ import ContinueCard from './components/ContinueCard.vue'
 进阶（操盘）→ 团队 + 资金 + 战略 · 内测中
 ```
 
-## 三个绝不能犯的错
-
-1. **在没确认数据是否真实/新鲜的情况下就下决策**——Vine订单不是真实销量，过期数据不能用来调价
-2. **高不可逆操作（清仓/删货件/大改Listing）没确认就执行**
-3. **把不相关的决策混在一起做**——广告问题归广告、定价问题归定价，不要"一起调了吧"
-
 ## 官方参考文档
 
 - 🇪🇺 [亚马逊欧洲站官方卖家帮助](https://sellercentral.amazon.de/help/hub/reference/external/2?locale=zh-CN)
