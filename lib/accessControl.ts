@@ -205,9 +205,15 @@ export function extractPlaybookSlug(path: string): string | null {
  * - 管理员（mentor / admin）：所有手册全开
  * - 普通用户：仅当 profile.playbookAccess 里包含该手册 slug 时放行
  *
+ * 特例：PUBLIC_PLAYBOOK_SLUGS 里的手册走「登录可见」——
+ * 任意已登录用户都能看（无需单独授权），未登录游客拦截。
+ * 例：小白入门水平自测（beginner-self-check）作为免费自检工具，登录即可用。
+ *
  * @param path 当前页面路径（用于定位是哪本手册）
  * @param profile 用户 profile（含 role、playbookAccess）
  */
+export const PUBLIC_PLAYBOOK_SLUGS = ['beginner-self-check']
+
 export function isPlaybookAccessible(
   path: string,
   profile?: any | null
@@ -215,6 +221,10 @@ export function isPlaybookAccessible(
   if (isMentorRole(profile?.role)) return true
   const slug = extractPlaybookSlug(path)
   if (!slug) return false
+  // 登录可见的手册：任意已登录用户放行
+  if (PUBLIC_PLAYBOOK_SLUGS.includes(slug)) {
+    return !!profile?.role
+  }
   return (profile?.playbookAccess || []).includes(slug)
 }
 

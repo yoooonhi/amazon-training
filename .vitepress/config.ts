@@ -434,6 +434,16 @@ export default defineConfig({
             { text: '第5节 · 训练机制与判断标准', link: '/content/playbooks/ops-experience/05-training-and-judgment' },
           ],
         },
+        // ===== 小白入门水平自测（独立参考栏目，与 ops-experience 同级同权限）=====
+        // 走 /content/playbooks/ 前缀，自动按 playbook 权限拦截（见 lib/accessControl.ts 的 isPlaybookPath）。
+        {
+          text: '小白入门水平自测',
+          collapsed: true,
+          items: [
+            { text: '栏目首页 · 怎么用这份清单', link: '/content/playbooks/beginner-self-check/' },
+            { text: '第1节 · 完整自查清单（七大模块）', link: '/content/playbooks/beginner-self-check/01-checklist' },
+          ],
+        },
       ],
     },
 

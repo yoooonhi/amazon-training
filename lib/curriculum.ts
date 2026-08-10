@@ -383,6 +383,9 @@ export const pathToLessonId: Record<string, string> = {
   'ops-experience/03-stage-sop-and-diagnosis': 'pb-ops-03',
   'ops-experience/04-from-experience-to-rules': 'pb-ops-04',
   'ops-experience/05-training-and-judgment': 'pb-ops-05',
+  // ===== 小白入门水平自测（与 ops-experience 同级同权限）=====
+  'beginner-self-check/index': 'pb-self-00',
+  'beginner-self-check/01-checklist': 'pb-self-01',
 }
 
 // ===== 技能补给站：独立栏目（登录可见，不参与五级体系）=====
@@ -420,6 +423,9 @@ export const playbookLessons: { lessonId: string; title: string }[] = [
   { lessonId: 'pb-ops-03', title: '第3节 · 阶段运营 SOP 与转化诊断' },
   { lessonId: 'pb-ops-04', title: '第4节 · 把经验改写成决策规则' },
   { lessonId: 'pb-ops-05', title: '第5节 · 训练机制与判断标准' },
+  // ===== 小白入门水平自测（与 ops-experience 同级同权限）=====
+  { lessonId: 'pb-self-00', title: '小白入门水平自测 · 首页' },
+  { lessonId: 'pb-self-01', title: '第1节 · 完整自查清单（七大模块）' },
 ]
 
 // 实战手册 slug 清单（后台授权 UI + accessControl 校验 + 拦截页定价共用）
@@ -428,6 +434,7 @@ export const playbookLessons: { lessonId: string; title: string }[] = [
 export const PLAYBOOK_SLUGS: { slug: string; title: string; price: string }[] = [
   { slug: 'ads-16-tactics', title: '广告打法手册', price: '2.99' },
   { slug: 'ops-experience', title: '「真实」运营实战经验', price: '3.99' },
+  { slug: 'beginner-self-check', title: '小白入门水平自测', price: '0' },
 ]
 
 // 课程内容的目录前缀（getLessonIdByPath 用）
@@ -632,6 +639,8 @@ export const lessonTitles: Record<string, string> = {
   'pb-ops-03': "第3节 · 阶段运营 SOP 与转化诊断",
   'pb-ops-04': "第4节 · 把经验改写成决策规则（五问法 + 五字段决策卡）",
   'pb-ops-05': "第5节 · 训练机制与判断标准（盲测回放 + 影子运营 + 30天计划）",
+  'pb-self-00': "小白入门水平自测 · 七大模块知识点自查清单",
+  'pb-self-01': "第1节 · 完整自查清单（七大模块 · 80+ 问题）",
   'skill-ai-image': "AI 生图工作流（亚马逊合规版）",
   'skill-ai-keywords': "AI 选品与关键词反查",
   'skill-ai-ops': "AI 广告与运营提效",
@@ -795,6 +804,8 @@ export const lessonNumbers: Record<string, string> = {
   'pb-ops-03': '手册10',
   'pb-ops-04': '手册11',
   'pb-ops-05': '手册12',
+  'pb-self-00': '手册14',
+  'pb-self-01': '手册15',
   'skill-ai-image': '技能6',
   'skill-ai-keywords': '技能8',
   'skill-ai-ops': '技能9',
@@ -959,6 +970,8 @@ export const lessonIdToUrl: Record<string, string> = {
   'pb-ops-03': '/content/playbooks/ops-experience/03-stage-sop-and-diagnosis',
   'pb-ops-04': '/content/playbooks/ops-experience/04-from-experience-to-rules',
   'pb-ops-05': '/content/playbooks/ops-experience/05-training-and-judgment',
+  'pb-self-00': '/content/playbooks/beginner-self-check/index',
+  'pb-self-01': '/content/playbooks/beginner-self-check/01-checklist',
   'skill-ai-image': '/content/skills/ai-image-workflow',
   'skill-ai-keywords': '/content/skills/ai-selection-keywords',
   'skill-ai-ops': '/content/skills/ai-ads-ops',

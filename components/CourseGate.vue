@@ -5,6 +5,7 @@ import {
   getLevelByPath, isLevelAccessible, isMentorRole,
   isSkillPath, isSkillAccessible, getSkillSlug, MEMBER_SKILL_SLUGS,
   isPlaybookPath, isPlaybookAccessible, isPathAccessible, extractPlaybookSlug,
+  PUBLIC_PLAYBOOK_SLUGS,
 } from '../lib/accessControl'
 import { PLAYBOOK_SLUGS } from '../lib/curriculum'
 
@@ -38,6 +39,14 @@ const currentPlaybook = computed(() => {
   const slug = extractPlaybookSlug(currentPath.value)
   if (!slug) return null
   return PLAYBOOK_SLUGS.find((p) => p.slug === slug) || null
+})
+
+// 被拦截的手册是否属于「登录可见」的免费手册（如小白入门水平自测）。
+// 这类手册未登录时拦截卡应显示「请登录」而非「扫码付款」。
+const isPublicPlaybookBlocked = computed(() => {
+  if (!isPlaybookBlocked.value) return false
+  const slug = extractPlaybookSlug(currentPath.value)
+  return slug ? PUBLIC_PLAYBOOK_SLUGS.includes(slug) : false
 })
 
 // 判断当前页面是否是需要会员才能访问的技能课
@@ -179,6 +188,22 @@ onMounted(() => {
     <div class="gate-card gate-card-loading">
       <div class="gate-loading-dot"></div>
       <p class="gate-loading-text">正在校验访问权限…</p>
+    </div>
+  </div>
+
+  <!-- 登录可见的免费手册被拦截（未登录）：请登录 -->
+  <div v-else-if="authResolved && isPublicPlaybookBlocked" class="course-gate">
+    <div class="gate-card">
+      <div class="gate-icon">🔐</div>
+      <h2 class="gate-title">登录后查看</h2>
+      <p class="gate-desc">
+        这是「{{ currentPlaybook?.title || '自学手册' }}」栏目。<br />
+        免费注册 / 登录后即可查看全部内容。
+      </p>
+      <div class="gate-actions">
+        <button class="gate-btn gate-btn-primary" @click="openAuthPanel">免费注册 / 登录</button>
+      </div>
+      <p class="gate-hint">已登录用户即可访问，无需付费或单独授权。</p>
     </div>
   </div>
 
