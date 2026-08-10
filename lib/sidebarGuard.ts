@@ -18,7 +18,7 @@ import { authState, supabase } from './supabase'
 import {
   publicLevels, isMentorRole, isMember,
   SKILL_PATH_PREFIX, PUBLIC_SKILL_SLUGS, MEMBER_SKILL_SLUGS, LIMITED_FREE_SKILL_SLUGS,
-  PLAYBOOK_PATH_PREFIX,
+  PLAYBOOK_PATH_PREFIX, PUBLIC_PLAYBOOK_SLUGS,
 } from './accessControl'
 
 // 受保护等级的关键字（出现在侧边栏分组标题里的）
@@ -151,6 +151,9 @@ function applyPlaybookVisibility() {
       '.VPSidebar a[href^="' + PLAYBOOK_PATH_PREFIX + '"]'
     ),
   ]
+  // 判断某 slug 是否「登录可见」（免费手册，登录即可看，非付费专享）
+  const isPublicSlug = (slug: string | null): boolean =>
+    !!slug && PUBLIC_PLAYBOOK_SLUGS.includes(slug)
   const processedTitles = new WeakSet()
   handbookLinks.forEach((a) => {
     // 沿 DOM 向上找 level-0 分组容器
@@ -159,11 +162,17 @@ function applyPlaybookVisibility() {
     processedTitles.add(section)
     const titleEl = section.querySelector('.item > .text') as HTMLElement | null
     if (!titleEl) return
-    // 分组标题始终保留 👑 标识（无论是否授权，都体现「付费专享」定位）
-    // 先去掉残留的 emoji 前缀，再统一加回 👑，避免重复叠加
+    // 先去掉残留的 emoji 前缀，避免重复叠加
     let text = titleEl.textContent || ''
     if (text.startsWith('🔒 ') || text.startsWith('👑 ')) text = text.slice(3)
-    titleEl.textContent = '👑 ' + text
+    // 登录可见的免费手册：分组标题不加任何锁标（登录即可访问）
+    // 付费专享手册：分组标题始终保留 👑 标识（无论是否授权，都体现「付费专享」定位）
+    const titleSlug = slugFromHref(a.getAttribute('href') || '')
+    if (!isPublicSlug(titleSlug)) {
+      titleEl.textContent = '👑 ' + text
+    } else {
+      titleEl.textContent = text
+    }
   })
 
   // 处理手册内所有链接项（按各自 href 的 slug 判断）
@@ -174,6 +183,14 @@ function applyPlaybookVisibility() {
     textEl.textContent = text
     delete textEl.dataset.playbookLocked
     const slug = slugFromHref(a.getAttribute('href') || '')
+    // 登录可见的免费手册：已登录不加锁；未登录用 🔒（非付费专享，不用 👑）
+    if (isPublicSlug(slug)) {
+      if (!currentRole) {
+        textEl.textContent = '🔒 ' + text
+        textEl.dataset.playbookLocked = '1'
+      }
+      return
+    }
     if (!canAccessSlug(slug)) {
       textEl.textContent = '👑 ' + text
       textEl.dataset.playbookLocked = '1'
