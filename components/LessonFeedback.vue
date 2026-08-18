@@ -39,9 +39,11 @@ async function loadMyFeedback() {
   loading.value = true
   errorMsg.value = ''
   try {
+    // 只查 helpful：原表列权限已收紧为 (lesson_id, helpful)，
+    // 多要 created_at 会被 42501 拒绝（回显也用不到它）
     const { data, error } = await supabase
       .from('lesson_feedback')
-      .select('helpful, created_at')
+      .select('helpful')
       .eq('lesson_id', lessonId.value)
       .eq('user_id', currentUser.value.id)
       .maybeSingle() // 复合主键下最多一条；无记录返回 null

@@ -8,13 +8,18 @@
  *   3. 反馈明细：哪个用户对哪节课点了什么（可按课程 / 选择筛选）
  *
  * 直接回答「哪个用户对哪个课程进行了点击」。
- * 加载模式仿 CommentsPage：一次拉 lesson_feedback，再批量 join profiles 取昵称。
+ *
+ * 数据源：rpc('admin_feedback_list')（docs/supabase-admin-feedback-rpc.sql）。
+ * 2026-08-16 起 lesson_feedback 原表列权限收紧为 (lesson_id, helpful)，
+ * 明细（user_id/created_at/昵称）只能经该 RPC 读取 —— 函数内部
+ * is_mentor() 判定，非管理员返回空集；客户端直查原表明细会 42501。
  */
 import { ref, computed, reactive, onMounted } from 'vue'
 import { supabase } from '../../lib/supabase'
 import { getLessonLabel } from '../../lib/curriculum'
 
 const loading = ref(true)
+const loadError = ref('') // 查询失败必须显式提示，不能静默成「空数据」
 const allFeedback = ref([]) // 原始反馈（含 user_id）
 
 // 筛选
@@ -29,31 +34,19 @@ function lessonLabel(id) {
 
 async function loadData() {
   loading.value = true
-  const { data: raw } = await supabase
-    .from('lesson_feedback')
-    .select('lesson_id, user_id, helpful, created_at')
-    .order('created_at', { ascending: false })
-    .limit(5000)
-  const list = raw || []
-  // 批量查昵称
-  const userIds = [...new Set(list.map((f) => f.user_id))]
-  const profileMap = {}
-  if (userIds.length) {
-    const { data: ps } = await supabase
-      .from('profiles')
-      .select('id, nickname, role')
-      .in('id', userIds)
-    ;(ps || []).forEach((p) => (profileMap[p.id] = p))
+  loadError.value = ''
+  const { data: raw, error } = await supabase.rpc('admin_feedback_list')
+  if (error) {
+    loadError.value = error.message || String(error)
+    loading.value = false
+    return
   }
-  allFeedback.value = list.map((f) => {
-    const p = profileMap[f.user_id] || {}
-    return {
-      ...f,
-      authorName: p.nickname || '同学',
-      authorRole: p.role || null,
-      lessonLabel: lessonLabel(f.lesson_id),
-    }
-  })
+  allFeedback.value = (raw || []).map((f) => ({
+    ...f,
+    authorName: f.author_name || '同学',
+    authorRole: f.author_role || null,
+    lessonLabel: lessonLabel(f.lesson_id),
+  }))
   loading.value = false
 }
 
@@ -134,6 +127,10 @@ onMounted(loadData)
 
 <template>
   <div v-if="loading" class="loading-box">加载反馈数据中...</div>
+  <div v-else-if="loadError" class="load-error-box">
+    <div>反馈数据加载失败：{{ loadError }}</div>
+    <button class="retry-btn" @click="loadData">重试</button>
+  </div>
   <div v-else>
     <!-- 统计卡 -->
     <div class="stats-row">
@@ -217,6 +214,17 @@ onMounted(loadData)
 
 <style scoped>
 @import './dashboard-shared.css';
+
+.load-error-box {
+  padding: 2rem 1rem; text-align: center; color: #ef4444;
+  border: 1px dashed #ef4444; border-radius: 8px; line-height: 1.8;
+}
+.retry-btn {
+  margin-top: 0.8rem; padding: 0.35rem 1.2rem; border-radius: 6px;
+  border: 1px solid var(--vp-c-divider); background: var(--vp-c-bg);
+  color: var(--vp-c-text-1); cursor: pointer; font-size: 0.85rem;
+}
+.retry-btn:hover { border-color: var(--vp-c-brand-1); color: var(--vp-c-brand-1); }
 
 .sortable { cursor: pointer; user-select: none; white-space: nowrap; }
 .sortable:hover { color: var(--vp-c-brand-1); }
