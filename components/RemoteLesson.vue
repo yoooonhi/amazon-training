@@ -59,15 +59,16 @@ const componentMap = {
  *           按位置把 markdown 切成 [文本段, 组件, 文本段, 组件, ...]。
  */
 function splitMarkdownSegments(mdText, namePattern) {
+  // 正则必须从 '<' 开始整体消费标签：旧版从组件名起匹配，'<'
+  // 残留在前一个文本段末尾，渲染成正文里孤立的 '<'
   const tagRegex = new RegExp(
-    `(${namePattern})\\b([\\s\\S]*?)\\s*/>`,
+    `<(${namePattern})\\b([\\s\\S]*?)\\s*/>`,
     'g'
   )
   const segs = []
   let lastEnd = 0
   let m
   while ((m = tagRegex.exec(mdText)) !== null) {
-    // 前面的文本段（含 '<' 开头的那一半标签 —— 因为正则没消费它）
     const fullMatch = m[0]
     const matchStart = m.index
     // 从 lastEnd 到 matchStart 之间是纯 markdown 文本
