@@ -2,78 +2,70 @@
 /**
  * 访问分析页
  * 近14天趋势 + UV独立访客 + 热门课程页Top10 + 登录/游客占比 + 人均访问页数
+ *
+ * 数据源：rpc('visit_stats')（docs/supabase-visit-stats-rpc.sql）。
+ * 背景（2026-08-19）：原实现一次拉最近 5000 条在浏览器里数数，但
+ * Supabase PostgREST 服务端硬上限 db-max-rows=1000（单次最多返回
+ * 1000 行，limit(5000) 无效且静默截断），site_visits 突破 1000 条后
+ * 「总访问(PV)」恒为 1000。改为服务端聚合 RPC，一次返回全部指标。
  */
 import { ref, computed, onMounted } from 'vue'
 import { supabase } from '../../lib/supabase'
 import { getLessonIdByUrl, getLessonLabel } from '../../lib/curriculum'
 
 const loading = ref(true)
-const visits = ref([])
+const errorMsg = ref('')
+const totalVisits = ref(0)
 const visitTrend = ref([])
 const topPaths = ref([])
 const loginRatio = ref({ logged: 0, guest: 0 })
 const uniqueVisitors = ref(0)
 
-function toLocalDateStr(ts) {
-  const d = new Date(ts)
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-}
 function localDayKey(offset = 0) {
   const d = new Date()
   d.setDate(d.getDate() - offset)
-  return toLocalDateStr(d)
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
-function localDayLabel(offset = 0) {
-  const d = new Date()
-  d.setDate(d.getDate() - offset)
-  return `${d.getMonth() + 1}/${d.getDate()}`
+// 'YYYY-MM-DD' → 'M/D'（与原 localDayLabel 展示格式一致）
+function dayLabel(dayKey) {
+  const [, m, d] = dayKey.split('-')
+  return `${Number(m)}/${Number(d)}`
 }
 
 async function loadData() {
   loading.value = true
-  const { data } = await supabase
-    .from('site_visits')
-    .select('path, page_type, is_logged_in, created_at, visitor_id')
-    .order('created_at', { ascending: false })
-    .limit(5000)
-  const all = data || []
-  visits.value = all
+  errorMsg.value = ''
+  const { data, error } = await supabase.rpc('visit_stats')
+  if (error) {
+    errorMsg.value = '访问统计加载失败：' + (error.message || error) + '（若首次接入，请先在 Supabase 执行 docs/supabase-visit-stats-rpc.sql）'
+    loading.value = false
+    return
+  }
+  if (data == null) {
+    // is_mentor() 为 false 时函数返回空集（见 SQL 头注释）
+    errorMsg.value = '仅导师/管理员可查看访问统计'
+    loading.value = false
+    return
+  }
 
-  // 近14天趋势
+  totalVisits.value = data.total || 0
+  uniqueVisitors.value = data.uv || 0
+  loginRatio.value = { logged: data.logged || 0, guest: data.guest || 0 }
+  topPaths.value = data.top_paths || []
+
+  // 近14天趋势：本地日期做骨架，填入服务端按上海时区聚合的计数
   const dayCounts = {}
-  all.forEach((v) => {
-    const k = toLocalDateStr(v.created_at)
-    dayCounts[k] = (dayCounts[k] || 0) + 1
-  })
+  ;(data.trend || []).forEach((t) => { dayCounts[t.day] = t.count })
   const trend = []
   for (let i = 13; i >= 0; i--) {
-    trend.push({ key: localDayLabel(i), count: dayCounts[localDayKey(i)] || 0 })
+    const k = localDayKey(i)
+    trend.push({ key: dayLabel(k), count: dayCounts[k] || 0 })
   }
   visitTrend.value = trend
-
-  // UV（按 visitor_id 去重）
-  const visitorSet = new Set()
-  all.forEach((v) => { if (v.visitor_id) visitorSet.add(v.visitor_id) })
-  uniqueVisitors.value = visitorSet.size
-
-  // 热门路径 Top10（按 path，只取课程页 lesson 类型）
-  const pathCounts = {}
-  all.filter((v) => v.page_type === 'lesson' && v.path).forEach((v) => {
-    pathCounts[v.path] = (pathCounts[v.path] || 0) + 1
-  })
-  topPaths.value = Object.entries(pathCounts)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 10)
-    .map(([path, count]) => ({ path, count }))
-
-  // 登录占比
-  const logged = all.filter((v) => v.is_logged_in).length
-  loginRatio.value = { logged, guest: all.length - logged }
 
   loading.value = false
 }
 
-const totalVisits = computed(() => visits.value.length)
 const maxTrend = computed(() => Math.max(1, ...visitTrend.value.map((d) => d.count)))
 const maxPath = computed(() => Math.max(1, ...topPaths.value.map((p) => p.count)))
 const avgPages = computed(() => (uniqueVisitors.value ? (totalVisits.value / uniqueVisitors.value).toFixed(1) : 0))
@@ -94,6 +86,10 @@ onMounted(loadData)
 
 <template>
   <div v-if="loading" class="loading-box">加载访问数据中...</div>
+  <div v-else-if="errorMsg" class="empty-hint">
+    <p>{{ errorMsg }}</p>
+    <button type="button" class="retry-btn" @click="loadData">重试</button>
+  </div>
   <div v-else>
     <div class="stats-row">
       <div class="stat-card"><span class="stat-num">{{ totalVisits }}</span><span class="stat-label">总访问(PV)</span></div>
@@ -146,6 +142,17 @@ onMounted(loadData)
 
 <style scoped>
 @import './dashboard-shared.css';
+.retry-btn {
+  margin-top: 0.6rem;
+  padding: 0.35rem 1.1rem;
+  border: 1px solid var(--vp-c-brand-1);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--vp-c-brand-1);
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+.retry-btn:hover { background: var(--vp-c-brand-1); color: #fff; }
 .path-list { display: flex; flex-direction: column; gap: 0.4rem; }
 .path-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; }
 .path-rank { width: 1.5rem; font-weight: 700; color: var(--vp-c-brand-1); text-align: center; }
