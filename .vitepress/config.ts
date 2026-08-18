@@ -311,6 +311,7 @@ export default defineConfig({
               collapsed: true,
               items: [
                 { text: '1.1 Transparency透明计划', link: '/content/advanced/a1-brand-protection/01-transparency-program' },
+                { text: '1.1a 官方操作指南（在线阅读）', link: '/content/advanced/a1-brand-protection/01a-transparency-official-guide' },
                 { text: '1.2 Project Zero与自动保护', link: '/content/advanced/a1-brand-protection/02-project-zero' },
                 { text: '1.3 跟卖打击SOP', link: '/content/advanced/a1-brand-protection/03-hijack-defense-sop' },
                 { text: '1.4 品牌资产沉淀', link: '/content/advanced/a1-brand-protection/04-brand-assets' },

@@ -6,6 +6,14 @@ gated: true
 storage_path: advanced/a1-brand-protection/01-transparency-program.md
 ---
 
+::: info 📄 配套官方资料：Transparency 透明计划操作指南
+亚马逊官方《透明计划操作指南》（2026 年 7 月更新，56 页），覆盖账户创建、ASIN 注册贴标、OPR 评估、保护开启、费用与常见问答全流程。
+
+**[📖 在线阅读（网页版，微信可直接看）](/content/advanced/a1-brand-protection/01a-transparency-official-guide)** ｜ **[⬇️ 下载 PDF](/files/transparency-program-guide.pdf){download="亚马逊透明计划操作指南.pdf"}**
+
+提示：PDF 原文件在微信内打开体验不佳，微信阅读请用上面的「网页版」入口。
+:::
+
 <ClientOnly>
   <RemoteLesson storage-path="advanced/a1-brand-protection/01-transparency-program.md" />
 </ClientOnly>
