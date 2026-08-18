@@ -87,3 +87,4 @@ import ContinueCard from './components/ContinueCard.vue'
 
 - 🇪🇺 [亚马逊欧洲站官方卖家帮助](https://sellercentral.amazon.de/help/hub/reference/external/2?locale=zh-CN)
 - 🇺🇸 [亚马逊美国站官方卖家帮助](https://sellercentral.amazon.com/help/hub/reference/external/2?locale=zh-CN)
+- 📄 [Transparency透明计划操作指南（2026/07/21）](http://4g0.cn/3ubH2)
