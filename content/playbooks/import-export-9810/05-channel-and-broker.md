@@ -116,5 +116,3 @@ Shipment发生拆分、改仓、拒收或部分入库时，应保留前后版本
 ## 官方参考
 
 - [海关总署公告2024年第167号](https://12335.mofcom.gov.cn/articledwmy/zcxx/dwmy/202412/1940660_1.html)
-
-> 下一节：[首票9810出口：从商品资料到放行离境](./06-first-shipment)

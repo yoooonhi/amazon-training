@@ -129,5 +129,3 @@ gated: true
 - [财税〔2018〕103号：综试区零售出口货物税收政策](https://www.chinatax.gov.cn/chinatax/n810341/n810765/n3359382/201809/c3937100/content.html)
 - [国家税务总局公告2025年第3号政策解读](https://tianjin.chinatax.gov.cn/11200000000/0300/030002/20250205101032805.shtml)
 - [汇发〔2024〕11号：进一步优化贸易外汇业务管理](https://m.safe.gov.cn/safe/2024/0407/24204.html)
-
-> 下一节：[9810通关通道：平台、报关行与电子数据](./05-channel-and-broker)

@@ -127,5 +127,3 @@ gated: true
 - [中国电子口岸制发卡全国通办常见问题](https://www.chinaport.gov.cn/pages/customer/problem-detail.html?id=16150)
 - [深圳电子口岸制卡业务操作指引](https://sz.singlewindow.cn/dyckfile/news/file20221209/202212091712080850661.pdf)
 - [深圳电子口岸分中心及制卡服务点](https://www.szepz.com/info/17/2849.html)
-
-> 下一节：[税务与外汇：退税、免税、无票免税和收汇](./04-tax-and-fx)

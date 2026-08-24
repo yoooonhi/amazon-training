@@ -137,5 +137,3 @@ gated: true
 - [深圳单一窗口企业进出口权备案指引](https://sz.singlewindow.cn/dyckfile/news/file20230306/202303061746110219246.pdf)
 - [深圳经济特区范围扩大到全市的官方说明](https://www.sz.gov.cn/zfgb/2010/gb705/content/post_4969677.html)
 - [海关总署公告2024年第167号](https://12335.mofcom.gov.cn/articledwmy/zcxx/dwmy/202412/1940660_1.html)
-
-> 下一节：[深圳电子口岸制卡：法人卡与操作员卡](./03-eport-card)
