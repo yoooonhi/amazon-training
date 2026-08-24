@@ -386,6 +386,16 @@ export const pathToLessonId: Record<string, string> = {
   // ===== 小白入门水平自测（与 ops-experience 同级同权限）=====
   'beginner-self-check/index': 'pb-self-00',
   'beginner-self-check/01-checklist': 'pb-self-01',
+  // ===== 进出口权资质（海关备案）（9810）=====
+  'import-export-9810/index': 'pb-trade-00',
+  'import-export-9810/01-preparation': 'pb-trade-01',
+  'import-export-9810/02-customs-filing': 'pb-trade-02',
+  'import-export-9810/03-eport-card': 'pb-trade-03',
+  'import-export-9810/04-tax-and-fx': 'pb-trade-04',
+  'import-export-9810/05-channel-and-broker': 'pb-trade-05',
+  'import-export-9810/06-first-shipment': 'pb-trade-06',
+  'import-export-9810/07-post-export': 'pb-trade-07',
+  'import-export-9810/08-process-log': 'pb-trade-08',
 }
 
 // ===== 技能补给站：独立栏目（登录可见，不参与五级体系）=====
@@ -426,6 +436,16 @@ export const playbookLessons: { lessonId: string; title: string }[] = [
   // ===== 小白入门水平自测（与 ops-experience 同级同权限）=====
   { lessonId: 'pb-self-00', title: '小白入门水平自测 · 首页' },
   { lessonId: 'pb-self-01', title: '第1节 · 完整自查清单（七大模块）' },
+  // ===== 进出口权资质（海关备案）（9810）=====
+  { lessonId: 'pb-trade-00', title: '进出口权资质（海关备案）（9810）· 首页' },
+  { lessonId: 'pb-trade-01', title: '第1节 · 开始前准备' },
+  { lessonId: 'pb-trade-02', title: '第2节 · 海关备案' },
+  { lessonId: 'pb-trade-03', title: '第3节 · 深圳电子口岸制卡' },
+  { lessonId: 'pb-trade-04', title: '第4节 · 税务与外汇' },
+  { lessonId: 'pb-trade-05', title: '第5节 · 9810通关通道' },
+  { lessonId: 'pb-trade-06', title: '第6节 · 首票9810出口' },
+  { lessonId: 'pb-trade-07', title: '第7节 · 出口后闭环' },
+  { lessonId: 'pb-trade-08', title: '第8节 · 办理记录与常见问题' },
 ]
 
 // 实战手册 slug 清单（后台授权 UI + accessControl 校验 + 拦截页定价共用）
@@ -435,6 +455,7 @@ export const PLAYBOOK_SLUGS: { slug: string; title: string; price: string }[] = 
   { slug: 'ads-16-tactics', title: '广告打法手册', price: '2.99' },
   { slug: 'ops-experience', title: '「真实」运营实战经验', price: '3.99' },
   { slug: 'beginner-self-check', title: '小白入门水平自测', price: '0' },
+  { slug: 'import-export-9810', title: '进出口权资质（海关备案）（9810）', price: '0' },
 ]
 
 // 课程内容的目录前缀（getLessonIdByPath 用）
@@ -972,6 +993,15 @@ export const lessonIdToUrl: Record<string, string> = {
   'pb-ops-05': '/content/playbooks/ops-experience/05-training-and-judgment',
   'pb-self-00': '/content/playbooks/beginner-self-check/index',
   'pb-self-01': '/content/playbooks/beginner-self-check/01-checklist',
+  'pb-trade-00': '/content/playbooks/import-export-9810/index',
+  'pb-trade-01': '/content/playbooks/import-export-9810/01-preparation',
+  'pb-trade-02': '/content/playbooks/import-export-9810/02-customs-filing',
+  'pb-trade-03': '/content/playbooks/import-export-9810/03-eport-card',
+  'pb-trade-04': '/content/playbooks/import-export-9810/04-tax-and-fx',
+  'pb-trade-05': '/content/playbooks/import-export-9810/05-channel-and-broker',
+  'pb-trade-06': '/content/playbooks/import-export-9810/06-first-shipment',
+  'pb-trade-07': '/content/playbooks/import-export-9810/07-post-export',
+  'pb-trade-08': '/content/playbooks/import-export-9810/08-process-log',
   'skill-ai-image': '/content/skills/ai-image-workflow',
   'skill-ai-keywords': '/content/skills/ai-selection-keywords',
   'skill-ai-ops': '/content/skills/ai-ads-ops',

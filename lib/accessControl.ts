@@ -212,7 +212,7 @@ export function extractPlaybookSlug(path: string): string | null {
  * @param path 当前页面路径（用于定位是哪本手册）
  * @param profile 用户 profile（含 role、playbookAccess）
  */
-export const PUBLIC_PLAYBOOK_SLUGS = ['beginner-self-check']
+export const PUBLIC_PLAYBOOK_SLUGS = ['beginner-self-check', 'import-export-9810']
 
 export function isPlaybookAccessible(
   path: string,
