@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>家庭酒单 · Home Bar Menu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0e1013;
+    --panel:#15181e;
+    --card:#1a1e25;
+    --line:#262b33;
+    --gold:#e2b04a;
+    --gold-dim:rgba(226,176,74,.12);
+    --text:#e8e6e1;
+    --muted:#9aa0aa;
+    --serif:"Noto Serif SC","Songti SC","STSong",serif;
+    --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    background:radial-gradient(1200px 500px at 75% -10%, rgba(226,176,74,.09), transparent 60%), var(--bg);
+    color:var(--text); font-family:var(--sans); line-height:1.6;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px 90px}
+
+  /* ---------- Hero ---------- */
+  .hero{text-align:center;padding:64px 0 30px}
+  .hero .kicker{color:var(--gold);letter-spacing:.5em;font-size:12px;text-transform:uppercase;padding-left:.5em}
+  .hero h1{font-family:var(--serif);font-weight:900;font-size:clamp(36px,5.5vw,58px);margin:14px 0 10px;letter-spacing:.12em}
+  .hero .sub{color:var(--muted);font-size:14px}
+  .hero .sub b{color:var(--gold);font-weight:600}
+  .hero .divider{width:180px;margin:22px auto 0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+
+  /* ---------- Controls ---------- */
+  .controls{
+    position:sticky;top:0;z-index:50;
+    background:rgba(14,16,19,.88);backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+    padding:14px 0 12px;margin-bottom:26px;
+  }
+  .ctrl-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .ctrl-row + .ctrl-row{margin-top:8px}
+  .chip{
+    appearance:none;border:1px solid var(--line);background:var(--panel);
+    color:var(--muted);font-size:13px;padding:6px 14px;border-radius:999px;cursor:pointer;
+    transition:all .18s ease;font-family:var(--sans);
+  }
+  .chip:hover{border-color:var(--gold);color:var(--text)}
+  .chip.on{background:var(--gold);border-color:var(--gold);color:#14110a;font-weight:600}
+  .chip .n{opacity:.65;font-size:11px;margin-left:2px}
+  .search{
+    margin-left:auto;display:flex;align-items:center;gap:8px;
+    background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:6px 16px;
+  }
+  .search input{
+    background:transparent;border:none;outline:none;color:var(--text);
+    font-size:13px;width:200px;font-family:var(--sans);
+  }
+  .search input::placeholder{color:#5c626c}
+  .count{font-size:12px;color:var(--muted);margin-left:10px}
+  @media (max-width:720px){
+    .search{margin-left:0;width:100%}
+    .search input{width:100%}
+  }
+
+  /* ---------- Grid & Card ---------- */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:18px}
+  .card{
+    position:relative;background:var(--card);border:1px solid var(--line);
+    border-radius:16px;padding:22px 22px 18px;overflow:hidden;
+    transition:transform .18s ease,border-color .18s ease;
+  }
+  .card:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--c) 55%, var(--line))}
+  .card .strip{position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--c),transparent 85%)}
+  .chead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+  .chead h3{font-family:var(--serif);font-size:20px;font-weight:600;display:flex;align-items:center;gap:8px}
+  .chead h3::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--c);box-shadow:0 0 10px var(--c);flex:none}
+  .chead .en{color:var(--muted);font-size:12px;font-style:italic}
+  .stars{color:var(--gold);font-size:13px;letter-spacing:2px;white-space:nowrap}
+  .badges{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 14px}
+  .pill{font-size:11px;padding:3px 10px;border-radius:999px;border:1px solid transparent;white-space:nowrap}
+  .pill.cat{color:var(--c);background:color-mix(in srgb,var(--c) 14%, transparent);border-color:color-mix(in srgb,var(--c) 38%, transparent)}
+  .pill.dim{color:var(--muted);border-color:var(--line)}
+  .pill.low{color:#4ade80;background:rgba(74,222,128,.1);border-color:rgba(74,222,128,.35)}
+  .pill.mid{color:#fbbf24;background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.35)}
+  .pill.strong{color:#f87171;background:rgba(248,113,113,.1);border-color:rgba(248,113,113,.35)}
+  .pill.none{color:#38bdf8;background:rgba(56,189,248,.1);border-color:rgba(56,189,248,.35)}
+  .sec h4{font-size:12px;color:#6b7280;letter-spacing:.25em;margin-bottom:6px;font-weight:600}
+  .sec ul{list-style:none}
+  .sec li{font-size:13.5px;padding:2.5px 0;display:flex;gap:8px}
+  .sec ul li::before{content:"·";color:var(--c);font-weight:900}
+  .sec ol{list-style:none;counter-reset:s}
+  .sec ol li{font-size:13px;color:#c8ccd4;padding:2.5px 0;display:flex;gap:10px;counter-increment:s}
+  .sec ol li::before{content:counter(s);color:var(--c);font-size:11px;flex:none;width:16px;height:16px;border:1px solid color-mix(in srgb,var(--c) 45%, transparent);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-top:3px}
+  .sec + .sec{margin-top:12px}
+  .tip{
+    margin-top:14px;font-size:12.5px;color:#c9b98f;
+    background:var(--gold-dim);border-left:2px solid var(--gold);
+    padding:8px 12px;border-radius:0 8px 8px 0;
+  }
+  .empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:60px 0;font-size:14px}
+
+  /* ---------- Sections ---------- */
+  .section-title{
+    font-family:var(--serif);font-size:22px;font-weight:600;margin:56px 0 18px;
+    display:flex;align-items:center;gap:12px;
+  }
+  .section-title::after{content:"";flex:1;height:1px;background:var(--line)}
+  .panelgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+  .panel h4{color:var(--gold);font-size:13px;letter-spacing:.15em;margin-bottom:10px;font-weight:600}
+  .panel ul{list-style:none}
+  .panel li{font-size:13px;color:#c8ccd4;padding:3px 0;display:flex;gap:8px}
+  .panel li::before{content:"·";color:var(--gold);font-weight:900}
+  .tips-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+  .tip-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px;font-size:13.5px;color:#c8ccd4}
+  .tip-card b{color:var(--text);display:block;margin-bottom:4px;font-size:14px}
+  .shop{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+  .shop-card{background:linear-gradient(160deg,rgba(226,176,74,.08),transparent 55%),var(--panel);border:1px solid rgba(226,176,74,.25);border-radius:14px;padding:16px 18px;font-size:13.5px;color:#c8ccd4}
+  .shop-card b{color:var(--gold);display:block;margin-bottom:4px;font-size:14.5px}
+
+  footer{text-align:center;color:#5c626c;font-size:12px;margin-top:70px;line-height:2}
+  footer .cocktail{font-size:22px;color:var(--gold)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="kicker">Home Bar Menu</div>
+    <h1>家 庭 酒 单</h1>
+    <div class="sub">基于你的库存生成的 <b id="totalN">41</b> 款调酒 · 度数为估算值 · 无口味筛选，全都在这儿</div>
+    <div class="divider"></div>
+  </header>
+
+  <div class="controls">
+    <div class="ctrl-row" id="catChips">
+      <button class="chip on" data-cat="all">全部</button>
+      <button class="chip" data-cat="gin">金酒基<span class="n">8</span></button>
+      <button class="chip" data-cat="rum">白朗姆基<span class="n">7</span></button>
+      <button class="chip" data-cat="vodka">伏特加基<span class="n">8</span></button>
+      <button class="chip" data-cat="ume">梅酒基<span class="n">8</span></button>
+      <button class="chip" data-cat="cognac">白兰地基<span class="n">5</span></button>
+      <button class="chip" data-cat="mock">无酒精<span class="n">5</span></button>
+    </div>
+    <div class="ctrl-row">
+      <button class="chip on" data-abv="all">全部度数</button>
+      <button class="chip" data-abv="zero">0% 无酒精</button>
+      <button class="chip" data-abv="low">低度 ≤6%</button>
+      <button class="chip" data-abv="mid">中度 7~12%</button>
+      <button class="chip" data-abv="strong">较烈 &gt;15%</button>
+      <span class="count" id="count"></span>
+      <label class="search">
+        <span>🔍</span>
+        <input id="q" type="text" placeholder="搜索酒名 / 英文名 / 配料…">
+      </label>
+    </div>
+  </div>
+
+  <main class="grid" id="grid"></main>
+
+  <div class="section-title">🍸 调酒师小抄</div>
+  <div class="tips-list">
+    <div class="tip-card"><b>量器换算</b>1 shot ≈ 30ml。量酒器小头约 15~25ml、大头约 30~50ml，按你家那套的刻度来；半个柠檬 ≈ 15ml 鲜柠檬汁。</div>
+    <div class="tip-card"><b>柠檬液是含糖的</b>它=柠檬汁+糖。凡是用柠檬液替代鲜柠檬汁的配方，把配方里的风味糖浆<b style="display:inline">减半</b>，否则会齁。</div>
+    <div class="tip-card"><b>气泡永远最后倒</b>汤力水、苏打水、雪碧、C100 沿杯壁缓缓倒入，保住气泡；倒完只"提拉"1~2 下，别搅猛了。</div>
+    <div class="tip-card"><b>摇和 vs 兑和</b>摇和=材料加冰进摇壶摇10~15秒再滤出，出杯更冰、口感融合；兑和=直接倒进杯里搅。标"兑和"的都可无脑做。</div>
+    <div class="tip-card"><b>两瓶伏特加分工</b>绝对伏特加做喝得出酒感的（蓝泻湖、伏特加汤力）；斯米诺丢进可乐、葡萄气泡这类重味饮料里。</div>
+    <div class="tip-card"><b>渐变色的秘密</b>红石榴糖浆密度大，沿吧勺背缓缓倒入会沉底，形成"日出"渐变——倒完千万别搅。</div>
+  </div>
+
+  <div class="section-title">🛒 再买一样，解锁新酒</div>
+  <div class="shop">
+    <div class="shop-card"><b>君度（橙味利口酒）</b>立刻解锁真·侧车 Sidecar、大都会 Cosmopolitan（后者再配一盒蔓越莓汁）。你现在全场的材料就差这一瓶。</div>
+    <div class="shop-card"><b>一盒薄荷叶 + 几颗青柠</b>莫吉托、南区菲士升级为完全体；青柠还能让葡萄日出、自由古巴更立体。</div>
+    <div class="shop-card"><b>一瓶橙汁</b>解锁螺丝起子 Screwdriver（伏特加+橙汁）和经典款日出。</div>
+    <div class="shop-card"><b>咖啡利口酒 + 牛奶</b>解锁白俄罗斯 White Russian——伏特加你已经有了。</div>
+  </div>
+
+  <div class="section-title">📦 你的库存</div>
+  <div class="panelgrid">
+    <div class="panel"><h4>基酒</h4><ul>
+      <li>孟买蓝宝石金酒</li><li>百加得白朗姆</li><li>梅酒</li>
+      <li>绝对伏特加</li><li>斯米诺伏特加</li><li>马爹利鼎盛 VSOP 干邑</li>
+    </ul></div>
+    <div class="panel"><h4>工具</h4><ul>
+      <li>基础调酒套装（摇壶 / 量酒器 / 吧勺 / 滤冰器）</li>
+    </ul></div>
+    <div class="panel"><h4>辅料</h4><ul>
+      <li>鲜柠檬</li><li>柠檬液（含糖浓缩汁）</li><li>冰块</li>
+      <li>风味糖浆 ×4：莫吉托 / 蓝橙 / 绿薄荷 / 红石榴</li>
+    </ul></div>
+    <div class="panel"><h4>饮料</h4><ul>
+      <li>可乐 / 雪碧 / 泰象苏打水</li>
+      <li>汤力水 / 椰子水</li>
+      <li>水溶C100 ×4 口味（柠檬、西柚等）</li>
+      <li>元气森林气泡水（葡萄）</li>
+      <li>东方树叶（青柑普洱 / 茉莉花茶）· 菊花茶</li>
+    </ul></div>
+  </div>
+
+  <footer>
+    <div class="cocktail">🍸</div>
+    理性饮酒，未成年人请从「无酒精」区点单 · 度数为估算值，随冰块融化与倒酒手法浮动<br>
+    所有配方按你家现有库存可 100% 复刻 · Home Bar Menu
+  </footer>
+</div>
+
+<script>
+const CATS = {
+  gin:    {label:'金酒基',   color:'#7fb4ff'},
+  rum:    {label:'白朗姆基', color:'#f0a35e'},
+  vodka:  {label:'伏特加基', color:'#b9c2cf'},
+  ume:    {label:'梅酒基',   color:'#fb8a9e'},
+  cognac: {label:'白兰地基', color:'#e0a94c'},
+  mock:   {label:'无酒精',   color:'#5fce9a'}
+};
+
+const DRINKS = [
+  /* ================= 金酒 ================= */
+  {n:'金汤力', en:'Gin & Tonic', cat:'gin', abv:9, m:'兑和', d:1, c:'#8ecae6',
+   ing:['孟买蓝宝石 45ml','汤力水 补满（约135ml）','柠檬角 1个'],
+   st:['杯中装满冰块，倒入金酒','汤力水沿杯壁缓缓倒入','柠檬角挤汁后投入，吧勺轻提拉1~2下'],
+   tip:'柠檬皮在杯口扭一下，喷出的柠檬油让香气翻倍。'},
+  {n:'蓝色珊瑚礁', en:'Blue Coral G&T', cat:'gin', abv:8, m:'兑和', d:1, c:'#29b6f6',
+   ing:['金酒 40ml','蓝橙风味糖浆 10ml','汤力水 补满'],
+   st:['满冰，金酒与蓝橙糖浆先搅匀','汤力水沿壁补满','柠檬角点缀'],
+   tip:'汤力水的奎宁让蓝橙糖浆显出湖水般的透亮蓝。'},
+  {n:'茉莉金汤力', en:'Jasmine G&T', cat:'gin', abv:6, m:'兑和', d:1, c:'#d8b4fe',
+   ing:['金酒 30ml','东方树叶·茉莉花茶 60ml','汤力水 90ml','柠檬皮 1条'],
+   st:['满冰后倒入金酒','依次加入茉莉花茶与汤力水','柠檬皮在杯口扭香后投入'],
+   tip:'茉莉花香与孟买蓝宝石的十种植物香是花香对花香。'},
+  {n:'南区菲士', en:'Southside Fizz', cat:'gin', abv:9, m:'摇和', d:2, c:'#c5e1a5',
+   ing:['金酒 45ml','鲜柠檬汁 20ml','莫吉托风味糖浆 20ml','泰象苏打水 补满'],
+   st:['前三样加冰摇 12 秒','滤入装满冰的杯中','苏打水补满'],
+   tip:'正统做法要捣薄荷叶；莫吉托糖浆自带薄荷味，替你省一步。'},
+  {n:'青柑金', en:'Gin & Puer', cat:'gin', abv:8, m:'兑和', d:1, c:'#bcaaa4',
+   ing:['金酒 30ml','东方树叶·青柑普洱 120ml'],
+   st:['满冰，倒入金酒','加青柑普洱，吧勺搅匀'],
+   tip:'杜松子的松木香与青柑陈茶香，越喝越顺。'},
+  {n:'椰风金酒', en:'Gin Coconut Cooler', cat:'gin', abv:7, m:'兑和', d:1, c:'#80cbc4',
+   ing:['金酒 30ml','椰子水 120ml','鲜柠檬汁 10ml'],
+   st:['满冰，全部倒入搅匀','柠檬角点缀']},
+  {n:'金西柚', en:'Gin & Grapefruit', cat:'gin', abv:8, m:'兑和', d:1, c:'#ff8a65',
+   ing:['金酒 40ml','水溶C100 西柚味 补满','柠檬角 1个'],
+   st:['满冰，倒入金酒','西柚味C100沿壁补满'],
+   tip:'没有西柚味就换柠檬味C100，一样成立。'},
+  {n:'菊花金', en:'Gin & Chrysanthemum', cat:'gin', abv:8, m:'兑和', d:1, c:'#ffe082',
+   ing:['金酒 30ml','菊花茶 120ml','红石榴风味糖浆 5ml（可选）'],
+   st:['满冰，倒入金酒与菊花茶','红石榴糖浆沿吧勺沉底做渐变'],
+   tip:'菊花的甘香配杜松子，加了红石榴像杯黄昏。'},
+
+  /* ================= 白朗姆 ================= */
+  {n:'快手莫吉托', en:'Quick Mojito', cat:'rum', abv:8, m:'摇和', d:2, c:'#66bb6a',
+   ing:['百加得白朗姆 40ml','莫吉托风味糖浆 20ml','鲜柠檬汁 15ml','泰象苏打水 补满'],
+   st:['朗姆、糖浆、柠檬汁加冰摇 10 秒','滤入满冰的杯中','苏打水补满，轻提拉'],
+   tip:'想升级完全体，买一盒薄荷叶拍两下丢进去。'},
+  {n:'自由古巴', en:'Cuba Libre', cat:'rum', abv:9, m:'兑和', d:1, c:'#a1887f',
+   ing:['白朗姆 45ml','可乐 补满','柠檬角 1个'],
+   st:['满冰，倒入朗姆','可乐补满，柠檬角挤汁投入'],
+   tip:'正宗用青柠；家里用柠檬就多挤半勺。可乐有咖啡因，晚上悠着点。'},
+  {n:'蓝色夏威夷', en:'Blue Hawaii', cat:'rum', abv:8, m:'摇和', d:2, c:'#26c6da',
+   ing:['白朗姆 40ml','蓝橙风味糖浆 15ml','鲜柠檬汁 15ml','雪碧 补满'],
+   st:['前三样加冰摇 12 秒','滤入满冰杯','雪碧补满']},
+  {n:'椰林朗姆', en:'Rum Coconut Cooler', cat:'rum', abv:10, m:'兑和', d:1, c:'#dcedc8',
+   ing:['白朗姆 45ml','椰子水 120ml','鲜柠檬汁 10ml'],
+   st:['满冰，全部倒入搅匀'],
+   tip:'白朗姆与椰子天生一对，柠檬负责不寡淡。'},
+  {n:'葡萄日出', en:'Grape Sunrise', cat:'rum', abv:8, m:'兑和', d:1, c:'#ab47bc',
+   ing:['白朗姆 40ml','元气森林·葡萄气泡水 1瓶','红石榴风味糖浆 10ml'],
+   st:['满冰，倒入朗姆与葡萄气泡','红石榴糖浆沿吧勺背缓缓沉底','别搅拌，让它自然渐变']},
+  {n:'朗姆茉莉', en:'Jasmine Rum', cat:'rum', abv:8, m:'兑和', d:1, c:'#f48fb1',
+   ing:['白朗姆 30ml','东方树叶·茉莉花茶 110ml'],
+   st:['满冰，倒入白朗姆','加茉莉花茶搅匀'],
+   tip:'像一杯液体茉莉奶绿（去掉奶），配晚饭很温柔。'},
+  {n:'朗姆西柚', en:'Rum & Grapefruit', cat:'rum', abv:8, m:'兑和', d:1, c:'#ffab91',
+   ing:['白朗姆 40ml','水溶C100 西柚味 补满','柠檬角 1个'],
+   st:['满冰，倒入朗姆','西柚味C100沿壁补满']},
+
+  /* ================= 伏特加 ================= */
+  {n:'蓝色泻湖', en:'Blue Lagoon', cat:'vodka', abv:7, m:'摇和', d:1, c:'#42a5f5',
+   ing:['绝对伏特加 40ml','蓝橙风味糖浆 15ml','水溶C100 柠檬味 补满'],
+   st:['全部加冰摇 10 秒，滤入杯中','懒人版：直接杯内兑和搅匀'],
+   tip:'用透明玻璃杯装，这抹蓝才值回票价。'},
+  {n:'伏特加汤力', en:'Vodka Tonic', cat:'vodka', abv:9, m:'兑和', d:1, c:'#b3e5fc',
+   ing:['伏特加 45ml','汤力水 补满','柠檬角 1个'],
+   st:['满冰，倒入伏特加','汤力水沿壁补满','柠檬角挤汁投入'],
+   tip:'伏特加干净无个性——喝不出酒味的"度数陷阱"，小心。'},
+  {n:'伪大都会', en:'Faux Cosmo', cat:'vodka', abv:11, m:'摇和', d:2, c:'#ec407a',
+   ing:['伏特加 40ml','红石榴风味糖浆 10ml','水溶C100 西柚味 80ml','鲜柠檬汁 15ml'],
+   st:['全部加冰摇 12 秒','滤入冰镇过的杯','柠檬皮扭香点缀'],
+   tip:'正版是君度+蔓越莓汁，这版能还原七成神韵。'},
+  {n:'极地薄荷', en:'Polar Mint Fizz', cat:'vodka', abv:8, m:'兑和', d:1, c:'#26a69a',
+   ing:['伏特加 40ml','绿薄荷风味糖浆 10ml','雪碧 补满'],
+   st:['满冰，伏特加与薄荷糖浆搅匀','雪碧补满'],
+   tip:'像液态口香糖，饭后一杯超解腻。'},
+  {n:'莫斯科之秋', en:'Moscow Autumn', cat:'vodka', abv:7, m:'兑和', d:1, c:'#a1887f',
+   ing:['伏特加 30ml','东方树叶·青柑普洱 120ml'],
+   st:['满冰，倒入伏特加','加青柑普洱搅匀'],
+   tip:'茶味盖过酒味，几乎无感——请慢喝。'},
+  {n:'椰子伏特加', en:'Coco Vodka', cat:'vodka', abv:8, m:'兑和', d:1, c:'#e6ee9c',
+   ing:['伏特加 40ml','椰子水 130ml','鲜柠檬汁 10ml'],
+   st:['满冰，全部倒入搅匀']},
+  {n:'海风', en:'Sea Breeze', cat:'vodka', abv:8, m:'兑和', d:1, c:'#ff7043',
+   ing:['伏特加 40ml','水溶C100 西柚味 补满','柠檬角 1个'],
+   st:['满冰，倒入伏特加','西柚味C100补满'],
+   tip:'正版配蔓越莓汁；西柚版更苦一点、更"大人"。'},
+  {n:'白雪', en:'Vodka Sprite', cat:'vodka', abv:9, m:'兑和', d:1, c:'#e1f5fe',
+   ing:['伏特加 40ml','雪碧 补满','柠檬角 1个'],
+   st:['满冰，倒入伏特加','雪碧补满，柠檬角投入'],
+   tip:'新手第一杯，永远不会失败。'},
+
+  /* ================= 梅酒 ================= */
+  {n:'梅酒气泡', en:'Ume Spritz', cat:'ume', abv:5, m:'兑和', d:1, c:'#ffcc80',
+   ing:['梅酒 60ml','泰象苏打水 60ml'],
+   st:['满冰，梅酒与苏打 1:1 倒入','轻提拉一下'],
+   tip:'1:1 是黄金比例；想更爽口就 1:1.5。'},
+  {n:'梅酒茉莉', en:'Ume Jasmine', cat:'ume', abv:4, m:'兑和', d:1, c:'#f48fb1',
+   ing:['梅酒 40ml','东方树叶·茉莉花茶 100ml'],
+   st:['满冰，倒入梅酒','加茉莉花茶搅匀'],
+   tip:'全场最温柔的一杯，配晚饭几乎无酒感。'},
+  {n:'梅酒青柑', en:'Ume & Puer', cat:'ume', abv:4, m:'兑和', d:1, c:'#bcaaa4',
+   ing:['梅酒 40ml','东方树叶·青柑普洱 100ml'],
+   st:['满冰，倒入梅酒','加青柑普洱搅匀'],
+   tip:'梅子的酸衬普洱的醇厚，解腻一绝。'},
+  {n:'梅菊饮', en:'Ume Chrysanthemum', cat:'ume', abv:4, m:'兑和', d:1, c:'#ffe0b2',
+   ing:['梅酒 40ml','菊花茶 100ml'],
+   st:['满冰，倒入梅酒','加菊花茶搅匀'],
+   tip:'菊花自带甘甜，不用加任何糖。'},
+  {n:'梅酒汤力', en:'Ume Tonic', cat:'ume', abv:4, m:'兑和', d:1, c:'#80deea',
+   ing:['梅酒 50ml','汤力水 100ml','柠檬角 1个'],
+   st:['满冰，倒入梅酒','汤力水沿壁补满'],
+   tip:'奎宁的微苦把梅酒的甜衬得很高级。'},
+  {n:'椰风梅子', en:'Ume Coconut', cat:'ume', abv:4, m:'兑和', d:1, c:'#dce775',
+   ing:['梅酒 50ml','椰子水 100ml'],
+   st:['满冰，全部倒入搅匀'],
+   tip:'东南亚度假感，丢一片柠檬更清爽。'},
+  {n:'梅酒葡萄', en:'Ume Grape Fizz', cat:'ume', abv:4, m:'兑和', d:1, c:'#ce93d8',
+   ing:['梅酒 50ml','元气森林·葡萄气泡水 补满'],
+   st:['满冰，倒入梅酒','葡萄气泡沿壁补满'],
+   tip:'渐变紫色，先按快门再喝。'},
+  {n:'梅酒纯饮', en:'Ume on the Rocks', cat:'ume', abv:12, m:'兑和', d:1, c:'#ffb74d',
+   ing:['梅酒 90ml','冰块 适量'],
+   st:['老式杯装满冰','缓缓倒入梅酒'],
+   tip:'最简单也最考验梅酒品质；杯口搁一颗盐渍梅子。'},
+
+  /* ================= 白兰地 ================= */
+  {n:'蓝侧车', en:'Blue Sidecar', cat:'cognac', abv:20, m:'摇和', d:3, c:'#7986cb',
+   ing:['马爹利VSOP 45ml','蓝橙风味糖浆 15ml','鲜柠檬汁 20ml'],
+   st:['全部加冰用力摇 15 秒至壶身结霜','双重过滤（滤冰器+细滤网）入冰镇杯','柠檬皮扭香点缀'],
+   tip:'正版用君度；蓝橙糖浆同为橙皮风味——全场最接近酒吧经典的一杯。'},
+  {n:'干邑可乐', en:'Cognac & Cola', cat:'cognac', abv:8, m:'兑和', d:1, c:'#6d4c41',
+   ing:['马爹利VSOP 40ml','可乐 补满','柠檬角 1个'],
+   st:['满冰，倒入干邑','可乐补满，柠檬角挤汁投入'],
+   tip:'法国人的日常喝法；好干邑配可乐不丢人。'},
+  {n:'干邑汤力', en:'Cognac Tonic', cat:'cognac', abv:8, m:'兑和', d:1, c:'#4dd0e1',
+   ing:['干邑 40ml','汤力水 补满','柠檬皮 1条'],
+   st:['满冰，倒入干邑','汤力水沿壁补满','柠檬皮在杯口扭香后投入'],
+   tip:'西班牙酒吧的经典组合；柠檬皮务必扭一下。'},
+  {n:'干邑青柑', en:'Cognac & Puer', cat:'cognac', abv:5, m:'兑和', d:1, c:'#bcaaa4',
+   ing:['干邑 20ml','东方树叶·青柑普洱 130ml'],
+   st:['满冰，倒入干邑','加青柑普洱搅匀'],
+   tip:'茶酒同源：干邑的果香与青柑普洱的陈韵互相托底。'},
+  {n:'干邑菊花', en:'Cognac Chrysanthemum', cat:'cognac', abv:5, m:'兑和', d:1, c:'#ffccbc',
+   ing:['干邑 20ml','菊花茶 130ml','红石榴风味糖浆 5ml（可选）'],
+   st:['满冰，倒入干邑','加菊花茶搅匀']},
+
+  /* ================= 无酒精 ================= */
+  {n:'无酒精莫吉托', en:'Virgin Mojito', cat:'mock', abv:0, m:'兑和', d:1, c:'#81c784',
+   ing:['莫吉托风味糖浆 25ml','鲜柠檬汁 15ml','泰象苏打水 补满'],
+   st:['满冰，糖浆与柠檬汁搅匀','苏打补满','柠檬角点缀']},
+  {n:'雪莉坦普', en:'Shirley Temple', cat:'mock', abv:0, m:'兑和', d:1, c:'#ef5350',
+   ing:['红石榴风味糖浆 15ml','雪碧 补满','柠檬角 1个'],
+   st:['满冰，倒入红石榴糖浆','雪碧补满，柠檬角挤汁'],
+   tip:'1930年代好莱坞童星同款，最经典的无酒精鸡尾酒。'},
+  {n:'维珍蓝色夏威夷', en:'Virgin Blue Hawaii', cat:'mock', abv:0, m:'兑和', d:1, c:'#29b6f6',
+   ing:['蓝橙风味糖浆 15ml','鲜柠檬汁 10ml','雪碧 补满'],
+   st:['满冰，糖浆与柠檬汁搅匀','雪碧补满']},
+  {n:'薄荷雪碧', en:'Virgin Mint Fizz', cat:'mock', abv:0, m:'兑和', d:1, c:'#26a69a',
+   ing:['绿薄荷风味糖浆 10ml','雪碧 补满','柠檬角 1个'],
+   st:['满冰，倒入薄荷糖浆','雪碧补满']},
+  {n:'维珍葡萄日出', en:'Virgin Grape Sunrise', cat:'mock', abv:0, m:'兑和', d:1, c:'#ab47bc',
+   ing:['元气森林·葡萄气泡水 1瓶','红石榴风味糖浆 10ml'],
+   st:['满冰，倒入葡萄气泡','红石榴糖浆沿吧勺沉底成渐变']}
+];
+
+/* ---------- 渲染逻辑 ---------- */
+const state = {cat:'all', abv:'all', q:''};
+
+function abvInfo(a){
+  if(a === 0)  return {t:'0% 无酒精', cls:'none'};
+  if(a <= 6)   return {t:'低度 ≈' + a + '%', cls:'low'};
+  if(a <= 12)  return {t:'中度 ≈' + a + '%', cls:'mid'};
+  return {t:'较烈 ≈' + a + '%', cls:'strong'};
+}
+
+function cardHTML(d){
+  const cat = CATS[d.cat];
+  const a = abvInfo(d.abv);
+  const stars = '★'.repeat(d.d) + '☆'.repeat(3 - d.d);
+  return `
+  <article class="card" style="--c:${d.c}">
+    <div class="strip"></div>
+    <div class="chead">
+      <div><h3>${d.n}</h3><span class="en">${d.en}</span></div>
+      <span class="stars" title="难度">${stars}</span>
+    </div>
+    <div class="badges">
+      <span class="pill cat">${cat.label}</span>
+      <span class="pill ${a.cls}">${a.t}</span>
+      <span class="pill dim">${d.m}</span>
+    </div>
+    <div class="sec"><h4>配方</h4><ul>${d.ing.map(i=>`<li>${i}</li>`).join('')}</ul></div>
+    ${d.st && d.st.length ? `<div class="sec"><h4>做法</h4><ol>${d.st.map(s=>`<li>${s}</li>`).join('')}</ol></div>` : ''}
+    ${d.tip ? `<p class="tip">💡 ${d.tip}</p>` : ''}
+  </article>`;
+}
+
+function render(){
+  const list = DRINKS.filter(d=>{
+    if(state.cat !== 'all' && d.cat !== state.cat) return false;
+    if(state.abv === 'zero'  && d.abv !== 0) return false;
+    if(state.abv === 'low'   && (d.abv === 0 || d.abv > 6)) return false;
+    if(state.abv === 'mid'   && (d.abv < 7 || d.abv > 12)) return false;
+    if(state.abv === 'strong'&& d.abv <= 12) return false;
+    if(state.q){
+      const hay = (d.n + d.en + d.ing.join('')).toLowerCase();
+      if(!hay.includes(state.q)) return false;
+    }
+    return true;
+  });
+  document.getElementById('grid').innerHTML =
+    list.map(cardHTML).join('') || '<div class="empty">这个组合下没有酒款——换个筛选试试 🥃</div>';
+  document.getElementById('count').textContent = `当前 ${list.length} / ${DRINKS.length} 款`;
+}
+
+document.getElementById('catChips').addEventListener('click', e=>{
+  const b = e.target.closest('.chip'); if(!b) return;
+  document.querySelectorAll('#catChips .chip').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');
+  state.cat = b.dataset.cat; render();
+});
+document.querySelectorAll('[data-abv]').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    document.querySelectorAll('[data-abv]').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    state.abv = b.dataset.abv; render();
+  });
+});
+document.getElementById('q').addEventListener('input', e=>{
+  state.q = e.target.value.trim().toLowerCase(); render();
+});
+
+document.getElementById('totalN').textContent = DRINKS.length;
+render();
+</script>
+</body>
+</html>
