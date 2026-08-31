@@ -88,6 +88,12 @@
   .pill.mid{color:#fbbf24;background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.35)}
   .pill.strong{color:#f87171;background:rgba(248,113,113,.1);border-color:rgba(248,113,113,.35)}
   .pill.none{color:#38bdf8;background:rgba(56,189,248,.1);border-color:rgba(56,189,248,.35)}
+  .pill.t-classic{color:#e2b04a;background:rgba(226,176,74,.1);border-color:rgba(226,176,74,.4)}
+  .pill.t-adapt{color:#7fb4ff;background:rgba(127,180,255,.1);border-color:rgba(127,180,255,.4)}
+  .pill.t-original{color:#b9c2cf;background:rgba(185,194,207,.08);border-color:rgba(185,194,207,.35)}
+  .legend{margin-top:12px;font-size:12.5px;color:var(--muted)}
+  .legend b{font-weight:600}
+  .legend i{font-style:normal;margin:0 8px;opacity:.4}
   .sec h4{font-size:12px;color:#6b7280;letter-spacing:.25em;margin-bottom:6px;font-weight:600}
   .sec ul{list-style:none}
   .sec li{font-size:13.5px;padding:2.5px 0;display:flex;gap:8px}
@@ -133,6 +139,7 @@
     <div class="kicker">Home Bar Menu</div>
     <h1>家 庭 酒 单</h1>
     <div class="sub">基于你的库存生成的 <b id="totalN">41</b> 款调酒 · 度数为估算值 · 无口味筛选，全都在这儿</div>
+    <div class="legend" id="legend"></div>
     <div class="divider"></div>
   </header>
 
@@ -247,7 +254,7 @@ const DRINKS = [
   {n:'金西柚', en:'Gin & Grapefruit', cat:'gin', abv:8, m:'兑和', d:1, c:'#ff8a65',
    ing:['金酒 40ml','水溶C100 西柚味 补满','柠檬角 1个'],
    st:['满冰，倒入金酒','西柚味C100沿壁补满'],
-   tip:'没有西柚味就换柠檬味C100，一样成立。'},
+   tip:'灰狗（Greyhound）的金酒版；没有西柚味就换柠檬味C100，一样成立。'},
   {n:'菊花金', en:'Gin & Chrysanthemum', cat:'gin', abv:8, m:'兑和', d:1, c:'#ffe082',
    ing:['金酒 30ml','菊花茶 120ml','红石榴风味糖浆 5ml（可选）'],
    st:['满冰，倒入金酒与菊花茶','红石榴糖浆沿吧勺沉底做渐变'],
@@ -264,7 +271,8 @@ const DRINKS = [
    tip:'正宗用青柠；家里用柠檬就多挤半勺。可乐有咖啡因，晚上悠着点。'},
   {n:'蓝色夏威夷', en:'Blue Hawaii', cat:'rum', abv:8, m:'摇和', d:2, c:'#26c6da',
    ing:['白朗姆 40ml','蓝橙风味糖浆 15ml','鲜柠檬汁 15ml','雪碧 补满'],
-   st:['前三样加冰摇 12 秒','滤入满冰杯','雪碧补满']},
+   st:['前三样加冰摇 12 秒','滤入满冰杯','雪碧补满'],
+   tip:'1957 年原版（Harry Yee）含菠萝汁和伏特加，这版是用现有库存做的简化家用版。'},
   {n:'椰林朗姆', en:'Rum Coconut Cooler', cat:'rum', abv:10, m:'兑和', d:1, c:'#dcedc8',
    ing:['白朗姆 45ml','椰子水 120ml','鲜柠檬汁 10ml'],
    st:['满冰，全部倒入搅匀'],
@@ -304,10 +312,10 @@ const DRINKS = [
   {n:'椰子伏特加', en:'Coco Vodka', cat:'vodka', abv:8, m:'兑和', d:1, c:'#e6ee9c',
    ing:['伏特加 40ml','椰子水 130ml','鲜柠檬汁 10ml'],
    st:['满冰，全部倒入搅匀']},
-  {n:'海风', en:'Sea Breeze', cat:'vodka', abv:8, m:'兑和', d:1, c:'#ff7043',
+  {n:'灰狗', en:'Greyhound', cat:'vodka', abv:8, m:'兑和', d:1, c:'#ff7043',
    ing:['伏特加 40ml','水溶C100 西柚味 补满','柠檬角 1个'],
    st:['满冰，倒入伏特加','西柚味C100补满'],
-   tip:'正版配蔓越莓汁；西柚版更苦一点、更"大人"。'},
+   tip:'经典配方只需伏特加 + 西柚汁；用鲜榨西柚更正宗，杯口抹盐圈就变成"咸狗" Salty Dog。'},
   {n:'白雪', en:'Vodka Sprite', cat:'vodka', abv:9, m:'兑和', d:1, c:'#e1f5fe',
    ing:['伏特加 40ml','雪碧 补满','柠檬角 1个'],
    st:['满冰，倒入伏特加','雪碧补满，柠檬角投入'],
@@ -387,6 +395,25 @@ const DRINKS = [
    st:['满冰，倒入葡萄气泡','红石榴糖浆沿吧勺沉底成渐变']}
 ];
 
+/* ---------- 经典 / 改编 / 原创 标注 ----------
+   经典：遵循国际通行配方（IBA 酒谱或广泛标准做法）
+   改编：有经典出处，但用库存材料做了替代或简化
+   原创：按配对原理现调的家用特调，无经典出处      */
+const TAG_META = {
+  classic:{label:'经典', cls:'t-classic'},
+  adapt:{label:'改编', cls:'t-adapt'},
+  original:{label:'原创', cls:'t-original'}
+};
+const DRINK_TAG = {
+  '金汤力':'classic','自由古巴':'classic','伏特加汤力':'classic','灰狗':'classic',
+  '梅酒气泡':'classic','梅酒纯饮':'classic','无酒精莫吉托':'classic','雪莉坦普':'classic',
+  '蓝色珊瑚礁':'adapt','茉莉金汤力':'adapt','南区菲士':'adapt','金西柚':'adapt',
+  '快手莫吉托':'adapt','蓝色夏威夷':'adapt','葡萄日出':'adapt',
+  '蓝色泻湖':'adapt','伪大都会':'adapt','维珍蓝色夏威夷':'adapt','维珍葡萄日出':'adapt',
+  '蓝侧车':'adapt','干邑可乐':'adapt','干邑汤力':'adapt'
+};
+DRINKS.forEach(d => d.tag = DRINK_TAG[d.n] || 'original');
+
 /* ---------- 渲染逻辑 ---------- */
 const state = {cat:'all', abv:'all', q:''};
 
@@ -412,6 +439,7 @@ function cardHTML(d){
       <span class="pill cat">${cat.label}</span>
       <span class="pill ${a.cls}">${a.t}</span>
       <span class="pill dim">${d.m}</span>
+      <span class="pill ${TAG_META[d.tag].cls}">${TAG_META[d.tag].label}</span>
     </div>
     <div class="sec"><h4>配方</h4><ul>${d.ing.map(i=>`<li>${i}</li>`).join('')}</ul></div>
     ${d.st && d.st.length ? `<div class="sec"><h4>做法</h4><ol>${d.st.map(s=>`<li>${s}</li>`).join('')}</ol></div>` : ''}
@@ -455,6 +483,14 @@ document.getElementById('q').addEventListener('input', e=>{
 });
 
 document.getElementById('totalN').textContent = DRINKS.length;
+(function legend(){
+  const c = {classic:0, adapt:0, original:0};
+  DRINKS.forEach(d => c[d.tag]++);
+  document.getElementById('legend').innerHTML =
+    '🏅 <b style="color:#e2b04a">经典 ×' + c.classic + '</b>（遵循国际通行配方）' +
+    '<i>|</i>🔧 <b style="color:#7fb4ff">改编 ×' + c.adapt + '</b>（经典结构 + 库存替代）' +
+    '<i>|</i>✨ <b style="color:#b9c2cf">原创 ×' + c.original + '</b>（按配对原理现调的家用特调）';
+})();
 render();
 </script>
 </body>
