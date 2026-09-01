@@ -5,7 +5,7 @@
  */
 import { ref, computed, onMounted } from 'vue'
 import { supabase } from '../../lib/supabase'
-import { totalLessons } from '../../lib/curriculum'
+import { totalLessons, publicLessonIds } from '../../lib/curriculum'
 import { modalConfirm, modalAlert } from '../../lib/modal'
 
 const loading = ref(true)
@@ -26,12 +26,12 @@ async function loadData() {
   members.value = all.filter((p) => p.is_member)
   nonMembers.value = all.filter((p) => !p.is_member).length
 
-  // 完课率对比
+  // 完课率对比（分子只算入门主课，与 totalLessons 分母同口径）
   const { data: allProgress } = await supabase
     .from('progress')
-    .select('user_id, completed')
+    .select('user_id, lesson_id, completed')
   const userCounts = {}
-  ;(allProgress || []).filter((p) => p.completed).forEach((p) => {
+  ;(allProgress || []).filter((p) => p.completed && publicLessonIds.has(p.lesson_id)).forEach((p) => {
     userCounts[p.user_id] = (userCounts[p.user_id] || 0) + 1
   })
   const memberIds = new Set(members.value.map((m) => m.id))

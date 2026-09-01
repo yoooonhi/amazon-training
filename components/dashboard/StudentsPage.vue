@@ -8,7 +8,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { supabase } from '../../lib/supabase'
 import { LEVELS, isMentorRole, PUBLIC_PLAYBOOK_SLUGS } from '../../lib/accessControl'
-import { totalLessons, getLessonLabel, PLAYBOOK_SLUGS } from '../../lib/curriculum'
+import { totalLessons, getLessonLabel, PLAYBOOK_SLUGS, publicLessonIds } from '../../lib/curriculum'
 import { modalConfirm, modalAlert } from '../../lib/modal'
 
 const GRANTABLE_LEVELS = LEVELS.filter((l) => l !== '入门')
@@ -90,6 +90,9 @@ async function loadData() {
   students.value = profiles.map((p) => {
     const prog =
       allProgress?.filter((x) => x.user_id === p.id && x.completed) || []
+    // 完成率分子与分母同口径：只统计入门主课（totalLessons 只含入门）。
+    // 技能课等完成记录不进百分比，但保留在详情完成列表与活跃度计算里。
+    const mainDone = prog.filter((x) => publicLessonIds.has(x.lesson_id))
     const checkins = allCheckins?.filter((x) => x.user_id === p.id) || []
     const quizzes = allQuiz?.filter((x) => x.user_id === p.id) || []
     const quizCorrect = quizzes.filter((x) => x.is_correct).length
@@ -112,8 +115,8 @@ async function loadData() {
       : null
     return {
       profile: p,
-      progressCount: prog.length,
-      percent: Math.round((prog.length / totalLessons) * 100),
+      progressCount: mainDone.length,
+      percent: Math.round((mainDone.length / totalLessons) * 100),
       checkinDays: checkins.length,
       streak,
       quizCorrect,

@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { supabase, authState } from '../lib/supabase'
-import { curriculum, totalLessons } from '../lib/curriculum'
+import { curriculum, totalLessons, publicLessonIds } from '../lib/curriculum'
 import { isMentorRole, isLevelAccessible } from '../lib/accessControl'
 
 const START_KEY = 'amazon-training-start-date'
@@ -22,7 +22,10 @@ const visibleCurriculum = computed(() => {
   return curriculum.filter(w => isLevelAccessible(w.level, role.value, accessLevels.value))
 })
 
-const completedCount = computed(() => Object.values(progress.value).filter(v => v.completed).length)
+// 总完成数与 totalLessons 分母同口径：只数入门主课，技能课等不计入，避免超过 100%
+const completedCount = computed(() =>
+  Object.entries(progress.value).filter(([id, v]) => v.completed && publicLessonIds.has(id)).length
+)
 const overallPercent = computed(() => Math.round((completedCount.value / totalLessons) * 100))
 
 function weekPercent(weekLessons) {

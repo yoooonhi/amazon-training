@@ -7,7 +7,7 @@
  */
 import { ref, computed, onMounted } from 'vue'
 import { supabase } from '../../lib/supabase'
-import { totalLessons, getLessonLabel } from '../../lib/curriculum'
+import { totalLessons, getLessonLabel, publicLessonIds } from '../../lib/curriculum'
 
 const loading = ref(true)
 const overallCorrectRate = ref(0)
@@ -69,9 +69,9 @@ async function loadData() {
     .select('user_id, lesson_id, completed, completed_at')
   const completed = (allProgress || []).filter((p) => p.completed)
 
-  // 完课率分布
+  // 完课率分布（分子只算入门主课，与 totalLessons 分母同口径；每日趋势仍按全部完成记录算活跃）
   const userCounts = {}
-  completed.forEach((p) => {
+  completed.filter((p) => publicLessonIds.has(p.lesson_id)).forEach((p) => {
     userCounts[p.user_id] = (userCounts[p.user_id] || 0) + 1
   })
   const dist = { p0: 0, p25: 0, p50: 0, p75: 0 }

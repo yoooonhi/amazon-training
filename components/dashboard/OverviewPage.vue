@@ -7,7 +7,7 @@
  */
 import { ref, computed, onMounted } from 'vue'
 import { supabase } from '../../lib/supabase'
-import { totalLessons } from '../../lib/curriculum'
+import { totalLessons, publicLessonIds } from '../../lib/curriculum'
 
 const loading = ref(true)
 const totalStudents = ref(0)
@@ -67,13 +67,17 @@ async function loadData() {
   // progress（算活跃+转化）
   const { data: allProgress } = await supabase
     .from('progress')
-    .select('user_id, completed, completed_at')
+    .select('user_id, lesson_id, completed, completed_at')
   const todayKey = localDayKey(0)
   const activeUsers = new Set()
-  const userCompleted = {} // {userId: count}
+  const userCompleted = {} // {userId: count}（全部完成记录，算活跃/停滞用）
+  const userMainCompleted = {} // {userId: count}（仅入门主课，与 totalLessons 同口径）
   ;(allProgress || []).forEach((p) => {
     if (p.completed) {
       userCompleted[p.user_id] = (userCompleted[p.user_id] || 0) + 1
+      if (publicLessonIds.has(p.lesson_id)) {
+        userMainCompleted[p.user_id] = (userMainCompleted[p.user_id] || 0) + 1
+      }
       if (toLocalDateStr(p.completed_at) === todayKey) {
         activeUsers.add(p.user_id)
       }
@@ -81,7 +85,7 @@ async function loadData() {
   })
   activeToday.value = activeUsers.size
   startedLearning.value = Object.keys(userCompleted).length
-  completedHalf.value = Object.values(userCompleted).filter(
+  completedHalf.value = Object.values(userMainCompleted).filter(
     (c) => c >= totalLessons / 2
   ).length
 

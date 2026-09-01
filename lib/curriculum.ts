@@ -210,6 +210,10 @@ export const publicLessons = curriculum
 // totalLessons 用于进度分母：保持为入门课数量，避免普通学员看到分母变大
 export const totalLessons = publicLessons.length
 
+// 进度统计的分子口径：仅入门主课（与 totalLessons 分母一致）。
+// 技能课等其余完成记录不计入完成率，避免出现 >100% 的进度。
+export const publicLessonIds = new Set<string>(publicLessons)
+
 // URL 路径 → lessonId 的权威映射表
 // lessonId 命名规则在模块间不统一（m1-m4 用纯课号 m4-04，m5-m7 带完整文件名），
 // 无法靠字符串推导，只能用显式映射。由构建脚本扫描各 .md 的 lessonId 生成。
