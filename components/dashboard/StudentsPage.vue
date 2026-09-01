@@ -7,7 +7,7 @@
  */
 import { ref, computed, onMounted } from 'vue'
 import { supabase } from '../../lib/supabase'
-import { LEVELS, isMentorRole } from '../../lib/accessControl'
+import { LEVELS, isMentorRole, PUBLIC_PLAYBOOK_SLUGS } from '../../lib/accessControl'
 import { totalLessons, getLessonLabel, PLAYBOOK_SLUGS } from '../../lib/curriculum'
 import { modalConfirm, modalAlert } from '../../lib/modal'
 
@@ -565,13 +565,14 @@ onMounted(async () => {
       </div>
     </div>
 
-    <!-- 实战手册授权 -->
+    <!-- 实战手册授权（PUBLIC_PLAYBOOK_SLUGS 里的手册登录即可访问，无需授权，显示为默认开放） -->
     <div class="access-panel">
       <h3>📘 实战手册授权</h3>
       <div class="access-toggles">
         <div v-for="pb in PLAYBOOK_SLUGS" :key="pb.slug" class="access-toggle-item">
           <span class="access-level-name">{{ pb.title }}</span>
-          <button class="access-switch" :class="{ on: selectedStudent.playbookAccess.includes(pb.slug) }" :disabled="playbookBusy" @click="togglePlaybook(selectedStudent, pb.slug, pb.title)">
+          <span v-if="PUBLIC_PLAYBOOK_SLUGS.includes(pb.slug)" class="access-status always-on">登录即可访问</span>
+          <button v-else class="access-switch" :class="{ on: selectedStudent.playbookAccess.includes(pb.slug) }" :disabled="playbookBusy" @click="togglePlaybook(selectedStudent, pb.slug, pb.title)">
             {{ selectedStudent.playbookAccess.includes(pb.slug) ? '已授权 ✓' : '未授权' }}
           </button>
         </div>
