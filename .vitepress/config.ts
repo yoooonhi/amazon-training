@@ -445,10 +445,10 @@ export default defineConfig({
             { text: '第1节 · 完整自查清单（七大模块）', link: '/content/playbooks/beginner-self-check/01-checklist' },
           ],
         },
-        // ===== 进出口权资质（海关备案）（9810） =====
+        // ===== 亚马逊9810自营出口实操课 =====
         // 深圳注册、深圳经营、深圳制卡、深圳口岸出口的完整合规流程。
         {
-          text: '进出口权资质（海关备案）（9810）',
+          text: '亚马逊9810自营出口实操课',
           collapsed: true,
           items: [
             { text: '课程首页 · 完整办理路线', link: '/content/playbooks/import-export-9810/' },

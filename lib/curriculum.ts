@@ -390,7 +390,7 @@ export const pathToLessonId: Record<string, string> = {
   // ===== 小白入门水平自测（与 ops-experience 同级同权限）=====
   'beginner-self-check/index': 'pb-self-00',
   'beginner-self-check/01-checklist': 'pb-self-01',
-  // ===== 进出口权资质（海关备案）（9810）=====
+  // ===== 亚马逊9810自营出口实操课 =====
   'import-export-9810/index': 'pb-trade-00',
   'import-export-9810/01-preparation': 'pb-trade-01',
   'import-export-9810/02-customs-filing': 'pb-trade-02',
@@ -440,8 +440,8 @@ export const playbookLessons: { lessonId: string; title: string }[] = [
   // ===== 小白入门水平自测（与 ops-experience 同级同权限）=====
   { lessonId: 'pb-self-00', title: '小白入门水平自测 · 首页' },
   { lessonId: 'pb-self-01', title: '第1节 · 完整自查清单（七大模块）' },
-  // ===== 进出口权资质（海关备案）（9810）=====
-  { lessonId: 'pb-trade-00', title: '进出口权资质（海关备案）（9810）· 首页' },
+  // ===== 亚马逊9810自营出口实操课 =====
+  { lessonId: 'pb-trade-00', title: '亚马逊9810自营出口实操课 · 首页' },
   { lessonId: 'pb-trade-01', title: '第1节 · 开始前准备' },
   { lessonId: 'pb-trade-02', title: '第2节 · 海关备案' },
   { lessonId: 'pb-trade-03', title: '第3节 · 深圳电子口岸制卡' },
@@ -459,7 +459,7 @@ export const PLAYBOOK_SLUGS: { slug: string; title: string; price: string }[] = 
   { slug: 'ads-16-tactics', title: '广告打法手册', price: '2.99' },
   { slug: 'ops-experience', title: '「真实」运营实战经验', price: '3.99' },
   { slug: 'beginner-self-check', title: '小白入门水平自测', price: '0' },
-  { slug: 'import-export-9810', title: '进出口权资质（海关备案）（9810）', price: '9.99' },
+  { slug: 'import-export-9810', title: '亚马逊9810自营出口实操课', price: '9.99' },
 ]
 
 // 课程内容的目录前缀（getLessonIdByPath 用）
