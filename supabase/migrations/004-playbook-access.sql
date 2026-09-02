@@ -48,7 +48,16 @@ begin
       end if;
     end if;
 
-    -- 1. 实战手册：管理员全开，否则查 playbook_access 是否授权了对应手册
+    -- 1. 9810 课程试读：课程首页和第 1 节为登录免费内容
+    --    与 lib/accessControl.ts 的 PUBLIC_PLAYBOOK_PATHS 保持一致。
+    if path_text in (
+      'playbooks/import-export-9810/index.md',
+      'playbooks/import-export-9810/01-preparation.md'
+    ) then
+      return user_uid is not null;
+    end if;
+
+    -- 2. 其余实战手册：管理员全开，否则查 playbook_access 是否授权了对应手册
     if path_text like 'playbooks/%' then
       if (v_role = 'mentor' or v_role = 'admin') then
         return true;
@@ -65,7 +74,7 @@ begin
       return coalesce(v_has_pb, false);
     end if;
 
-    -- 2. 主课程五级
+    -- 3. 主课程五级
     if path_text like 'modules/%' then
       return true;
     end if;
@@ -86,7 +95,7 @@ begin
       return '进阶' = any(v_access_levels);
     end if;
 
-    -- 3. 技能补给站
+    -- 4. 技能补给站
     if path_text like 'skills/%' then
       if (v_role = 'mentor' or v_role = 'admin') then return true; end if;
       -- 提取 slug 并去掉 .md 后缀（skills/excel-for-ops.md → excel-for-ops）

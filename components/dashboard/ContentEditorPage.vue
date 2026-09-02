@@ -42,6 +42,14 @@ const originalContent = ref('') // 保存时的原始内容，用于判断是否
 const showPreview = ref(true)
 const errorMsg = ref('')
 
+// 管理员可直接把新课程的 Markdown 批量导入 Storage，
+// 避免新课程已上线、但“内容编辑”没有同步的情况再次发生。
+const showImportPanel = ref(false)
+const importPrefix = ref('playbooks/import-export-9810')
+const importFiles = ref([])
+const importInputRef = ref(null)
+const importing = ref(false)
+
 // ===== 优化：搜索 + 分组折叠 =====
 const searchQuery = ref('')
 const collapsedGroups = ref(new Set()) // 折叠的分组 key
@@ -67,8 +75,8 @@ function refreshDraftPaths() {
 // 目录路径 → 中文名称映射（左侧分组标题用）
 // 支持嵌套路径：先精确匹配，再按顶层目录匹配
 const GROUP_LABELS = {
-  // 实战手册（当前只有广告打法手册一套）
-  'playbooks': '广告打法手册',
+  // 实战课程与手册
+  'playbooks': '实战课程与手册',
   // 主课程五级（扁平结构：beginner/xxx.md）
   'beginner': '初级课程',
   'intermediate': '中级课程',
@@ -156,6 +164,78 @@ async function loadFileList() {
   files.value = [...allFiles]
   refreshDraftPaths()
   loading.value = false
+}
+
+function onImportFilesSelected(event) {
+  importFiles.value = Array.from(event.target.files || []).filter((file) =>
+    file.name.toLowerCase().endsWith('.md')
+  )
+}
+
+function normalizeImportPrefix(value) {
+  return value.trim().replace(/^\/+|\/+$/g, '').replace(/\/+/g, '/')
+}
+
+async function importMarkdownFiles() {
+  if (importing.value || importFiles.value.length === 0) return
+  const importCount = importFiles.value.length
+  const prefix = normalizeImportPrefix(importPrefix.value)
+  if (!prefix || prefix.includes('..')) {
+    await modalAlert('请填写有效的远程目录，例如 playbooks/import-export-9810', '导入课程')
+    return
+  }
+  const duplicateNames = importFiles.value
+    .map((file) => file.name)
+    .filter((name, index, names) => names.indexOf(name) !== index)
+  if (duplicateNames.length) {
+    await modalAlert(`文件名重复：${[...new Set(duplicateNames)].join('、')}`, '导入课程')
+    return
+  }
+  const ok = await modalConfirm(
+    `将 ${importFiles.value.length} 个 Markdown 文件导入到\n${prefix}/\n\n同名文件会被覆盖，是否继续？`,
+    '导入课程'
+  )
+  if (!ok) return
+
+  importing.value = true
+  errorMsg.value = ''
+  try {
+    const { data: sessionData } = await supabase.auth.getSession()
+    const token = sessionData?.session?.access_token
+    if (!token) {
+      await modalAlert('登录状态已失效，请重新登录后再试。', '导入失败')
+      return
+    }
+
+    const failures = []
+    for (const file of importFiles.value) {
+      const storagePath = `${prefix}/${file.name}`
+      const response = await fetch(`${supabaseUrl}/storage/v1/object/${BUCKET}/${storagePath}`, {
+        method: 'POST',
+        headers: {
+          apikey: supabaseAnonKey,
+          authorization: `Bearer ${token}`,
+          'Content-Type': 'text/markdown; charset=utf-8',
+          'x-upsert': 'true',
+        },
+        body: file,
+      })
+      if (!response.ok) failures.push(`${file.name}（HTTP ${response.status}）`)
+    }
+
+    if (failures.length) {
+      await modalAlert(`导入失败 ${failures.length} 个：\n${failures.join('\n')}`, '导入未完成')
+      return
+    }
+
+    await loadFileList()
+    showImportPanel.value = false
+    importFiles.value = []
+    if (importInputRef.value) importInputRef.value.value = ''
+    await modalAlert(`已导入 ${importCount} 个文件，课程现已出现在左侧列表。`, '导入完成')
+  } finally {
+    importing.value = false
+  }
 }
 
 // 按顶层目录分组（左侧导航用），分组标题用中文
@@ -503,7 +583,37 @@ onBeforeUnmount(() => {
     <aside class="ce-sidebar">
       <div class="ce-sidebar-head">
         <h3>课程内容</h3>
-        <button class="ce-refresh-btn" @click="loadFileList" :disabled="loading" title="刷新文件列表">↻</button>
+        <div class="ce-sidebar-actions">
+          <button class="ce-import-toggle" @click="showImportPanel = !showImportPanel" :class="{ active: showImportPanel }" title="批量导入 Markdown">导入</button>
+          <button class="ce-refresh-btn" @click="loadFileList" :disabled="loading" title="刷新文件列表">↻</button>
+        </div>
+      </div>
+
+      <div v-if="showImportPanel" class="ce-import-panel">
+        <label>远程目录</label>
+        <input
+          v-model="importPrefix"
+          class="ce-import-prefix"
+          placeholder="playbooks/课程-slug"
+          spellcheck="false"
+        />
+        <label class="ce-file-picker">
+          <span>{{ importFiles.length ? `已选 ${importFiles.length} 个 Markdown` : '选择 Markdown 文件' }}</span>
+          <input
+            ref="importInputRef"
+            type="file"
+            accept=".md,text/markdown"
+            multiple
+            @change="onImportFilesSelected"
+          />
+        </label>
+        <button
+          class="ce-import-submit"
+          :disabled="importing || importFiles.length === 0"
+          @click="importMarkdownFiles"
+        >
+          {{ importing ? '导入中…' : '确认导入' }}
+        </button>
       </div>
 
       <!-- 搜索框 -->
@@ -646,6 +756,26 @@ onBeforeUnmount(() => {
   font-weight: 600;
   color: var(--vp-c-text-1);
 }
+.ce-sidebar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.ce-import-toggle {
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 6px;
+  padding: 0.22rem 0.5rem;
+  background: transparent;
+  color: var(--vp-c-text-2);
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+.ce-import-toggle:hover,
+.ce-import-toggle.active {
+  border-color: var(--vp-c-brand-1);
+  color: var(--vp-c-brand-1);
+  background: var(--vp-c-brand-soft, rgba(99, 102, 241, 0.08));
+}
 .ce-refresh-btn {
   background: transparent;
   border: 1px solid var(--vp-c-divider);
@@ -662,6 +792,69 @@ onBeforeUnmount(() => {
 }
 .ce-refresh-btn:disabled {
   opacity: 0.5;
+  cursor: not-allowed;
+}
+.ce-import-panel {
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.7rem 0.75rem;
+  border-bottom: 1px solid var(--vp-c-divider);
+  background: var(--vp-c-bg-alt);
+}
+.ce-import-panel label {
+  color: var(--vp-c-text-3);
+  font-size: 0.68rem;
+  font-weight: 600;
+}
+.ce-import-prefix {
+  width: 100%;
+  padding: 0.42rem 0.55rem;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 7px;
+  background: var(--vp-c-bg);
+  color: var(--vp-c-text-1);
+  font: 0.7rem 'SF Mono', Menlo, Consolas, monospace;
+}
+.ce-import-prefix:focus {
+  outline: none;
+  border-color: var(--vp-c-brand-1);
+}
+.ce-file-picker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 0.45rem;
+  border: 1px dashed var(--vp-c-divider);
+  border-radius: 7px;
+  background: var(--vp-c-bg);
+  color: var(--vp-c-text-2) !important;
+  cursor: pointer;
+  text-align: center;
+}
+.ce-file-picker:hover {
+  border-color: var(--vp-c-brand-1);
+  color: var(--vp-c-brand-1) !important;
+}
+.ce-file-picker input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+.ce-import-submit {
+  padding: 0.42rem 0.6rem;
+  border: none;
+  border-radius: 7px;
+  background: var(--vp-c-brand-1);
+  color: #fff;
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.ce-import-submit:disabled {
+  opacity: 0.45;
   cursor: not-allowed;
 }
 .ce-empty {
