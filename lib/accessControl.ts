@@ -205,14 +205,32 @@ export function extractPlaybookSlug(path: string): string | null {
  * - 管理员（mentor / admin）：所有手册全开
  * - 普通用户：仅当 profile.playbookAccess 里包含该手册 slug 时放行
  *
- * 特例：PUBLIC_PLAYBOOK_SLUGS 里的手册走「登录可见」——
- * 任意已登录用户都能看（无需单独授权），未登录游客拦截。
+ * 特例：PUBLIC_PLAYBOOK_SLUGS 里的整本手册，以及 PUBLIC_PLAYBOOK_PATHS
+ * 里的指定试听页面走「登录可见」——任意已登录用户都能看（无需单独授权），
+ * 未登录游客拦截。
  * 例：小白入门水平自测（beginner-self-check）作为免费自检工具，登录即可用。
  *
  * @param path 当前页面路径（用于定位是哪本手册）
  * @param profile 用户 profile（含 role、playbookAccess）
  */
 export const PUBLIC_PLAYBOOK_SLUGS = ['beginner-self-check']
+
+// 付费手册中的登录免费试听页面。只放行这些精确页面，不放行同手册其他章节。
+export const PUBLIC_PLAYBOOK_PATHS = [
+  '/content/playbooks/import-export-9810',
+  '/content/playbooks/import-export-9810/01-preparation',
+]
+
+function normalizePlaybookPath(path: string): string {
+  return (path || '')
+    .split(/[?#]/)[0]
+    .replace(/\/index\/?$/, '')
+    .replace(/\/+$/, '')
+}
+
+export function isPublicPlaybookPath(path: string): boolean {
+  return PUBLIC_PLAYBOOK_PATHS.includes(normalizePlaybookPath(path))
+}
 
 export function isPlaybookAccessible(
   path: string,
@@ -223,6 +241,10 @@ export function isPlaybookAccessible(
   if (!slug) return false
   // 登录可见的手册：任意已登录用户放行
   if (PUBLIC_PLAYBOOK_SLUGS.includes(slug)) {
+    return !!profile?.role
+  }
+  // 付费手册中的指定试听页面：登录即可访问，不要求整本手册授权。
+  if (isPublicPlaybookPath(path)) {
     return !!profile?.role
   }
   return (profile?.playbookAccess || []).includes(slug)

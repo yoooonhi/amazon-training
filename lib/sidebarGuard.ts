@@ -18,7 +18,7 @@ import { authState, supabase } from './supabase'
 import {
   publicLevels, isMentorRole, isMember,
   SKILL_PATH_PREFIX, PUBLIC_SKILL_SLUGS, MEMBER_SKILL_SLUGS, LIMITED_FREE_SKILL_SLUGS,
-  PLAYBOOK_PATH_PREFIX, PUBLIC_PLAYBOOK_SLUGS,
+  PLAYBOOK_PATH_PREFIX, PUBLIC_PLAYBOOK_SLUGS, isPublicPlaybookPath,
 } from './accessControl'
 
 // 受保护等级的关键字（出现在侧边栏分组标题里的）
@@ -154,6 +154,8 @@ function applyPlaybookVisibility() {
   // 判断某 slug 是否「登录可见」（免费手册，登录即可看，非付费专享）
   const isPublicSlug = (slug: string | null): boolean =>
     !!slug && PUBLIC_PLAYBOOK_SLUGS.includes(slug)
+  const isPublicEntry = (href: string, slug: string | null): boolean =>
+    isPublicSlug(slug) || isPublicPlaybookPath(href)
   const processedTitles = new WeakSet()
   handbookLinks.forEach((a) => {
     // 沿 DOM 向上找 level-0 分组容器
@@ -183,8 +185,8 @@ function applyPlaybookVisibility() {
     textEl.textContent = text
     delete textEl.dataset.playbookLocked
     const slug = slugFromHref(a.getAttribute('href') || '')
-    // 登录可见的免费手册：已登录不加锁；未登录用 🔒（非付费专享，不用 👑）
-    if (isPublicSlug(slug)) {
+    // 登录可见的免费手册/试听页：已登录不加锁；未登录用 🔒（不用 👑）
+    if (isPublicEntry(a.getAttribute('href') || '', slug)) {
       if (!currentRole) {
         textEl.textContent = '🔒 ' + text
         textEl.dataset.playbookLocked = '1'

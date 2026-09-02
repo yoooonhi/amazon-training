@@ -5,7 +5,7 @@ import {
   getLevelByPath, isLevelAccessible, isMentorRole,
   isSkillPath, isSkillAccessible, getSkillSlug, MEMBER_SKILL_SLUGS,
   isPlaybookPath, isPlaybookAccessible, isPathAccessible, extractPlaybookSlug,
-  PUBLIC_PLAYBOOK_SLUGS,
+  PUBLIC_PLAYBOOK_SLUGS, isPublicPlaybookPath,
 } from '../lib/accessControl'
 import { PLAYBOOK_SLUGS } from '../lib/curriculum'
 
@@ -41,12 +41,13 @@ const currentPlaybook = computed(() => {
   return PLAYBOOK_SLUGS.find((p) => p.slug === slug) || null
 })
 
-// 被拦截的手册是否属于「登录可见」的免费手册（如小白入门水平自测）。
-// 这类手册未登录时拦截卡应显示「请登录」而非「扫码付款」。
+// 被拦截的页面是否属于「登录可见」的免费手册或付费手册试听页。
+// 这类页面未登录时应显示「请登录」而非「扫码付款」。
 const isPublicPlaybookBlocked = computed(() => {
   if (!isPlaybookBlocked.value) return false
   const slug = extractPlaybookSlug(currentPath.value)
-  return slug ? PUBLIC_PLAYBOOK_SLUGS.includes(slug) : false
+  return (slug ? PUBLIC_PLAYBOOK_SLUGS.includes(slug) : false)
+    || isPublicPlaybookPath(currentPath.value)
 })
 
 // 判断当前页面是否是需要会员才能访问的技能课
