@@ -459,7 +459,7 @@ export const PLAYBOOK_SLUGS: { slug: string; title: string; price: string }[] = 
   { slug: 'ads-16-tactics', title: '广告打法手册', price: '2.99' },
   { slug: 'ops-experience', title: '「真实」运营实战经验', price: '3.99' },
   { slug: 'beginner-self-check', title: '小白入门水平自测', price: '0' },
-  { slug: 'import-export-9810', title: '进出口权资质（海关备案）（9810）', price: '0' },
+  { slug: 'import-export-9810', title: '进出口权资质（海关备案）（9810）', price: '9.99' },
 ]
 
 // 课程内容的目录前缀（getLessonIdByPath 用）
