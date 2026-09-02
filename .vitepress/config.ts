@@ -455,7 +455,7 @@ export default defineConfig({
             { text: '第1节 · 开始前准备', link: '/content/playbooks/import-export-9810/01-preparation' },
             { text: '第2节 · 海关备案', link: '/content/playbooks/import-export-9810/02-customs-filing' },
             { text: '第3节 · 深圳电子口岸制卡', link: '/content/playbooks/import-export-9810/03-eport-card' },
-            { text: '第4节 · 税务与外汇', link: '/content/playbooks/import-export-9810/04-tax-and-fx' },
+            { text: '第4节 · 税务与收款', link: '/content/playbooks/import-export-9810/04-tax-and-fx' },
             { text: '第5节 · 9810通关通道', link: '/content/playbooks/import-export-9810/05-channel-and-broker' },
             { text: '第6节 · 首票9810出口', link: '/content/playbooks/import-export-9810/06-first-shipment' },
             { text: '第7节 · 出口后闭环', link: '/content/playbooks/import-export-9810/07-post-export' },

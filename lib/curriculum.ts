@@ -445,7 +445,7 @@ export const playbookLessons: { lessonId: string; title: string }[] = [
   { lessonId: 'pb-trade-01', title: '第1节 · 开始前准备' },
   { lessonId: 'pb-trade-02', title: '第2节 · 海关备案' },
   { lessonId: 'pb-trade-03', title: '第3节 · 深圳电子口岸制卡' },
-  { lessonId: 'pb-trade-04', title: '第4节 · 税务与外汇' },
+  { lessonId: 'pb-trade-04', title: '第4节 · 税务与收款' },
   { lessonId: 'pb-trade-05', title: '第5节 · 9810通关通道' },
   { lessonId: 'pb-trade-06', title: '第6节 · 首票9810出口' },
   { lessonId: 'pb-trade-07', title: '第7节 · 出口后闭环' },
