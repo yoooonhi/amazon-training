@@ -114,3 +114,10 @@ begin
   end;
 end;
 $$;
+
+-- 该函数只供已登录用户的 Storage RLS 策略调用；
+-- 移除默认 PUBLIC/anon 执行权限，避免匿名 RPC 调用。
+revoke all on function public.can_access_course_path(text, uuid) from public;
+revoke all on function public.can_access_course_path(text, uuid) from anon;
+grant execute on function public.can_access_course_path(text, uuid) to authenticated;
+grant execute on function public.can_access_course_path(text, uuid) to service_role;
