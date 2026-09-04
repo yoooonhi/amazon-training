@@ -21,15 +21,55 @@
   }
   *{margin:0;padding:0;box-sizing:border-box}
   body{
-    background:radial-gradient(1200px 500px at 75% -10%, rgba(226,176,74,.09), transparent 60%), var(--bg);
+    background:linear-gradient(180deg,#101318 0%,#0c0e12 60%,#0a0c10 100%);
     color:var(--text); font-family:var(--sans); line-height:1.6;
+  }
+
+  /* ---------- 深夜酒吧氛围背景 ---------- */
+  .bg-deco{
+    position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+    background:
+      radial-gradient(900px 520px at 12% -8%, rgba(255,158,44,.11), transparent 62%),
+      radial-gradient(820px 500px at 88% -6%, rgba(45,212,191,.08), transparent 62%),
+      radial-gradient(1100px 640px at 50% 115%, rgba(226,176,74,.07), transparent 65%);
+  }
+  .bokeh{position:absolute;border-radius:50%;filter:blur(70px);opacity:.14;will-change:transform}
+  .b1{width:420px;height:420px;background:#ff9e2c;top:6%;left:4%;animation:drift 72s ease-in-out -6s infinite}
+  .b2{width:300px;height:300px;background:#2dd4bf;top:16%;right:8%;animation:drift 95s ease-in-out -30s infinite;opacity:.10}
+  .b3{width:260px;height:260px;background:#b0413e;bottom:16%;left:16%;animation:drift 84s ease-in-out -48s infinite;opacity:.10}
+  .b4{width:380px;height:380px;background:#e2b04a;bottom:4%;right:20%;animation:drift 105s ease-in-out -12s infinite}
+  .b5{width:200px;height:200px;background:#d946ef;top:44%;left:56%;animation:drift 118s ease-in-out -60s infinite;opacity:.07}
+  .b6{width:320px;height:320px;background:#ff7b3d;top:-4%;left:36%;animation:drift 88s ease-in-out -24s infinite;opacity:.09}
+  .b7{width:240px;height:240px;background:#3b82f6;bottom:38%;right:44%;animation:drift 76s ease-in-out -40s infinite;opacity:.06}
+  .b8{width:160px;height:160px;background:#e2b04a;top:62%;left:8%;animation:drift 130s ease-in-out -80s infinite;opacity:.12}
+  @keyframes drift{
+    0%,100%{transform:translate3d(0,0,0) scale(1)}
+    33%{transform:translate3d(70px,-45px,0) scale(1.12)}
+    66%{transform:translate3d(-55px,50px,0) scale(.94)}
+  }
+  .grain{
+    position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.045;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.55'/></svg>");
+    background-size:180px 180px;
+  }
+  .vignette{
+    position:fixed;inset:0;z-index:1;pointer-events:none;
+    background:radial-gradient(125% 95% at 50% 42%, transparent 58%, rgba(0,0,0,.30) 100%);
+  }
+  .wrap{position:relative;z-index:2}
+  @media (max-width:720px){
+    .bokeh{filter:blur(45px)}
+    .b5,.b7{display:none}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .bokeh{animation:none}
   }
   .wrap{max-width:1180px;margin:0 auto;padding:0 24px 90px}
 
   /* ---------- Hero ---------- */
   .hero{text-align:center;padding:64px 0 30px}
   .hero .kicker{color:var(--gold);letter-spacing:.5em;font-size:12px;text-transform:uppercase;padding-left:.5em}
-  .hero h1{font-family:var(--serif);font-weight:900;font-size:clamp(36px,5.5vw,58px);margin:14px 0 10px;letter-spacing:.12em}
+  .hero h1{font-family:var(--serif);font-weight:900;font-size:clamp(36px,5.5vw,58px);margin:14px 0 10px;letter-spacing:.12em;text-shadow:0 0 34px rgba(226,176,74,.28)}
   .hero .sub{color:var(--muted);font-size:14px}
   .hero .sub b{color:var(--gold);font-weight:600}
   .hero .divider{width:180px;margin:22px auto 0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
@@ -176,6 +216,12 @@
 </style>
 </head>
 <body>
+<div class="bg-deco" aria-hidden="true">
+  <span class="bokeh b1"></span><span class="bokeh b2"></span><span class="bokeh b3"></span><span class="bokeh b4"></span>
+  <span class="bokeh b5"></span><span class="bokeh b6"></span><span class="bokeh b7"></span><span class="bokeh b8"></span>
+</div>
+<div class="grain" aria-hidden="true"></div>
+<div class="vignette" aria-hidden="true"></div>
 <div class="wrap">
 
   <header class="hero">
