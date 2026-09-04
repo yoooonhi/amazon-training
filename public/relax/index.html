@@ -147,9 +147,9 @@
     <div class="ctrl-row" id="catChips">
       <button class="chip on" data-cat="all">全部</button>
       <button class="chip" data-cat="gin">金酒基<span class="n">8</span></button>
-      <button class="chip" data-cat="rum">白朗姆基<span class="n">7</span></button>
-      <button class="chip" data-cat="vodka">伏特加基<span class="n">8</span></button>
-      <button class="chip" data-cat="ume">梅酒基<span class="n">8</span></button>
+      <button class="chip" data-cat="rum">白朗姆基<span class="n">9</span></button>
+      <button class="chip" data-cat="vodka">伏特加基<span class="n">10</span></button>
+      <button class="chip" data-cat="ume">梅酒基<span class="n">10</span></button>
       <button class="chip" data-cat="cognac">白兰地基<span class="n">5</span></button>
       <button class="chip" data-cat="mock">无酒精<span class="n">5</span></button>
     </div>
@@ -177,6 +177,8 @@
     <div class="tip-card"><b>摇和 vs 兑和</b>摇和=材料加冰进摇壶摇10~15秒再滤出，出杯更冰、口感融合；兑和=直接倒进杯里搅。标"兑和"的都可无脑做。</div>
     <div class="tip-card"><b>两瓶伏特加分工</b>绝对伏特加做喝得出酒感的（蓝泻湖、伏特加汤力）；斯米诺丢进可乐、葡萄气泡这类重味饮料里。</div>
     <div class="tip-card"><b>渐变色的秘密</b>红石榴糖浆密度大，沿吧勺背缓缓倒入会沉底，形成"日出"渐变——倒完千万别搅。</div>
+    <div class="tip-card"><b>柠檬家族分工</b>塔希提青柠＝酸度担当（莫吉托/自由古巴/咸狗）；香水柠檬＝香气担当（手打柠檬茶/杯口皮油）；国产柠檬＝万能替补；金桔＝对半切开捣压，出橙香和微苦。</div>
+    <div class="tip-card"><b>椰汁 ≠ 椰子水</b>椰树椰汁是椰肉打的奶白色乳饮，厚甜；椰子水是透明的，清爽低糖。奶香系（椰奶朗姆/蓝椰子/梅子椰奶）用椰汁，清爽系（椰风金酒/椰林朗姆）用椰子水，别互相替换。</div>
   </div>
 
   <div class="section-title">🛒 再买一样，解锁新酒</div>
@@ -197,12 +199,12 @@
       <li>基础调酒套装（摇壶 / 量酒器 / 吧勺 / 滤冰器）</li>
     </ul></div>
     <div class="panel"><h4>辅料</h4><ul>
-      <li>鲜柠檬</li><li>柠檬液（含糖浓缩汁）</li><li>冰块</li>
+      <li>鲜柠檬（国产 / 香水 / 塔希提青柠 / 金桔）</li><li>柠檬液（含糖浓缩汁）</li><li>冰块</li>
       <li>风味糖浆 ×4：莫吉托 / 蓝橙 / 绿薄荷 / 红石榴</li>
     </ul></div>
     <div class="panel"><h4>饮料</h4><ul>
       <li>可乐 / 雪碧 / 泰象苏打水</li>
-      <li>汤力水 / 椰子水</li>
+      <li>汤力水 / 椰子水 / 椰树椰汁</li>
       <li>水溶C100 ×4 口味（柠檬、西柚等）</li>
       <li>元气森林气泡水（葡萄）</li>
       <li>东方树叶（青柑普洱 / 茉莉花茶）· 菊花茶</li>
@@ -231,7 +233,7 @@ const DRINKS = [
   {n:'金汤力', en:'Gin & Tonic', cat:'gin', abv:9, m:'兑和', d:1, c:'#8ecae6',
    ing:['孟买蓝宝石 45ml','汤力水 补满（约135ml）','柠檬角 1个'],
    st:['杯中装满冰块，倒入金酒','汤力水沿杯壁缓缓倒入','柠檬角挤汁后投入，吧勺轻提拉1~2下'],
-   tip:'柠檬皮在杯口扭一下，喷出的柠檬油让香气翻倍。'},
+   tip:'柠檬皮在杯口扭一下，喷出的柠檬油让香气翻倍；优先用香水柠檬的皮，香气最足。'},
   {n:'蓝色珊瑚礁', en:'Blue Coral G&T', cat:'gin', abv:8, m:'兑和', d:1, c:'#29b6f6',
    ing:['金酒 40ml','蓝橙风味糖浆 10ml','汤力水 补满'],
    st:['满冰，金酒与蓝橙糖浆先搅匀','汤力水沿壁补满','柠檬角点缀'],
@@ -262,13 +264,13 @@ const DRINKS = [
 
   /* ================= 白朗姆 ================= */
   {n:'快手莫吉托', en:'Quick Mojito', cat:'rum', abv:8, m:'摇和', d:2, c:'#66bb6a',
-   ing:['百加得白朗姆 40ml','莫吉托风味糖浆 20ml','鲜柠檬汁 15ml','泰象苏打水 补满'],
-   st:['朗姆、糖浆、柠檬汁加冰摇 10 秒','滤入满冰的杯中','苏打水补满，轻提拉'],
-   tip:'想升级完全体，买一盒薄荷叶拍两下丢进去。'},
+   ing:['百加得白朗姆 40ml','莫吉托风味糖浆 20ml','塔希提青柠汁 15ml','泰象苏打水 补满'],
+   st:['朗姆、糖浆、青柠汁加冰摇 10 秒','滤入装满冰的杯中','苏打水补满，轻提拉'],
+   tip:'青柠已就位，现在只差一盒薄荷叶就是完全体莫吉托。'},
   {n:'自由古巴', en:'Cuba Libre', cat:'rum', abv:9, m:'兑和', d:1, c:'#a1887f',
-   ing:['白朗姆 45ml','可乐 补满','柠檬角 1个'],
-   st:['满冰，倒入朗姆','可乐补满，柠檬角挤汁投入'],
-   tip:'正宗用青柠；家里用柠檬就多挤半勺。可乐有咖啡因，晚上悠着点。'},
+   ing:['白朗姆 45ml','可乐 补满','塔希提青柠 半个（榨汁）'],
+   st:['满冰，倒入朗姆','可乐补满，青柠挤汁投入'],
+   tip:'青柠到位后这杯就是正宗配方。可乐有咖啡因，晚上悠着点。'},
   {n:'蓝色夏威夷', en:'Blue Hawaii', cat:'rum', abv:8, m:'摇和', d:2, c:'#26c6da',
    ing:['白朗姆 40ml','蓝橙风味糖浆 15ml','鲜柠檬汁 15ml','雪碧 补满'],
    st:['前三样加冰摇 12 秒','滤入满冰杯','雪碧补满'],
@@ -287,6 +289,15 @@ const DRINKS = [
   {n:'朗姆西柚', en:'Rum & Grapefruit', cat:'rum', abv:8, m:'兑和', d:1, c:'#ffab91',
    ing:['白朗姆 40ml','水溶C100 西柚味 补满','柠檬角 1个'],
    st:['满冰，倒入朗姆','西柚味C100沿壁补满']},
+
+  {n:'手打柠檬茶酒', en:'Smashed Lemon Tea Rum', cat:'rum', abv:8, m:'摇和', d:2, c:'#f4e04d',
+   ing:['白朗姆 40ml','香水柠檬 3~4 片（带皮）','莫吉托风味糖浆 15ml','东方树叶·茉莉花茶 90ml'],
+   st:['柠檬片与糖浆放摇壶，用吧勺柄适度捣压出汁','加朗姆、冰块和茉莉花茶，摇 10 秒','连冰倒入杯中，再放一片柠檬'],
+   tip:'茶饮店"手打柠檬茶"的含酒精版；带皮捣压会释放皮精油，香气翻倍。'},
+  {n:'椰奶朗姆', en:'Coconut Milk Rum', cat:'rum', abv:11, m:'摇和', d:1, c:'#e8d8b0',
+   ing:['白朗姆 40ml','椰树椰汁 90ml','鲜柠檬汁 5ml（可选）'],
+   st:['全部加冰摇 10 秒','连冰倒入杯中'],
+   tip:'椰林飘香（Piña Colada）的极简版——原版还差菠萝汁，但这杯已经奶香十足。'},
 
   /* ================= 伏特加 ================= */
   {n:'蓝色泻湖', en:'Blue Lagoon', cat:'vodka', abv:7, m:'摇和', d:1, c:'#42a5f5',
@@ -315,11 +326,21 @@ const DRINKS = [
   {n:'灰狗', en:'Greyhound', cat:'vodka', abv:8, m:'兑和', d:1, c:'#ff7043',
    ing:['伏特加 40ml','水溶C100 西柚味 补满','柠檬角 1个'],
    st:['满冰，倒入伏特加','西柚味C100补满'],
-   tip:'经典配方只需伏特加 + 西柚汁；用鲜榨西柚更正宗，杯口抹盐圈就变成"咸狗" Salty Dog。'},
+   tip:'经典配方只需伏特加 + 西柚汁；想喝咸口版，看下一张「咸狗」。'},
+
+  {n:'咸狗', en:'Salty Dog', cat:'vodka', abv:8, m:'兑和', d:2, c:'#d4e157',
+   ing:['伏特加 40ml','水溶C100 西柚味 补满','塔希提青柠 半个','食盐（蘸杯口用）'],
+   st:['青柠把杯口抹湿，倒扣蘸一圈盐','杯中满冰，倒入伏特加','西柚味C100补满，挤入青柠汁'],
+   tip:'咸口鸡尾酒的经典；盐圈把西柚的苦香衬得很立体。没有海盐，家用细盐也行。'},
   {n:'白雪', en:'Vodka Sprite', cat:'vodka', abv:9, m:'兑和', d:1, c:'#e1f5fe',
    ing:['伏特加 40ml','雪碧 补满','柠檬角 1个'],
    st:['满冰，倒入伏特加','雪碧补满，柠檬角投入'],
    tip:'新手第一杯，永远不会失败。'},
+
+  {n:'蓝椰子', en:'Blue Coconut', cat:'vodka', abv:9, m:'兑和', d:1, c:'#64b5f6',
+   ing:['伏特加 30ml','蓝橙风味糖浆 10ml','椰树椰汁 90ml'],
+   st:['满冰，伏特加与蓝橙糖浆先搅匀','椰汁沿吧勺缓缓倒入，形成蓝白渐层','喝前再搅'],
+   tip:'蓝橙+椰奶是海岛度假风的黄金配色，渐层先拍照再喝。'},
 
   /* ================= 梅酒 ================= */
   {n:'梅酒气泡', en:'Ume Spritz', cat:'ume', abv:5, m:'兑和', d:1, c:'#ffcc80',
@@ -354,6 +375,15 @@ const DRINKS = [
    ing:['梅酒 90ml','冰块 适量'],
    st:['老式杯装满冰','缓缓倒入梅酒'],
    tip:'最简单也最考验梅酒品质；杯口搁一颗盐渍梅子。'},
+
+  {n:'金桔梅气泡', en:'Kumquat Ume Fizz', cat:'ume', abv:4, m:'兑和', d:1, c:'#f9a825',
+   ing:['金桔 3 颗（对半切开）','梅酒 40ml','泰象苏打水 补满'],
+   st:['金桔放杯底，用吧勺柄捣压出汁','加冰与梅酒搅匀','苏打水补满'],
+   tip:'金桔的微苦橙香配梅酒，像大人版的金桔柠檬茶。'},
+  {n:'梅子椰奶', en:'Ume Coconut Milk', cat:'ume', abv:4, m:'兑和', d:1, c:'#f8c8dc',
+   ing:['梅酒 40ml','椰树椰汁 80ml'],
+   st:['杯中加冰，倒入梅酒与椰汁','搅匀即可'],
+   tip:'梅子的酸甜刚好切开椰奶的厚重，像液态梅子椰奶冻。'},
 
   /* ================= 白兰地 ================= */
   {n:'蓝侧车', en:'Blue Sidecar', cat:'cognac', abv:20, m:'摇和', d:3, c:'#7986cb',
@@ -405,12 +435,12 @@ const TAG_META = {
   original:{label:'原创', cls:'t-original'}
 };
 const DRINK_TAG = {
-  '金汤力':'classic','自由古巴':'classic','伏特加汤力':'classic','灰狗':'classic',
+  '金汤力':'classic','自由古巴':'classic','伏特加汤力':'classic','灰狗':'classic','咸狗':'classic',
   '梅酒气泡':'classic','梅酒纯饮':'classic','无酒精莫吉托':'classic','雪莉坦普':'classic',
   '蓝色珊瑚礁':'adapt','茉莉金汤力':'adapt','南区菲士':'adapt','金西柚':'adapt',
   '快手莫吉托':'adapt','蓝色夏威夷':'adapt','葡萄日出':'adapt',
   '蓝色泻湖':'adapt','伪大都会':'adapt','维珍蓝色夏威夷':'adapt','维珍葡萄日出':'adapt',
-  '蓝侧车':'adapt','干邑可乐':'adapt','干邑汤力':'adapt'
+  '蓝侧车':'adapt','干邑可乐':'adapt','干邑汤力':'adapt','椰奶朗姆':'adapt'
 };
 DRINKS.forEach(d => d.tag = DRINK_TAG[d.n] || 'original');
 
