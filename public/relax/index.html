@@ -73,7 +73,7 @@
     border-radius:16px;padding:22px 22px 18px;overflow:hidden;
     transition:transform .18s ease,border-color .18s ease;
   }
-  .card:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--c) 55%, var(--line))}
+  .card:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--c) 55%, var(--line));cursor:pointer}
   .card .strip{position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--c),transparent 85%)}
   .chead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
   .chead h3{font-family:var(--serif);font-size:20px;font-weight:600;display:flex;align-items:center;gap:8px}
@@ -514,7 +514,7 @@ function cardHTML(d){
   const a = abvInfo(d.abv);
   const stars = '★'.repeat(d.d) + '☆'.repeat(3 - d.d);
   return `
-  <article class="card" style="--c:${d.c}">
+  <article class="card" style="--c:${d.c}" data-name="${d.n}">
     <div class="strip"></div>
     <div class="chead">
       <div><h3>${d.n}</h3><span class="en">${d.en}</span></div>
@@ -611,6 +611,15 @@ document.getElementById('againBtn').addEventListener('click', ()=>openModal(rand
 document.getElementById('modalClose').addEventListener('click', closeModal);
 document.getElementById('overlay').addEventListener('click', e=>{ if(e.target.id === 'overlay') closeModal(); });
 document.addEventListener('keydown', e=>{ if(e.key === 'Escape') closeModal(); });
+
+/* ---------- 点击卡片打开弹窗 ---------- */
+document.getElementById('grid').addEventListener('click', e=>{
+  if(e.target.closest('.plus1, .minus1')) return;
+  const card = e.target.closest('article.card');
+  if(!card) return;
+  const d = DRINKS.find(x=>x.n === card.dataset.name);
+  if(d) openModal(d);
+});
 
 document.getElementById('catChips').addEventListener('click', e=>{
   const b = e.target.closest('.chip'); if(!b) return;
