@@ -138,14 +138,15 @@
   .minus1:active:not(:disabled){transform:scale(.92)}
   .minus1:disabled{opacity:.35;cursor:default}
   .made{font-size:12px;color:var(--muted)}
-  .overlay{position:fixed;inset:0;z-index:100;background:rgba(5,6,8,.72);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:20px}
+  .overlay{position:fixed;inset:0;z-index:100;background:rgba(5,6,8,.72);backdrop-filter:blur(6px);display:none;padding:28px 24px;overflow-y:auto}
   .overlay.show{display:flex}
-  .modal{position:relative;max-width:500px;width:100%;max-height:86vh;overflow-y:auto;animation:pop .22s ease}
+  .modal{position:relative;max-width:560px;width:100%;margin:auto;animation:pop .22s ease}
   @keyframes pop{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
   .modal-close{
-    position:absolute;top:-14px;right:-6px;z-index:2;cursor:pointer;
+    position:absolute;top:-16px;right:-8px;z-index:2;cursor:pointer;
     appearance:none;background:var(--panel);border:1px solid var(--line);color:var(--muted);
-    width:32px;height:32px;border-radius:50%;font-size:13px;line-height:1;font-family:var(--sans);
+    width:34px;height:34px;border-radius:50%;font-size:14px;line-height:1;font-family:var(--sans);
+    box-shadow:0 2px 10px rgba(0,0,0,.45);
   }
   .modal-close:hover{color:var(--text);border-color:var(--gold)}
   .modal-head{font-family:var(--serif);font-size:17px;font-weight:600;color:var(--gold);margin-bottom:12px;padding-left:4px}
@@ -194,7 +195,7 @@
       <button class="chip" data-cat="ume">梅酒基<span class="n">10</span></button>
       <button class="chip" data-cat="cognac">白兰地基<span class="n">5</span></button>
       <button class="chip" data-cat="mock">无酒精<span class="n">5</span></button>
-      <button class="btn-random" id="randomBtn">🎲 随机一杯</button>
+      <button class="btn-random" id="randomBtn">🎲 今日缘分</button>
     </div>
     <div class="ctrl-row">
       <button class="chip on" data-abv="all">全部度数</button>
@@ -590,7 +591,7 @@ document.addEventListener('click', e=>{
   saveCounts(); updateCounterUI(n);
 });
 
-/* ---------- 随机一杯 & 弹窗 ---------- */
+/* ---------- 今日缘分 & 弹窗 ---------- */
 function randomDrink(){
   const pool = filteredList();
   const list = pool.length ? pool : DRINKS;
