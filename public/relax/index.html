@@ -20,6 +20,7 @@
     --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
   }
   *{margin:0;padding:0;box-sizing:border-box}
+  html{overflow-x:clip}
   body{
     background:linear-gradient(180deg,#101318 0%,#0c0e12 60%,#0a0c10 100%);
     color:var(--text); font-family:var(--sans); line-height:1.6;
@@ -79,7 +80,8 @@
     position:sticky;top:0;z-index:50;
     background:rgba(14,16,19,.88);backdrop-filter:blur(10px);
     border-bottom:1px solid var(--line);
-    padding:14px 0 12px;margin-bottom:26px;
+    margin:0 calc(50% - 50vw) 26px;
+    padding:14px calc(50vw - 50%) 12px;
   }
   .ctrl-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
   .ctrl-row + .ctrl-row{margin-top:8px}
