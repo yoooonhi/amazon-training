@@ -571,7 +571,7 @@ function updateCounterUI(name){
     el.textContent = '已调 ' + v + ' 杯';
   });
   document.querySelectorAll('.minus1[data-name="' + name + '"]').forEach(el=>{
-    el.disabled = v > 0;
+    el.disabled = !(v > 0);
   });
   const t = document.getElementById('totalMade');
   if(t) t.textContent = totalMade();
