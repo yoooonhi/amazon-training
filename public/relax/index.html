@@ -109,6 +109,40 @@
   }
   .empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:60px 0;font-size:14px}
 
+  /* ---------- 随机按钮 & 调酒记录 & 弹窗 ---------- */
+  .btn-random{
+    appearance:none;border:none;cursor:pointer;font-family:var(--sans);
+    background:linear-gradient(135deg,#e2b04a,#c98f2f);color:#14110a;
+    font-size:13px;font-weight:700;padding:7px 18px;border-radius:999px;
+    box-shadow:0 0 14px rgba(226,176,74,.35);transition:transform .15s ease;
+  }
+  .btn-random:hover{transform:translateY(-1px)}
+  .btn-random:active{transform:scale(.95)}
+  .gold-t{color:var(--gold);font-weight:600}
+  .make-row{display:flex;align-items:center;gap:10px;margin-top:14px}
+  .plus1{
+    appearance:none;border:1px solid rgba(226,176,74,.5);cursor:pointer;
+    background:rgba(226,176,74,.12);color:var(--gold);font-family:var(--sans);
+    font-size:12.5px;font-weight:700;padding:5px 16px;border-radius:999px;
+    transition:all .15s ease;
+  }
+  .plus1:hover{background:var(--gold);color:#14110a}
+  .plus1:active{transform:scale(.92)}
+  .made{font-size:12px;color:var(--muted);cursor:pointer}
+  .made:hover{color:var(--text)}
+  .overlay{position:fixed;inset:0;z-index:100;background:rgba(5,6,8,.72);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:20px}
+  .overlay.show{display:flex}
+  .modal{position:relative;max-width:500px;width:100%;max-height:86vh;overflow-y:auto;animation:pop .22s ease}
+  @keyframes pop{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
+  .modal-close{
+    position:absolute;top:-14px;right:-6px;z-index:2;cursor:pointer;
+    appearance:none;background:var(--panel);border:1px solid var(--line);color:var(--muted);
+    width:32px;height:32px;border-radius:50%;font-size:13px;line-height:1;font-family:var(--sans);
+  }
+  .modal-close:hover{color:var(--text);border-color:var(--gold)}
+  .modal-head{font-family:var(--serif);font-size:17px;font-weight:600;color:var(--gold);margin-bottom:12px;padding-left:4px}
+  .modal-actions{margin-top:16px;text-align:center}
+
   /* ---------- Sections ---------- */
   .section-title{
     font-family:var(--serif);font-size:22px;font-weight:600;margin:56px 0 18px;
@@ -152,6 +186,7 @@
       <button class="chip" data-cat="ume">梅酒基<span class="n">10</span></button>
       <button class="chip" data-cat="cognac">白兰地基<span class="n">5</span></button>
       <button class="chip" data-cat="mock">无酒精<span class="n">5</span></button>
+      <button class="btn-random" id="randomBtn">🎲 随机一杯</button>
     </div>
     <div class="ctrl-row">
       <button class="chip on" data-abv="all">全部度数</button>
@@ -168,6 +203,17 @@
   </div>
 
   <main class="grid" id="grid"></main>
+
+  <div class="overlay" id="overlay">
+    <div class="modal">
+      <button class="modal-close" id="modalClose" title="关闭">✕</button>
+      <div class="modal-head">🎲 今晚就喝这杯</div>
+      <div id="modalCard"></div>
+      <div class="modal-actions">
+        <button class="btn-random" id="againBtn">🎲 不满意？换一杯</button>
+      </div>
+    </div>
+  </div>
 
   <div class="section-title">🍸 调酒师小抄</div>
   <div class="tips-list">
@@ -474,11 +520,15 @@ function cardHTML(d){
     <div class="sec"><h4>配方</h4><ul>${d.ing.map(i=>`<li>${i}</li>`).join('')}</ul></div>
     ${d.st && d.st.length ? `<div class="sec"><h4>做法</h4><ol>${d.st.map(s=>`<li>${s}</li>`).join('')}</ol></div>` : ''}
     ${d.tip ? `<p class="tip">💡 ${d.tip}</p>` : ''}
+    <div class="make-row">
+      <button class="plus1" data-name="${d.n}">＋1</button>
+      <span class="made" data-made="${d.n}" title="误点？点这里减 1">已调 ${COUNTS[d.n]||0} 杯</span>
+    </div>
   </article>`;
 }
 
-function render(){
-  const list = DRINKS.filter(d=>{
+function filteredList(){
+  return DRINKS.filter(d=>{
     if(state.cat !== 'all' && d.cat !== state.cat) return false;
     if(state.abv === 'zero'  && d.abv !== 0) return false;
     if(state.abv === 'low'   && (d.abv === 0 || d.abv > 6)) return false;
@@ -490,10 +540,56 @@ function render(){
     }
     return true;
   });
+}
+
+function render(){
+  const list = filteredList();
   document.getElementById('grid').innerHTML =
     list.map(cardHTML).join('') || '<div class="empty">这个组合下没有酒款——换个筛选试试 🥃</div>';
-  document.getElementById('count').textContent = `当前 ${list.length} / ${DRINKS.length} 款`;
+  document.getElementById('count').innerHTML =
+    `当前 ${list.length} / ${DRINKS.length} 款 · 已调 <b class="gold-t" id="totalMade">${totalMade()}</b> 杯`;
 }
+
+/* ---------- 调酒记录（存浏览器 localStorage） ---------- */
+const LS_KEY = 'barMenuCounts.v1';
+let COUNTS = {};
+try{ COUNTS = JSON.parse(localStorage.getItem(LS_KEY)) || {}; }catch(e){ COUNTS = {}; }
+function saveCounts(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(COUNTS)); }catch(e){} }
+function totalMade(){ return Object.values(COUNTS).reduce((a,b)=>a+b,0); }
+function updateCounterUI(name){
+  document.querySelectorAll('[data-made="' + name + '"]').forEach(el=>{
+    el.textContent = '已调 ' + (COUNTS[name]||0) + ' 杯';
+  });
+  const t = document.getElementById('totalMade');
+  if(t) t.textContent = totalMade();
+}
+document.addEventListener('click', e=>{
+  const p = e.target.closest('.plus1');
+  if(p){ const n = p.dataset.name; COUNTS[n] = (COUNTS[n]||0) + 1; saveCounts(); updateCounterUI(n); return; }
+  const m = e.target.closest('.made');
+  if(m){ const n = m.dataset.made; if((COUNTS[n]||0) > 0){ COUNTS[n]--; saveCounts(); updateCounterUI(n); } }
+});
+
+/* ---------- 随机一杯 & 弹窗 ---------- */
+function randomDrink(){
+  const pool = filteredList();
+  const list = pool.length ? pool : DRINKS;
+  return list[Math.floor(Math.random() * list.length)];
+}
+function openModal(d){
+  document.getElementById('modalCard').innerHTML = cardHTML(d);
+  document.getElementById('overlay').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(){
+  document.getElementById('overlay').classList.remove('show');
+  document.body.style.overflow = '';
+}
+document.getElementById('randomBtn').addEventListener('click', ()=>openModal(randomDrink()));
+document.getElementById('againBtn').addEventListener('click', ()=>openModal(randomDrink()));
+document.getElementById('modalClose').addEventListener('click', closeModal);
+document.getElementById('overlay').addEventListener('click', e=>{ if(e.target.id === 'overlay') closeModal(); });
+document.addEventListener('keydown', e=>{ if(e.key === 'Escape') closeModal(); });
 
 document.getElementById('catChips').addEventListener('click', e=>{
   const b = e.target.closest('.chip'); if(!b) return;
