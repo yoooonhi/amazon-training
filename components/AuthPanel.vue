@@ -392,15 +392,24 @@ function displayName() {
               <div class="dropdown-email">{{ currentUser.email }}</div>
             </div>
           </div>
-          <a
-            v-if="currentProfile?.role === 'mentor'"
-            href="/dashboard"
-            class="dropdown-item dropdown-admin"
-            @click="markAllSeen"
-          >
-            <span>📊 管理员后台</span>
-            <span v-if="newCommentsCount > 0" class="admin-comment-badge">{{ newCommentsCount > 99 ? '99+' : newCommentsCount }} 新评论</span>
-          </a>
+          <template v-if="currentProfile?.role === 'mentor'">
+            <a
+              href="/dashboard"
+              class="dropdown-item dropdown-admin"
+              @click="markAllSeen"
+            >
+              <span>📊 管理员后台</span>
+              <span v-if="newCommentsCount > 0" class="admin-comment-badge">{{ newCommentsCount > 99 ? '99+' : newCommentsCount }} 新评论</span>
+            </a>
+            <a
+              href="https://www.pipishou.top/relax/index.html"
+              target="_blank"
+              rel="noopener"
+              class="dropdown-item"
+            >
+              <span>🍸 微醺时刻</span>
+            </a>
+          </template>
           <!-- 普通用户：新互动提醒（点击弹通知浮层，不清零） -->
           <button
             v-else-if="newCommentsCount > 0"
