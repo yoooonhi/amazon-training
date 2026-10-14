@@ -316,7 +316,7 @@ const advice = computed(() => {
   margin: 2rem 0;
   padding: 1.5rem;
   background: var(--vp-c-bg-soft);
-  border-radius: 12px;
+  border-radius: var(--r-lg);
   border: 1px solid var(--vp-c-divider);
 }
 .rc-header {
@@ -326,7 +326,7 @@ const advice = computed(() => {
   margin-bottom: 1rem;
 }
 .rc-icon { font-size: 1.3rem; }
-.rc-title { font-weight: 700; font-size: 1.1rem; color: var(--vp-c-text-1); }
+.rc-title { font-weight: 700; font-size: 1.05rem; color: var(--vp-c-text-1); }
 .rc-hint { font-size: 0.8rem; color: var(--vp-c-text-2); }
 
 .rc-scenario {
@@ -337,7 +337,7 @@ const advice = computed(() => {
 .rc-scenario-btn {
   flex: 1;
   padding: 0.5rem;
-  border-radius: 8px;
+  border-radius: var(--r-md);
   border: 1px solid var(--vp-c-divider);
   background: var(--vp-c-bg);
   color: var(--vp-c-text-2);
@@ -348,7 +348,7 @@ const advice = computed(() => {
 }
 .rc-scenario-btn.active {
   border-color: var(--vp-c-brand-1);
-  background: var(--vp-c-brand-soft, rgba(52, 81, 178, 0.08));
+  background: var(--vp-c-brand-soft);
   color: var(--vp-c-brand-1);
 }
 
@@ -370,7 +370,7 @@ const advice = computed(() => {
   justify-content: center;
   width: 22px; height: 22px;
   border-radius: 50%;
-  background: var(--vp-c-brand-1);
+  background: var(--vp-button-brand-bg);
   color: #fff;
   font-size: 0.75rem;
   font-weight: 700;
@@ -400,7 +400,7 @@ const advice = computed(() => {
 }
 .rc-field input {
   padding: 0.4rem 0.55rem;
-  border-radius: 6px;
+  border-radius: var(--r-sm);
   border: 1px solid var(--vp-c-divider);
   background: var(--vp-c-bg);
   font-size: 0.88rem;
@@ -439,7 +439,7 @@ const advice = computed(() => {
 }
 .rc-risk-btn {
   padding: 0.35rem 0.7rem;
-  border-radius: 6px;
+  border-radius: var(--r-sm);
   border: 1px solid var(--vp-c-divider);
   background: var(--vp-c-bg);
   color: var(--vp-c-text-2);
@@ -452,17 +452,17 @@ const advice = computed(() => {
 }
 .rc-risk-btn.active {
   border-color: var(--vp-c-brand-1);
-  background: var(--vp-c-brand-soft, rgba(52, 81, 178, 0.08));
+  background: var(--vp-c-brand-soft);
   color: var(--vp-c-brand-1);
   font-weight: 600;
 }
-.rc-risk-days { font-size: 0.72rem; opacity: 0.7; }
+.rc-risk-days { font-size: var(--t-xs); opacity: 0.7; }
 
 .rc-result {
   margin-top: 0.5rem;
   padding: 1.25rem;
   background: var(--vp-c-bg);
-  border-radius: 10px;
+  border-radius: var(--r-md);
   border: 2px solid var(--vp-c-brand-1);
 }
 .rc-calc-steps {
@@ -478,7 +478,7 @@ const advice = computed(() => {
   margin-bottom: 0.3rem;
 }
 .rc-calc-line strong { color: var(--vp-c-text-1); }
-.rc-calc-line-new { color: #d97706; }
+.rc-calc-line-new { color: var(--c-warning); }
 
 .rc-final {
   display: flex;
@@ -498,7 +498,7 @@ const advice = computed(() => {
   font-weight: 800;
   color: var(--vp-c-brand-1);
 }
-.rc-final-num.negative { color: #16a34a; }
+.rc-final-num.negative { color: var(--c-success); }
 .rc-final-unit { font-size: 1rem; color: var(--vp-c-text-3); }
 .rc-final-advice {
   font-size: 0.82rem;
@@ -511,7 +511,7 @@ const advice = computed(() => {
   padding: 1.25rem;
   text-align: center;
   background: var(--vp-c-bg);
-  border-radius: 10px;
+  border-radius: var(--r-md);
   border: 2px dashed var(--vp-c-divider);
   font-size: 0.85rem;
   color: var(--vp-c-text-3);

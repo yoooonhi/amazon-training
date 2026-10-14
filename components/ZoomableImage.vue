@@ -161,11 +161,11 @@ function onDragEnd() {
   display: block;
   width: 100%;
   border: 1px solid var(--vp-c-divider);
-  border-radius: 12px;
+  border-radius: var(--r-lg);
   transition: box-shadow 0.2s;
 }
 .zoomable-wrap:hover .zoomable-img {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-2);
 }
 
 /* 右上角放大按钮 */
@@ -215,7 +215,7 @@ function onDragEnd() {
   max-width: 92vw;
   max-height: 88vh;
   object-fit: contain;
-  border-radius: 8px;
+  border-radius: var(--r-md);
   transition: transform 0.15s ease-out;
   user-select: none;
 }
@@ -259,7 +259,7 @@ function onDragEnd() {
   font-size: 0.8rem;
   background: rgba(0, 0, 0, 0.3);
   padding: 0.3rem 0.9rem;
-  border-radius: 20px;
+  border-radius: var(--r-xl);
   white-space: nowrap;
   pointer-events: none;
 }

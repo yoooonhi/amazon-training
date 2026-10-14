@@ -199,10 +199,10 @@ onMounted(() => {
 
 <style scoped>
 .progress-tracker {
-  margin: 1.5rem 0;
-  padding: 1.5rem;
+  margin: var(--s-4) 0 var(--s-6);
+  padding: var(--s-6);
   background: var(--vp-c-bg-soft);
-  border-radius: 12px;
+  border-radius: var(--r-lg);
   border: 1px solid var(--vp-c-divider);
 }
 .login-prompt {
@@ -247,14 +247,14 @@ onMounted(() => {
 .progress-bar-outer {
   height: 10px;
   background: var(--vp-c-divider);
-  border-radius: 5px;
+  border-radius: var(--r-sm);
   overflow: hidden;
   margin-bottom: 0.75rem;
 }
 .progress-bar-inner {
   height: 100%;
   background: linear-gradient(90deg, var(--vp-c-brand-1), var(--vp-c-brand-2));
-  border-radius: 5px;
+  border-radius: var(--r-sm);
   transition: width 0.3s ease;
 }
 .training-info {
@@ -272,7 +272,7 @@ onMounted(() => {
 }
 .week-item {
   padding: 0.75rem;
-  border-radius: 8px;
+  border-radius: var(--r-md);
   background: var(--vp-c-bg);
   border: 1px solid var(--vp-c-divider);
   transition: border-color 0.2s;
@@ -306,14 +306,14 @@ onMounted(() => {
 .week-bar {
   height: 6px;
   background: var(--vp-c-divider);
-  border-radius: 3px;
+  border-radius: var(--r-sm);
   overflow: hidden;
   margin-bottom: 0.35rem;
 }
 .week-bar-fill {
   height: 100%;
   background: var(--vp-c-brand-1);
-  border-radius: 3px;
+  border-radius: var(--r-sm);
   transition: width 0.3s ease;
 }
 .lesson-dots {
@@ -321,7 +321,7 @@ onMounted(() => {
   gap: 0.5rem;
 }
 .dot {
-  font-size: 0.65rem;
+  font-size: var(--t-xs);
   color: var(--vp-c-divider);
 }
 .dot.done {

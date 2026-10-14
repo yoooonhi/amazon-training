@@ -215,7 +215,7 @@ watch(lessonId, async () => {
     <!-- 提交成功提示 -->
     <div v-if="justSubmitted" class="feedback-success">
       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none">
-        <path fill="#55C948" d="M12 23c6.075 0 11-4.924 11-11S18.075 1 12 1 1 5.924 1 12s4.924 11 11 11Z" transform="scale(0.92) translate(1,1)"/>
+        <path fill="currentColor" d="M12 23c6.075 0 11-4.924 11-11S18.075 1 12 1 1 5.924 1 12s4.924 11 11 11Z" transform="scale(0.92) translate(1,1)"/>
         <path fill="white" d="M17.396 9.82a.832.832 0 0 0 0-1.176l-.486-.486a.832.832 0 0 0-1.176 0L10.472 13.426l-2.028-2.027a.832.832 0 0 0-1.176 0l-.486.486a.832.832 0 0 0 0 1.176l2.917 2.917a.833.833 0 0 0 1.037.118 1 1 0 0 0 .166-.118l6.494-6.157Z"/>
       </svg>
       <span>提交成功，感谢你的反馈！</span>
@@ -239,7 +239,7 @@ watch(lessonId, async () => {
   margin: 1.5rem 0 0;
   padding: 1.25rem 1.5rem;
   background: var(--vp-c-bg-soft);
-  border-radius: 12px;
+  border-radius: var(--r-lg);
   border: 1px solid var(--vp-c-divider);
   display: flex;
   flex-direction: column;
@@ -249,13 +249,13 @@ watch(lessonId, async () => {
 
 .feedback-title {
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 1.05rem;
   color: var(--vp-c-text-1);
 }
 
 .feedback-login-hint {
   padding: 0.6rem 1rem;
-  border-radius: 8px;
+  border-radius: var(--r-md);
   background: var(--vp-c-bg);
   border: 1px dashed var(--vp-c-divider);
   font-size: 0.85rem;
@@ -275,7 +275,7 @@ watch(lessonId, async () => {
   align-items: center;
   gap: 0.35rem;
   padding: 0.6rem 1.4rem;
-  border-radius: 10px;
+  border-radius: var(--r-md);
   border: 1px solid var(--vp-c-divider);
   background: var(--vp-c-bg);
   color: var(--vp-c-text-2);
@@ -287,12 +287,12 @@ watch(lessonId, async () => {
 .feedback-option:hover:not(:disabled) {
   border-color: var(--vp-c-brand-2);
   color: var(--vp-c-brand-1);
-  background: var(--vp-c-brand-soft, rgba(52, 81, 178, 0.06));
+  background: var(--vp-c-brand-soft);
 }
 .feedback-option.selected {
   border-color: var(--vp-c-brand-1);
   color: var(--vp-c-brand-1);
-  background: var(--vp-c-brand-soft, rgba(52, 81, 178, 0.1));
+  background: var(--vp-c-brand-soft);
   font-weight: 600;
 }
 .feedback-option:disabled {
@@ -324,7 +324,7 @@ watch(lessonId, async () => {
   gap: 0.4rem;
   font-size: 0.85rem;
   font-weight: 600;
-  color: #16a34a;
+  color: var(--c-success);
 }
 
 .feedback-toast {
@@ -340,6 +340,6 @@ watch(lessonId, async () => {
 
 .feedback-error {
   font-size: 0.8rem;
-  color: #ef4444;
+  color: var(--c-danger);
 }
 </style>

@@ -22,6 +22,7 @@ import AdminShell from '../../components/dashboard/AdminShell.vue'
 import { recordVisit, recordLastLesson } from '../../lib/visitTracker'
 import { setupSidebarGuard } from '../../lib/sidebarGuard'
 import { scrollSidebarActive } from '../../lib/scrollSidebarActive'
+import './tokens.css'
 import './custom.css'
 
 // dashboard 页面用全屏后台布局，跳过 VitePress 的导航/侧边栏/底部栏

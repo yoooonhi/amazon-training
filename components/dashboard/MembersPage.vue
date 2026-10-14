@@ -83,7 +83,7 @@ onMounted(loadData)
       <div class="compare-bars">
         <div class="compare-item">
           <span class="compare-label">👑 会员</span>
-          <div class="compare-bar-wrap"><div class="compare-bar-fill" style="background: linear-gradient(90deg, #fbbf24, #f59e0b);" :style="{ width: memberAvgCompletion + '%' }"></div></div>
+          <div class="compare-bar-wrap"><div class="compare-bar-fill" style="background: linear-gradient(90deg, var(--c-warning-strong), var(--c-warning));" :style="{ width: memberAvgCompletion + '%' }"></div></div>
           <span class="compare-val">{{ memberAvgCompletion }}%</span>
         </div>
         <div class="compare-item">
@@ -120,18 +120,17 @@ onMounted(loadData)
 </template>
 
 <style scoped>
-@import './dashboard-shared.css';
 .compare-bars { display: flex; flex-direction: column; gap: 0.75rem; }
 .compare-item { display: flex; align-items: center; gap: 0.75rem; }
 .compare-label { width: 80px; font-size: 0.85rem; font-weight: 600; color: var(--vp-c-text-2); }
-.compare-bar-wrap { flex: 1; height: 24px; background: var(--vp-c-divider); border-radius: 6px; overflow: hidden; }
-.compare-bar-fill { height: 100%; border-radius: 6px; transition: width 0.3s; }
+.compare-bar-wrap { flex: 1; height: 24px; background: var(--vp-c-divider); border-radius: var(--r-sm); overflow: hidden; }
+.compare-bar-fill { height: 100%; border-radius: var(--r-sm); transition: width 0.3s; }
 .compare-val { width: 50px; text-align: right; font-weight: 700; color: var(--vp-c-text-1); }
 .compare-hint { margin-top: 1rem; font-size: 0.85rem; color: var(--vp-c-text-2); }
 .rank-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
 .rank-table th { text-align: left; padding: 0.6rem; border-bottom: 1px solid var(--vp-c-divider); color: var(--vp-c-text-2); font-size: 0.78rem; }
 .rank-table td { padding: 0.6rem; border-bottom: 1px solid var(--vp-c-divider); }
 .muted { color: var(--vp-c-text-2); font-size: 0.8rem; }
-.cancel-btn { padding: 0.25rem 0.7rem; border-radius: 5px; border: 1px solid var(--vp-c-divider); background: var(--vp-c-bg); color: #ef4444; font-size: 0.76rem; cursor: pointer; }
-.cancel-btn:hover { background: rgba(239,68,68,0.06); }
+.cancel-btn { padding: 0.25rem 0.7rem; border-radius: var(--r-sm); border: 1px solid var(--vp-c-divider); background: var(--vp-c-bg); color: #ef4444; font-size: 0.76rem; cursor: pointer; }
+.cancel-btn:hover { background: var(--c-danger-soft); }
 </style>

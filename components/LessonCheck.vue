@@ -131,7 +131,7 @@ onMounted(() => {
   margin: 2rem 0;
   padding: 1.5rem;
   background: var(--vp-c-bg-soft);
-  border-radius: 12px;
+  border-radius: var(--r-lg);
   border: 1px solid var(--vp-c-divider);
 }
 .check-header {
@@ -152,8 +152,8 @@ onMounted(() => {
   margin-left: auto;
   font-size: 0.8rem;
   padding: 0.2rem 0.6rem;
-  border-radius: 4px;
-  background: var(--vp-c-brand-soft, rgba(52, 81, 178, 0.08));
+  border-radius: var(--r-sm);
+  background: var(--vp-c-brand-soft);
   color: var(--vp-c-brand-1);
   font-weight: 600;
 }
@@ -171,7 +171,7 @@ onMounted(() => {
   align-items: flex-start;
   gap: 0.6rem;
   padding: 0.6rem 0.8rem;
-  border-radius: 8px;
+  border-radius: var(--r-md);
   background: var(--vp-c-bg);
   border: 1px solid var(--vp-c-divider);
   cursor: pointer;
@@ -181,7 +181,7 @@ onMounted(() => {
   border-color: var(--vp-c-brand-2);
 }
 .check-item.checked {
-  background: var(--vp-c-brand-soft, rgba(52, 81, 178, 0.08));
+  background: var(--vp-c-brand-soft);
   border-color: var(--vp-c-brand-1);
 }
 .check-item input[type="checkbox"] {
@@ -208,7 +208,7 @@ onMounted(() => {
   font-size: 0.9rem;
   font-weight: 600;
   color: var(--vp-c-brand-1);
-  background: var(--vp-c-brand-soft, rgba(52, 81, 178, 0.08));
-  border-radius: 8px;
+  background: var(--vp-c-brand-soft);
+  border-radius: var(--r-md);
 }
 </style>

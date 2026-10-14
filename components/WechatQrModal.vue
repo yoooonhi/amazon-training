@@ -115,9 +115,9 @@ defineExpose({ bind })
 .qr-card {
   position: relative;
   background: var(--vp-c-bg);
-  border-radius: 16px;
+  border-radius: var(--r-lg);
   padding: 1.25rem 1.25rem 1.1rem;
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.28);
+  box-shadow: var(--shadow-3);
   border: 1px solid var(--vp-c-divider);
   display: flex;
   flex-direction: column;
@@ -131,7 +131,7 @@ defineExpose({ bind })
   height: auto;
   aspect-ratio: 1 / 1;
   object-fit: cover;
-  border-radius: 10px;
+  border-radius: var(--r-md);
 }
 .qr-tip {
   margin: 0.3rem 0 0;
@@ -152,11 +152,11 @@ defineExpose({ bind })
   text-underline-offset: 3px;
   transition: opacity 0.15s;
   outline: none;
-  border-radius: 3px;
+  border-radius: var(--r-sm);
 }
 .copy-site:hover { opacity: 0.8; }
 .copy-site:focus-visible {
-  background: var(--vp-c-brand-soft, rgba(52, 81, 178, 0.1));
+  background: var(--vp-c-brand-soft);
 }
 .copy-icon {
   margin-left: 0.2rem;
@@ -165,11 +165,11 @@ defineExpose({ bind })
 }
 .copy-toast {
   margin-top: 0.2rem;
-  font-size: 0.72rem;
-  color: #16a34a;
+  font-size: var(--t-xs);
+  color: var(--c-success);
   background: rgba(22, 163, 74, 0.1);
   padding: 0.15rem 0.6rem;
-  border-radius: 4px;
+  border-radius: var(--r-sm);
 }
 .toast-enter-active, .toast-leave-active { transition: opacity 0.2s; }
 .toast-enter-from, .toast-leave-to { opacity: 0; }
@@ -189,7 +189,7 @@ defineExpose({ bind })
   transition: all 0.15s;
 }
 .qr-close:hover {
-  background: var(--vp-c-brand-1);
+  background: var(--vp-button-brand-bg);
   color: #fff;
 }
 

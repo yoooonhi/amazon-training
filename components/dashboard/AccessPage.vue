@@ -175,23 +175,22 @@ onMounted(() => {
 </template>
 
 <style scoped>
-@import './dashboard-shared.css';
 .level-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; }
-.level-card { padding: 1rem; border-radius: 10px; background: var(--vp-c-bg); border: 1px solid var(--vp-c-divider); text-align: center; }
+.level-card { padding: 1rem; border-radius: var(--r-md); background: var(--vp-c-bg); border: 1px solid var(--vp-c-divider); text-align: center; }
 .level-name { font-weight: 700; font-size: 0.9rem; color: var(--vp-c-text-1); margin-bottom: 0.3rem; }
 .level-num { font-size: 2rem; font-weight: 800; color: var(--vp-c-brand-1); }
-.level-bar-wrap { height: 6px; background: var(--vp-c-divider); border-radius: 3px; overflow: hidden; margin: 0.5rem 0; }
-.level-bar-fill { height: 100%; background: var(--vp-c-brand-1); border-radius: 3px; }
+.level-bar-wrap { height: 6px; background: var(--vp-c-divider); border-radius: var(--r-sm); overflow: hidden; margin: 0.5rem 0; }
+.level-bar-fill { height: 100%; background: var(--vp-c-brand-1); border-radius: var(--r-sm); }
 .level-coverage { font-size: 0.75rem; color: var(--vp-c-text-2); }
 
 .student-check-grid { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.75rem; max-height: 200px; overflow-y: auto; }
-.check-item { display: flex; align-items: center; gap: 0.3rem; padding: 0.3rem 0.6rem; border-radius: 6px; border: 1px solid var(--vp-c-divider); font-size: 0.8rem; cursor: pointer; }
-.check-item.checked { border-color: var(--vp-c-brand-1); background: var(--vp-c-brand-soft, rgba(52,81,178,0.08)); color: var(--vp-c-brand-1); }
+.check-item { display: flex; align-items: center; gap: 0.3rem; padding: 0.3rem 0.6rem; border-radius: var(--r-sm); border: 1px solid var(--vp-c-divider); font-size: 0.8rem; cursor: pointer; }
+.check-item.checked { border-color: var(--vp-c-brand-1); background: var(--vp-c-brand-soft); color: var(--vp-c-brand-1); }
 .check-item input { accent-color: var(--vp-c-brand-1); }
 
 .rank-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
 .rank-table th { text-align: left; padding: 0.6rem; border-bottom: 1px solid var(--vp-c-divider); color: var(--vp-c-text-2); font-size: 0.78rem; }
 .rank-table td { padding: 0.6rem; border-bottom: 1px solid var(--vp-c-divider); }
-.access-tag { font-size: 0.72rem; padding: 2px 8px; border-radius: 4px; background: var(--vp-c-brand-soft, rgba(59,130,246,0.12)); color: var(--vp-c-brand-1); font-weight: 600; }
+.access-tag { font-size: var(--t-xs); padding: 2px 8px; border-radius: var(--r-sm); background: var(--vp-c-brand-soft); color: var(--vp-c-brand-1); font-weight: 600; }
 .muted { color: var(--vp-c-text-2); font-size: 0.8rem; }
 </style>

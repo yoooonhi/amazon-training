@@ -117,10 +117,10 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 1rem 0 0.5rem;
-  padding: 0.9rem 1.1rem;
+  margin: var(--s-4) 0 var(--s-6);
+  padding: var(--s-3) var(--s-4);
   background: var(--vp-c-bg-soft);
-  border-radius: 12px;
+  border-radius: var(--r-md);
   border: 1px solid var(--vp-c-brand-1);
   text-decoration: none;
   transition: all 0.2s;
@@ -128,7 +128,7 @@ onMounted(() => {
 }
 .continue-card:hover {
   border-color: var(--vp-c-brand-2);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-1);
   transform: translateY(-1px);
 }
 .cc-left {

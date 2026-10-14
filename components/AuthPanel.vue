@@ -524,13 +524,13 @@ function displayName() {
   align-items: center;
 }
 
-/* 未登录按钮 */
+/* 未登录按钮（对比原则：导航里唯一的实底主操作，登录入口要够突出） */
 .nav-login-btn {
-  padding: 0.2rem 0.6rem;
-  border-radius: 4px;
+  padding: 0.2rem 0.75rem;
+  border-radius: var(--r-sm);
   border: none;
-  background: var(--vp-c-brand-soft, rgba(52, 81, 178, 0.08));
-  color: var(--vp-c-brand-1);
+  background: var(--vp-button-brand-bg, var(--vp-c-brand-3));
+  color: #fff;
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
@@ -538,7 +538,7 @@ function displayName() {
   transition: background 0.15s;
 }
 .nav-login-btn:hover {
-  background: var(--vp-c-brand-soft, rgba(52,81,178,0.06));
+  background: var(--vp-button-brand-hover-bg, var(--vp-c-brand-2));
 }
 
 /* 已登录用户区 */
@@ -547,7 +547,7 @@ function displayName() {
   align-items: center;
   gap: 0.4rem;
   padding: 0.3rem 0.7rem;
-  border-radius: 6px;
+  border-radius: var(--r-sm);
   cursor: pointer;
   position: relative;
   transition: background 0.15s;
@@ -568,18 +568,18 @@ function displayName() {
   white-space: nowrap;
 }
 .nav-role {
-  font-size: 0.65rem;
+  font-size: var(--t-xs);
   padding: 0.05rem 0.35rem;
-  border-radius: 3px;
-  background: #ff9900;
+  border-radius: var(--r-sm);
+  background: var(--c-warning-solid);
   color: #fff;
   font-weight: 600;
 }
 .nav-member {
-  font-size: 0.62rem;
+  font-size: var(--t-xs);
   padding: 0.05rem 0.4rem;
-  border-radius: 3px;
-  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  border-radius: var(--r-sm);
+  background: linear-gradient(135deg, var(--c-warning-strong), var(--c-warning));
   color: #fff;
   font-weight: 700;
   letter-spacing: 0.02em;
@@ -590,10 +590,10 @@ function displayName() {
   min-width: 16px;
   height: 16px;
   padding: 0 4px;
-  border-radius: 8px;
-  background: #ef4444;
+  border-radius: var(--r-md);
+  background: var(--c-danger);
   color: #fff;
-  font-size: 0.62rem;
+  font-size: var(--t-xs);
   font-weight: 700;
   line-height: 16px;
   text-align: center;
@@ -611,11 +611,11 @@ function displayName() {
 }
 .admin-comment-badge {
   flex-shrink: 0;
-  font-size: 0.68rem;
+  font-size: var(--t-xs);
   font-weight: 600;
   padding: 0.1rem 0.4rem;
-  border-radius: 8px;
-  background: #ef4444;
+  border-radius: var(--r-md);
+  background: var(--c-danger);
   color: #fff;
 }
 /* 普通用户「新回复」提示项 */
@@ -625,17 +625,17 @@ function displayName() {
 }
 .reply-hint {
   flex-shrink: 0;
-  font-size: 0.68rem;
+  font-size: var(--t-xs);
   color: var(--vp-c-brand-1);
 }
 .dropdown-member {
   flex-shrink: 0;
-  font-size: 0.65rem;
+  font-size: var(--t-xs);
   font-weight: 600;
-  color: #b45309;
+  color: var(--c-warning);
   background: rgba(255, 193, 7, 0.14);
   padding: 0.05rem 0.35rem;
-  border-radius: 3px;
+  border-radius: var(--r-sm);
 }
 
 /* 下拉菜单 */
@@ -646,8 +646,8 @@ function displayName() {
   min-width: 200px;
   background: var(--vp-c-bg);
   border: 1px solid var(--vp-c-divider);
-  border-radius: 10px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-3);
   padding: 0.4rem;
   z-index: 1000;
 }
@@ -668,7 +668,7 @@ function displayName() {
   align-items: center;
   justify-content: center;
   font-size: 1.1rem;
-  background: var(--vp-c-brand-soft, rgba(52, 81, 178, 0.08));
+  background: var(--vp-c-brand-soft);
 }
 .dropdown-id {
   display: flex;
@@ -691,7 +691,7 @@ function displayName() {
   white-space: nowrap;
 }
 .dropdown-email {
-  font-size: 0.72rem;
+  font-size: var(--t-xs);
   color: var(--vp-c-text-2);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -699,11 +699,11 @@ function displayName() {
 }
 .dropdown-role-tag {
   flex-shrink: 0;
-  font-size: 0.6rem;
+  font-size: var(--t-xs);
   font-weight: 600;
   padding: 0.05rem 0.3rem;
-  border-radius: 3px;
-  background: #ff9900;
+  border-radius: var(--r-sm);
+  background: var(--c-warning-solid);
   color: #fff;
 }
 .dropdown-item {
@@ -711,7 +711,7 @@ function displayName() {
   align-items: center;
   gap: 0.4rem;
   padding: 0.5rem 0.6rem;
-  border-radius: 6px;
+  border-radius: var(--r-sm);
   font-size: 0.85rem;
   color: var(--vp-c-text-1);
   text-decoration: none;
@@ -725,9 +725,9 @@ function displayName() {
   background: var(--vp-c-bg-soft);
 }
 .dropdown-logout {
-  color: #ef4444;
+  color: var(--c-danger);
   margin-top: 0.2rem;
-  border-radius: 6px;
+  border-radius: var(--r-sm);
 }
 .nickname-row {
   flex-direction: row;
@@ -736,16 +736,16 @@ function displayName() {
 .dropdown-input {
   flex: 1;
   padding: 0.3rem 0.5rem;
-  border-radius: 4px;
+  border-radius: var(--r-sm);
   border: 1px solid var(--vp-c-divider);
   font-size: 0.8rem;
   background: var(--vp-c-bg);
 }
 .dropdown-btn {
   padding: 0.3rem 0.6rem;
-  border-radius: 4px;
+  border-radius: var(--r-sm);
   border: none;
-  background: var(--vp-c-brand-1);
+  background: var(--vp-button-brand-bg);
   color: #fff;
   font-size: 0.78rem;
   cursor: pointer;
@@ -762,7 +762,7 @@ function displayName() {
 .auth-form {
   padding: 1.5rem 1.8rem;
   background: var(--vp-c-bg);
-  border-radius: 14px;
+  border-radius: var(--r-lg);
   border: 1px solid var(--vp-c-divider);
   display: flex;
   flex-direction: column;
@@ -770,11 +770,12 @@ function displayName() {
   width: 360px;
   max-width: calc(100vw - 2rem);
   position: relative;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+  box-shadow: var(--shadow-3);
 }
 .modal-title {
   margin: 0 0 0.3rem;
-  font-size: 1.15rem;
+  font-size: var(--t-lg);
+  font-weight: 700;
   color: var(--vp-c-text-1);
 }
 .modal-close {
@@ -827,21 +828,21 @@ function displayName() {
   flex: 1;
   padding: 0.5rem;
   border: 1px solid var(--vp-c-divider);
-  border-radius: 6px;
+  border-radius: var(--r-sm);
   background: var(--vp-c-bg);
   color: var(--vp-c-text-2);
   font-size: 0.9rem;
   cursor: pointer;
 }
 .form-tabs button.active {
-  background: var(--vp-c-brand-soft, rgba(52, 81, 178, 0.08));
+  background: var(--vp-c-brand-soft);
   color: var(--vp-c-brand-1);
-  border-color: var(--vp-c-brand-soft, rgba(52, 81, 178, 0.08));
+  border-color: var(--vp-c-brand-soft);
   font-weight: 600;
 }
 .form-input {
   padding: 0.5rem 0.7rem;
-  border-radius: 6px;
+  border-radius: var(--r-sm);
   border: 1px solid var(--vp-c-divider);
   font-size: 0.9rem;
   background: var(--vp-c-bg);
@@ -849,6 +850,7 @@ function displayName() {
 .form-input:focus {
   outline: none;
   border-color: var(--vp-c-brand-1);
+  box-shadow: var(--focus-ring);
 }
 /* 密码框 + 小眼睛 */
 .password-field {
@@ -878,24 +880,29 @@ function displayName() {
   opacity: 1;
 }
 .form-error {
-  color: #ef4444;
+  color: var(--c-danger);
   font-size: 0.82rem;
   margin: 0;
 }
 .form-info {
-  color: #22c55e;
+  color: var(--c-success);
   font-size: 0.82rem;
   margin: 0;
 }
 .submit-btn {
-  padding: 0.55rem;
-  border-radius: 4px;
+  /* 对比原则：主操作用实底品牌色（白字达标），与表单内其他元素强区分 */
+  padding: 0.6rem;
+  border-radius: var(--r-sm);
   border: none;
-  background: var(--vp-c-brand-soft, rgba(52, 81, 178, 0.08));
-  color: var(--vp-c-brand-1);
-  font-size: 0.9rem;
+  background: var(--vp-button-brand-bg, var(--vp-c-brand-3));
+  color: #fff;
+  font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
+  transition: background 0.15s;
+}
+.submit-btn:hover:not(:disabled) {
+  background: var(--vp-button-brand-hover-bg, var(--vp-c-brand-2));
 }
 .submit-btn:disabled {
   opacity: 0.6;
@@ -916,8 +923,8 @@ function displayName() {
 .notif-panel {
   background: var(--vp-c-bg);
   border: 1px solid var(--vp-c-divider);
-  border-radius: 14px;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-3);
   width: 420px;
   max-width: calc(100vw - 2rem);
   max-height: calc(100vh - 4rem);
@@ -948,7 +955,7 @@ function displayName() {
   display: flex;
   gap: 0.7rem;
   padding: 0.7rem 0.6rem;
-  border-radius: 8px;
+  border-radius: var(--r-md);
   cursor: pointer;
   transition: background 0.15s;
   align-items: flex-start;
@@ -989,7 +996,7 @@ function displayName() {
   margin: 0.2rem 0 0;
   display: flex;
   gap: 0.6rem;
-  font-size: 0.7rem;
+  font-size: var(--t-xs);
   color: var(--vp-c-text-3);
 }
 .notif-time {

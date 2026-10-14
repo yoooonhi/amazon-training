@@ -133,17 +133,17 @@ const hasAnyInput = computed(() => {
 
 const healthLevel = computed(() => {
   const t = totalScore.value
-  if (t >= 4.0) return { label: '健康', icon: '✅', color: '#16a34a', advice: '保持现状，小幅优化' }
-  if (t >= 3.0) return { label: '亚健康', icon: '⚠️', color: '#d97706', advice: '有1-2个维度需要改进' }
-  if (t >= 2.0) return { label: '不健康', icon: '❌', color: '#dc2626', advice: '需要重大调整' }
+  if (t >= 4.0) return { label: '健康', icon: '✅', color: 'var(--c-success)', advice: '保持现状，小幅优化' }
+  if (t >= 3.0) return { label: '亚健康', icon: '⚠️', color: 'var(--c-warning)', advice: '有1-2个维度需要改进' }
+  if (t >= 2.0) return { label: '不健康', icon: '❌', color: 'var(--c-danger)', advice: '需要重大调整' }
   return { label: '危险', icon: '🚨', color: '#b91c1c', advice: '立即停止扩品，先修复现有产品线' }
 })
 
 // 模块评分显示
 function levelOf(score) {
-  if (score >= 4) return { icon: '✅', color: '#16a34a', text: '健康' }
-  if (score >= 3) return { icon: '⚠️', color: '#d97706', text: '亚健康' }
-  return { icon: '❌', color: '#dc2626', text: '不健康' }
+  if (score >= 4) return { icon: '✅', color: 'var(--c-success)', text: '健康' }
+  if (score >= 3) return { icon: '⚠️', color: 'var(--c-warning)', text: '亚健康' }
+  return { icon: '❌', color: 'var(--c-danger)', text: '不健康' }
 }
 
 // 重置
@@ -328,7 +328,7 @@ function reset() {
   margin: 2rem 0;
   padding: 1.5rem;
   background: var(--vp-c-bg-soft);
-  border-radius: 12px;
+  border-radius: var(--r-lg);
   border: 1px solid var(--vp-c-divider);
 }
 .phc-header {
@@ -341,7 +341,7 @@ function reset() {
 .phc-icon { font-size: 1.3rem; }
 .phc-title {
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   color: var(--vp-c-text-1);
 }
 .phc-hint {
@@ -351,7 +351,7 @@ function reset() {
 .phc-reset {
   margin-left: auto;
   padding: 0.3rem 0.8rem;
-  border-radius: 6px;
+  border-radius: var(--r-sm);
   border: 1px solid var(--vp-c-divider);
   background: var(--vp-c-bg);
   color: var(--vp-c-text-2);
@@ -378,7 +378,7 @@ function reset() {
   justify-content: center;
   width: 24px; height: 24px;
   border-radius: 50%;
-  background: var(--vp-c-brand-1);
+  background: var(--vp-button-brand-bg);
   color: #fff;
   font-size: 0.8rem;
   font-weight: 700;
@@ -417,7 +417,7 @@ function reset() {
 }
 .phc-field input {
   padding: 0.45rem 0.6rem;
-  border-radius: 6px;
+  border-radius: var(--r-sm);
   border: 1px solid var(--vp-c-divider);
   background: var(--vp-c-bg);
   font-size: 0.9rem;
@@ -453,9 +453,9 @@ function reset() {
 .phc-reason {
   font-size: 0.75rem;
   padding: 0.15rem 0.5rem;
-  border-radius: 4px;
+  border-radius: var(--r-sm);
   background: rgba(220, 38, 38, 0.08);
-  color: #dc2626;
+  color: var(--c-danger);
 }
 
 .phc-total {
@@ -464,7 +464,7 @@ function reset() {
   justify-content: space-between;
   gap: 1rem;
   padding: 1rem 1.25rem;
-  border-radius: 10px;
+  border-radius: var(--r-md);
   border: 2px solid;
   background: var(--vp-c-bg);
   margin-top: 0.5rem;
@@ -499,7 +499,7 @@ function reset() {
   font-weight: 700;
   color: #fff;
   padding: 0.25rem 0.8rem;
-  border-radius: 6px;
+  border-radius: var(--r-sm);
 }
 .phc-total-advice {
   font-size: 0.78rem;

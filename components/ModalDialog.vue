@@ -59,8 +59,8 @@ function handleKey(e) {
 }
 .modal-card {
   background: var(--vp-c-bg);
-  border-radius: 12px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18), 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-3);
   border: 1px solid var(--vp-c-divider);
   padding: 1.5rem;
   min-width: min(320px, calc(100vw - 2rem));
@@ -80,10 +80,10 @@ function handleKey(e) {
   align-self: flex-start;
 }
 .modal-icon.confirm {
-  background: rgba(255, 153, 0, 0.12);
+  background: var(--c-warning-soft);
 }
 .modal-icon.alert {
-  background: var(--vp-c-brand-soft, rgba(52, 81, 178, 0.1));
+  background: var(--vp-c-brand-soft);
 }
 .modal-body {
   display: flex;
@@ -110,7 +110,7 @@ function handleKey(e) {
 }
 .modal-btn {
   padding: 0.45rem 1.2rem;
-  border-radius: 7px;
+  border-radius: var(--r-md);
   border: 1px solid var(--vp-c-divider);
   background: var(--vp-c-bg-soft);
   color: var(--vp-c-text-1);
@@ -125,13 +125,13 @@ function handleKey(e) {
   background: var(--vp-c-bg);
 }
 .modal-btn.primary {
-  background: var(--vp-c-brand-1);
+  background: var(--vp-button-brand-bg);
   color: #fff;
   border-color: var(--vp-c-brand-1);
 }
 .modal-btn.primary.danger {
-  background: #ef4444;
-  border-color: #ef4444;
+  background: var(--c-danger);
+  border-color: var(--c-danger);
 }
 
 /* 过渡动画 */

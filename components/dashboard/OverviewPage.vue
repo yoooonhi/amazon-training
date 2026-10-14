@@ -194,7 +194,7 @@ onMounted(loadData)
         <div class="funnel-row">
           <span class="funnel-label">完成 50%</span>
           <div class="funnel-bar-wrap">
-            <div class="funnel-bar" :style="{ width: pct(funnel.halfDone, funnel.registered) + '%', background: '#16a34a' }"></div>
+            <div class="funnel-bar" :style="{ width: pct(funnel.halfDone, funnel.registered) + '%', background: 'var(--c-success)' }"></div>
             <span class="funnel-count">{{ funnel.halfDone }} 人</span>
           </div>
           <span class="funnel-pct">{{ pct(funnel.halfDone, funnel.registered) }}%</span>
@@ -202,7 +202,7 @@ onMounted(loadData)
         <div class="funnel-row">
           <span class="funnel-label">👑 会员</span>
           <div class="funnel-bar-wrap">
-            <div class="funnel-bar" :style="{ width: pct(funnel.member, funnel.registered) + '%', background: 'linear-gradient(90deg, #fbbf24, #f59e0b)' }"></div>
+            <div class="funnel-bar" :style="{ width: pct(funnel.member, funnel.registered) + '%', background: 'linear-gradient(90deg, var(--c-warning-strong), var(--c-warning))' }"></div>
             <span class="funnel-count">{{ funnel.member }} 人</span>
           </div>
           <span class="funnel-pct">{{ pct(funnel.member, funnel.registered) }}%</span>
@@ -224,19 +224,18 @@ onMounted(loadData)
 </template>
 
 <style scoped>
-@import './dashboard-shared.css';
 
 .funnel { display: flex; flex-direction: column; gap: 0.75rem; }
 .funnel-row { display: flex; align-items: center; gap: 0.75rem; }
 .funnel-label { width: 80px; font-size: 0.85rem; font-weight: 600; color: var(--vp-c-text-2); flex-shrink: 0; }
-.funnel-bar-wrap { position: relative; flex: 1; height: 28px; background: var(--dash-track); border-radius: 6px; overflow: hidden; }
-.funnel-bar { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 6px; min-width: 2px; transition: width 0.3s; }
+.funnel-bar-wrap { position: relative; flex: 1; height: 28px; background: var(--dash-track); border-radius: var(--r-sm); overflow: hidden; }
+.funnel-bar { position: absolute; left: 0; top: 0; bottom: 0; border-radius: var(--r-sm); min-width: 2px; transition: width 0.3s; }
 .funnel-count { position: absolute; left: 0.6rem; top: 50%; transform: translateY(-50%); color: var(--vp-c-text-1); font-size: 0.78rem; font-weight: 600; z-index: 2; pointer-events: none; }
 .funnel-pct { width: 50px; text-align: right; font-size: 0.82rem; font-weight: 600; color: var(--vp-c-text-2); }
 
 .alert-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0.75rem; }
-.alert-item { padding: 1rem; border-radius: 8px; background: var(--vp-c-bg); border: 1px solid var(--vp-c-divider); text-align: center; }
-.alert-item.warn { border-color: #ff9900; background: rgba(255, 153, 0, 0.05); }
-.alert-num { display: block; font-size: 1.5rem; font-weight: 800; color: #ff9900; }
+.alert-item { padding: 1rem; border-radius: var(--r-md); background: var(--vp-c-bg); border: 1px solid var(--vp-c-divider); text-align: center; }
+.alert-item.warn { border-color: var(--c-warning-strong); background: var(--c-warning-soft); }
+.alert-num { display: block; font-size: 1.5rem; font-weight: 800; color: var(--c-warning-strong); }
 .alert-label { font-size: 0.78rem; color: var(--vp-c-text-2); }
 </style>

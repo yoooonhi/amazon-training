@@ -106,7 +106,7 @@ onMounted(() => {
   margin: 2rem 0;
   padding: 1.5rem;
   background: var(--vp-c-bg-soft);
-  border-radius: 12px;
+  border-radius: var(--r-lg);
   border: 1px solid var(--vp-c-divider);
 }
 .test-header {
@@ -125,8 +125,8 @@ onMounted(() => {
   margin-left: auto;
   font-size: 0.8rem;
   padding: 0.2rem 0.6rem;
-  border-radius: 4px;
-  background: var(--vp-c-brand-soft, rgba(52, 81, 178, 0.08));
+  border-radius: var(--r-sm);
+  background: var(--vp-c-brand-soft);
   color: var(--vp-c-brand-1);
   font-weight: 600;
 }
@@ -144,7 +144,7 @@ onMounted(() => {
   font-size: 0.92rem;
   line-height: 1.6;
   color: var(--vp-c-text-1);
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.6rem;
 }
 .q-num {
   font-weight: 800;
@@ -154,7 +154,7 @@ onMounted(() => {
 .q-type {
   font-size: 0.75rem;
   padding: 0.1rem 0.4rem;
-  border-radius: 3px;
+  border-radius: var(--r-sm);
   background: var(--vp-c-divider);
   color: var(--vp-c-text-2);
   margin-right: 0.4rem;
@@ -169,7 +169,7 @@ onMounted(() => {
   align-items: center;
   gap: 0.5rem;
   padding: 0.6rem 0.8rem;
-  border-radius: 8px;
+  border-radius: var(--r-md);
   border: 1px solid var(--vp-c-divider);
   background: var(--vp-c-bg);
   color: var(--vp-c-text-1);
@@ -184,14 +184,14 @@ onMounted(() => {
 }
 .option-btn.selected {
   border-color: var(--vp-c-brand-1);
-  background: var(--vp-c-brand-soft, rgba(52, 81, 178, 0.08));
+  background: var(--vp-c-brand-soft);
 }
 .option-btn.correct {
-  border-color: #22c55e;
-  background: rgba(34, 197, 94, 0.1);
+  border-color: var(--c-success);
+  background: var(--c-success-soft);
 }
 .option-btn.wrong {
-  border-color: #ef4444;
+  border-color: var(--c-danger);
   background: rgba(239, 68, 68, 0.1);
 }
 .option-btn:disabled {
@@ -204,9 +204,9 @@ onMounted(() => {
 .reveal-btn {
   margin-top: 0.5rem;
   padding: 0.4rem 1rem;
-  border-radius: 6px;
+  border-radius: var(--r-sm);
   border: none;
-  background: var(--vp-c-brand-1);
+  background: var(--vp-button-brand-bg);
   color: #fff;
   font-size: 0.85rem;
   cursor: pointer;
@@ -215,12 +215,12 @@ onMounted(() => {
 .explain-box {
   margin-top: 0.75rem;
   padding: 0.75rem;
-  border-radius: 8px;
+  border-radius: var(--r-md);
   font-size: 0.85rem;
 }
 .explain-box.correct {
-  background: rgba(34, 197, 94, 0.08);
-  border: 1px solid rgba(34, 197, 94, 0.3);
+  background: var(--c-success-soft);
+  border: 1px solid var(--c-success-soft);
 }
 .explain-box.wrong {
   background: rgba(239, 68, 68, 0.08);

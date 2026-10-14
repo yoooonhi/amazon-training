@@ -218,31 +218,30 @@ onMounted(loadData)
 </template>
 
 <style scoped>
-@import './dashboard-shared.css';
 .cm-filters { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; align-items: center; }
-.cm-select { padding: 0.35rem 0.6rem; border-radius: 6px; border: 1px solid var(--vp-c-divider); background: var(--vp-c-bg); color: var(--vp-c-text-1); font-size: 0.8rem; cursor: pointer; }
-.cm-reset { padding: 0.35rem 0.75rem; border-radius: 6px; border: 1px solid var(--vp-c-divider); background: var(--vp-c-bg); color: var(--vp-c-text-2); font-size: 0.78rem; cursor: pointer; }
+.cm-select { padding: 0.35rem 0.6rem; border-radius: var(--r-sm); border: 1px solid var(--vp-c-divider); background: var(--vp-c-bg); color: var(--vp-c-text-1); font-size: 0.8rem; cursor: pointer; }
+.cm-reset { padding: 0.35rem 0.75rem; border-radius: var(--r-sm); border: 1px solid var(--vp-c-divider); background: var(--vp-c-bg); color: var(--vp-c-text-2); font-size: 0.78rem; cursor: pointer; }
 .cm-list { display: flex; flex-direction: column; gap: 0.6rem; }
-.cm-item { padding: 0.75rem 1rem; border-radius: 8px; background: var(--vp-c-bg); border: 1px solid var(--vp-c-divider); border-left: 3px solid transparent; }
-.cm-item.pinned { border-color: var(--vp-c-brand-2); border-left-color: var(--vp-c-brand-1); background: var(--vp-c-brand-soft, rgba(52,81,178,0.04)); }
+.cm-item { padding: 0.75rem 1rem; border-radius: var(--r-md); background: var(--vp-c-bg); border: 1px solid var(--vp-c-divider); border-left: 3px solid transparent; }
+.cm-item.pinned { border-color: var(--vp-c-brand-2); border-left-color: var(--vp-c-brand-1); background: var(--vp-c-brand-soft); }
 .cm-meta { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.35rem; font-size: 0.78rem; }
 .cm-lesson { font-weight: 600; color: var(--vp-c-brand-1); }
 .cm-lesson-link { text-decoration: none; cursor: pointer; transition: opacity 0.15s; }
 .cm-lesson-link:hover { opacity: 0.75; text-decoration: underline; }
-.cm-tag { font-size: 0.7rem; font-weight: 600; padding: 0.05rem 0.35rem; border-radius: 3px; }
+.cm-tag { font-size: var(--t-xs); font-weight: 600; padding: 0.05rem 0.35rem; border-radius: var(--r-sm); }
 .cm-tag.pin { color: var(--vp-c-brand-1); }
-.cm-tag.feat { color: #d97706; }
+.cm-tag.feat { color: var(--c-warning); }
 .cm-author { font-weight: 600; color: var(--vp-c-text-1); }
 .cm-author.admin { color: var(--vp-c-brand-1); }
-.cm-role { font-size: 0.68rem; padding: 0.05rem 0.35rem; border-radius: 3px; background: var(--vp-c-brand-soft, rgba(52,81,178,0.12)); color: var(--vp-c-brand-1); font-weight: 600; }
-.cm-time { font-size: 0.72rem; color: var(--vp-c-text-3); margin-left: auto; }
+.cm-role { font-size: var(--t-xs); padding: 0.05rem 0.35rem; border-radius: var(--r-sm); background: var(--vp-c-brand-soft); color: var(--vp-c-brand-1); font-weight: 600; }
+.cm-time { font-size: var(--t-xs); color: var(--vp-c-text-3); margin-left: auto; }
 .cm-content { font-size: 0.85rem; line-height: 1.6; color: var(--vp-c-text-1); margin-bottom: 0.4rem; }
 .cm-content :deep(p) { margin: 0.25rem 0; }
 .cm-actions { display: flex; align-items: center; gap: 0.4rem; }
 .cm-likes { font-size: 0.75rem; color: var(--vp-c-text-2); margin-right: auto; }
-.cm-btn { padding: 0.25rem 0.7rem; border-radius: 5px; border: 1px solid var(--vp-c-divider); background: var(--vp-c-bg); color: var(--vp-c-text-2); font-size: 0.76rem; cursor: pointer; }
+.cm-btn { padding: 0.25rem 0.7rem; border-radius: var(--r-sm); border: 1px solid var(--vp-c-divider); background: var(--vp-c-bg); color: var(--vp-c-text-2); font-size: 0.76rem; cursor: pointer; }
 .cm-btn:hover { color: var(--vp-c-text-1); border-color: var(--vp-c-brand-2); }
-.cm-btn.danger:hover { color: #ef4444; border-color: #ef4444; background: rgba(239,68,68,0.06); }
+.cm-btn.danger:hover { color: var(--c-danger); border-color: var(--c-danger); background: var(--c-danger-soft); }
 
 .hot-list { display: flex; flex-direction: column; gap: 0.4rem; }
 .hot-item { display: flex; align-items: center; gap: 0.6rem; font-size: 0.82rem; }

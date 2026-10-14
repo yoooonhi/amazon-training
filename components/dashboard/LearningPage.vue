@@ -114,10 +114,10 @@ function lessonLabel(id) {
 }
 
 function diffColor(rate) {
-  if (rate < 40) return '#dc2626' // 红=很难
-  if (rate < 60) return '#f59e0b' // 橙=偏难
-  if (rate < 80) return '#fbbf24' // 黄=中等
-  return '#16a34a' // 绿=容易
+  if (rate < 40) return 'var(--c-danger)' // 红=很难
+  if (rate < 60) return 'var(--c-warning-strong)' // 橙=偏难
+  if (rate < 80) return 'var(--c-warning-strong)' // 黄=中等（token 随深浅模式自适应）
+  return 'var(--c-success)' // 绿=容易
 }
 
 onMounted(loadData)
@@ -128,7 +128,7 @@ onMounted(loadData)
   <div v-else>
     <!-- 正确率大数字 -->
     <div class="data-section" style="text-align: center;">
-      <span class="big-number" :style="{ color: overallCorrectRate >= 70 ? '#16a34a' : overallCorrectRate >= 50 ? '#f59e0b' : '#dc2626' }">
+      <span class="big-number" :style="{ color: overallCorrectRate >= 70 ? 'var(--c-success)' : overallCorrectRate >= 50 ? 'var(--c-warning-strong)' : 'var(--c-danger)' }">
         {{ overallCorrectRate }}%
       </span>
       <div class="big-number-label">全站答题正确率（{{ totalCorrect }}/{{ totalAnswers }} 题）</div>
@@ -143,15 +143,15 @@ onMounted(loadData)
           <span class="dist-label">0-25%</span>
         </div>
         <div class="dist-item">
-          <div class="dist-bar" style="background: #fbbf24;"><span>{{ completionDist.p25 }}</span></div>
+          <div class="dist-bar" style="background: var(--c-warning-strong);"><span>{{ completionDist.p25 }}</span></div>
           <span class="dist-label">25-50%</span>
         </div>
         <div class="dist-item">
-          <div class="dist-bar" style="background: #f59e0b;"><span>{{ completionDist.p50 }}</span></div>
+          <div class="dist-bar" style="background: var(--c-warning-strong);"><span>{{ completionDist.p50 }}</span></div>
           <span class="dist-label">50-75%</span>
         </div>
         <div class="dist-item">
-          <div class="dist-bar" style="background: #16a34a;"><span>{{ completionDist.p75 }}</span></div>
+          <div class="dist-bar" style="background: var(--c-success);"><span>{{ completionDist.p75 }}</span></div>
           <span class="dist-label">75-100%</span>
         </div>
       </div>
@@ -206,11 +206,10 @@ onMounted(loadData)
 </template>
 
 <style scoped>
-@import './dashboard-shared.css';
 
 .dist-bars { display: flex; gap: 1rem; justify-content: center; align-items: flex-end; height: 120px; padding: 1rem 0; }
 .dist-item { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; }
-.dist-bar { width: 60px; background: var(--vp-c-brand-1); border-radius: 6px 6px 0 0; display: flex; align-items: flex-start; justify-content: center; padding-top: 0.4rem; color: #fff; font-weight: 700; font-size: 0.9rem; min-height: 20px; }
+.dist-bar { width: 60px; background: var(--vp-button-brand-bg); border-radius: 6px 6px 0 0; display: flex; align-items: flex-start; justify-content: center; padding-top: 0.4rem; color: #fff; font-weight: 700; font-size: 0.9rem; min-height: 20px; }
 .dist-label { font-size: 0.75rem; color: var(--vp-c-text-2); }
 
 .rank-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
@@ -221,7 +220,7 @@ onMounted(loadData)
 .diff-list { display: flex; flex-direction: column; gap: 0.5rem; }
 .diff-item { display: flex; align-items: center; gap: 0.5rem; }
 .diff-name { font-size: 0.78rem; color: var(--vp-c-text-1); width: 100px; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.diff-bar-wrap { flex: 1; height: 18px; background: var(--vp-c-divider); border-radius: 4px; overflow: hidden; }
-.diff-bar-fill { height: 100%; border-radius: 4px; }
+.diff-bar-wrap { flex: 1; height: 18px; background: var(--vp-c-divider); border-radius: var(--r-sm); overflow: hidden; }
+.diff-bar-fill { height: 100%; border-radius: var(--r-sm); }
 .diff-rate { font-size: 0.78rem; font-weight: 700; width: 40px; text-align: right; }
 </style>

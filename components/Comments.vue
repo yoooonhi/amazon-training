@@ -503,10 +503,10 @@ watch(lessonId, async (id) => {
 
 <style scoped>
 .comments-section {
-  margin: 2.5rem 0 1rem;
+  margin: 2rem 0 1rem;
   padding: 1.5rem;
   background: var(--vp-c-bg-soft);
-  border-radius: 12px;
+  border-radius: var(--r-lg);
   border: 1px solid var(--vp-c-divider);
 }
 .comments-header {
@@ -534,7 +534,7 @@ watch(lessonId, async (id) => {
 .sort-btn {
   padding: 0.25rem 0.75rem;
   font-size: 0.8rem;
-  border-radius: 6px;
+  border-radius: var(--r-sm);
   border: 1px solid var(--vp-c-divider);
   background: var(--vp-c-bg);
   color: var(--vp-c-text-2);
@@ -543,7 +543,7 @@ watch(lessonId, async (id) => {
 }
 .sort-btn.active {
   border-color: var(--vp-c-brand-1);
-  background: var(--vp-c-brand-soft, rgba(52, 81, 178, 0.08));
+  background: var(--vp-c-brand-soft);
   color: var(--vp-c-brand-1);
   font-weight: 600;
 }
@@ -555,7 +555,7 @@ watch(lessonId, async (id) => {
 .comment-textarea {
   width: 100%;
   padding: 0.75rem;
-  border-radius: 8px;
+  border-radius: var(--r-md);
   border: 1px solid var(--vp-c-divider);
   background: var(--vp-c-bg);
   color: var(--vp-c-text-1);
@@ -578,15 +578,15 @@ watch(lessonId, async (id) => {
   margin-top: 0.5rem;
 }
 .char-hint {
-  font-size: 0.72rem;
+  font-size: var(--t-xs);
   color: var(--vp-c-text-2);
   margin-right: auto;
 }
 .submit-btn {
   padding: 0.4rem 1.1rem;
-  border-radius: 6px;
+  border-radius: var(--r-sm);
   border: none;
-  background: var(--vp-c-brand-1);
+  background: var(--vp-button-brand-bg);
   color: #fff;
   font-size: 0.85rem;
   font-weight: 600;
@@ -597,7 +597,7 @@ watch(lessonId, async (id) => {
 .submit-btn:disabled { opacity: 0.5; cursor: default; }
 .cancel-btn {
   padding: 0.4rem 1rem;
-  border-radius: 6px;
+  border-radius: var(--r-sm);
   border: 1px solid var(--vp-c-divider);
   background: var(--vp-c-bg);
   color: var(--vp-c-text-2);
@@ -607,7 +607,7 @@ watch(lessonId, async (id) => {
 .submit-error {
   margin-top: 0.5rem;
   font-size: 0.8rem;
-  color: #ef4444;
+  color: var(--c-danger);
 }
 .md-hint {
   margin-top: 0.6rem;
@@ -636,7 +636,7 @@ watch(lessonId, async (id) => {
 }
 .md-hint-list code {
   padding: 0.1rem 0.3rem;
-  border-radius: 3px;
+  border-radius: var(--r-sm);
   background: var(--vp-c-bg-soft);
   font-size: 0.82em;
 }
@@ -644,7 +644,7 @@ watch(lessonId, async (id) => {
 .login-hint {
   padding: 0.75rem 1rem;
   margin-bottom: 1.5rem;
-  border-radius: 8px;
+  border-radius: var(--r-md);
   background: var(--vp-c-bg);
   border: 1px dashed var(--vp-c-divider);
   font-size: 0.85rem;
@@ -658,7 +658,7 @@ watch(lessonId, async (id) => {
   color: var(--vp-c-text-2);
   font-size: 0.9rem;
 }
-.state-box.error { color: #ef4444; }
+.state-box.error { color: var(--c-danger); }
 .empty-state {
   padding: 2rem;
   text-align: center;
@@ -674,13 +674,13 @@ watch(lessonId, async (id) => {
 }
 .comment-item {
   padding: 1rem;
-  border-radius: 8px;
+  border-radius: var(--r-md);
   background: var(--vp-c-bg);
   border: 1px solid var(--vp-c-divider);
 }
 .comment-item.pinned {
   border-color: var(--vp-c-brand-2);
-  background: var(--vp-c-brand-soft, rgba(52, 81, 178, 0.05));
+  background: var(--vp-c-brand-soft);
 }
 .comment-main { }
 .comment-meta {
@@ -699,29 +699,29 @@ watch(lessonId, async (id) => {
   color: var(--vp-c-brand-1);
 }
 .role-badge {
-  font-size: 0.7rem;
+  font-size: var(--t-xs);
   padding: 0.05rem 0.4rem;
-  border-radius: 3px;
-  background: var(--vp-c-brand-soft, rgba(52, 81, 178, 0.12));
+  border-radius: var(--r-sm);
+  background: var(--vp-c-brand-soft);
   color: var(--vp-c-brand-1);
   font-weight: 600;
 }
 .member-badge {
-  font-size: 0.7rem;
+  font-size: var(--t-xs);
   padding: 0.05rem 0.4rem;
-  border-radius: 3px;
-  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  border-radius: var(--r-sm);
+  background: linear-gradient(135deg, var(--c-warning-strong), var(--c-warning));
   color: #fff;
   font-weight: 600;
 }
 .pin-badge {
-  font-size: 0.72rem;
+  font-size: var(--t-xs);
   color: var(--vp-c-brand-1);
   font-weight: 600;
 }
 .featured-badge {
-  font-size: 0.72rem;
-  color: #d97706;
+  font-size: var(--t-xs);
+  color: var(--c-warning);
   font-weight: 600;
 }
 .comment-time {
@@ -740,14 +740,14 @@ watch(lessonId, async (id) => {
 .comment-content :deep(pre) {
   padding: 0.75rem;
   margin: 0.5rem 0;
-  border-radius: 6px;
+  border-radius: var(--r-sm);
   background: var(--vp-c-bg-soft);
   overflow-x: auto;
   font-size: 0.82rem;
 }
 .comment-content :deep(code) {
   padding: 0.1rem 0.3rem;
-  border-radius: 3px;
+  border-radius: var(--r-sm);
   background: var(--vp-c-bg-soft);
   font-size: 0.85em;
 }
@@ -786,7 +786,7 @@ watch(lessonId, async (id) => {
 .action-btn {
   padding: 0.2rem 0.6rem;
   font-size: 0.78rem;
-  border-radius: 5px;
+  border-radius: var(--r-sm);
   border: none;
   background: transparent;
   color: var(--vp-c-text-2);
@@ -798,15 +798,15 @@ watch(lessonId, async (id) => {
   color: var(--vp-c-text-1);
 }
 .action-btn.liked {
-  color: #ef4444;
+  color: var(--c-danger);
 }
 .action-btn.danger:hover {
-  color: #ef4444;
+  color: var(--c-danger);
   background: rgba(239, 68, 68, 0.08);
 }
 .action-btn.mentor:hover {
   color: var(--vp-c-brand-1);
-  background: var(--vp-c-brand-soft, rgba(52, 81, 178, 0.08));
+  background: var(--vp-c-brand-soft);
 }
 
 /* 回复列表 */
@@ -820,7 +820,7 @@ watch(lessonId, async (id) => {
 }
 .reply-item {
   padding: 0.5rem 0.75rem;
-  border-radius: 6px;
+  border-radius: var(--r-sm);
   background: var(--vp-c-bg-soft);
 }
 .reply-item .comment-content {

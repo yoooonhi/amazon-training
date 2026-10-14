@@ -19,6 +19,8 @@ import CommentsPage from './CommentsPage.vue'
 import ContentEditorPage from './ContentEditorPage.vue'
 import FeedbackPage from './FeedbackPage.vue'
 import ModalDialog from '../ModalDialog.vue'
+// 后台共享样式在此单次全局引入，各页面组件不再重复 @import
+import './dashboard-shared.css'
 
 const isMounted = ref(false)
 const loading = ref(true)
@@ -231,15 +233,8 @@ onMounted(() => {
 
 <style scoped>
 /* ===== 全屏根容器 ===== */
-/* 品牌色：不覆盖 --vp-c-brand-1，让 VitePress 默认值亮暗自适应，
-   保证所有把它当字体色的数字/链接在深色模式下可读。
-   按钮背景单独用 indigo，侧边栏 active 用半透明高亮。*/
-.admin-root {
-  --vp-c-brand-soft: rgba(99, 102, 241, 0.12);
-  --vp-button-brand-bg: #4f46e5;
-  --vp-button-brand-hover-bg: #4338ca;
-  --vp-button-brand-border: #4f46e5;
-}
+/* 品牌色统一走全局 tokens.css（蓝 #3451b2 系），后台不再单独覆盖 indigo，
+   与主站共用 --vp-c-brand-* / --vp-button-brand-* 亮暗自适应变量。 */
 /* 不用 fixed（会被父容器 transform 破坏），用 100vw/100vh + 负 margin 撑满 */
 .admin-root {
   width: 100vw;
@@ -269,8 +264,8 @@ onMounted(() => {
 .gate-btn {
   display: inline-block;
   padding: 0.6rem 1.5rem;
-  border-radius: 8px;
-  background: var(--vp-c-brand-1);
+  border-radius: var(--r-md);
+  background: var(--vp-button-brand-bg);
   color: #fff;
   text-decoration: none;
   font-weight: 600;
@@ -335,11 +330,11 @@ onMounted(() => {
   width: 26px;
   height: 26px;
   flex-shrink: 0;
-  border-radius: 7px;
+  border-radius: var(--r-sm);
   border: 1px solid var(--vp-c-divider);
   background: var(--vp-c-default-soft, transparent);
   color: var(--vp-c-text-2);
-  font-size: 0.6rem;
+  font-size: var(--t-xs);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -359,7 +354,7 @@ onMounted(() => {
 .nav-body::-webkit-scrollbar { display: none; }
 
 .nav-group-label {
-  font-size: 0.68rem;
+  font-size: var(--t-xs);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -372,7 +367,7 @@ onMounted(() => {
   align-items: center;
   gap: 0.7rem;
   padding: 0.55rem 0.75rem;
-  border-radius: 8px;
+  border-radius: var(--r-md);
   border: none;
   background: transparent;
   color: var(--vp-c-text-2);
@@ -404,7 +399,9 @@ onMounted(() => {
   border-radius: 0 3px 3px 0;
   background: var(--vp-c-brand-1);
 }
-.nav-link-icon { font-size: 1.1rem; flex-shrink: 0; width: 1.4rem; text-align: center; }
+/* emoji 图标统一 line-height:1，消除各平台 emoji 字面高度差异，
+   与文字做视觉对齐（对齐原则：图形与文字的权重平衡） */
+.nav-link-icon { font-size: 1.1rem; line-height: 1; flex-shrink: 0; width: 1.4rem; text-align: center; }
 .nav-link-text { overflow: hidden; }
 
 .nav-footer {
@@ -417,7 +414,7 @@ onMounted(() => {
   align-items: center;
   gap: 0.7rem;
   padding: 0.55rem 0.75rem;
-  border-radius: 8px;
+  border-radius: var(--r-md);
   color: var(--vp-c-text-3);
   font-size: 0.82rem;
   text-decoration: none;
@@ -451,7 +448,7 @@ onMounted(() => {
   background: var(--vp-c-bg);
 }
 .topbar-left { display: flex; align-items: center; gap: 0.6rem; }
-.topbar-icon { font-size: 1.3rem; }
+.topbar-icon { font-size: 1.3rem; line-height: 1; }
 .topbar-title { margin: 0; font-size: 1.25rem; font-weight: 700; color: var(--vp-c-text-1); }
 .topbar-actions { display: flex; align-items: center; gap: 0.5rem; }
 .topbar-refresh {
@@ -459,7 +456,7 @@ onMounted(() => {
   align-items: center;
   gap: 0.35rem;
   padding: 0.45rem 1rem;
-  border-radius: 8px;
+  border-radius: var(--r-md);
   border: 1px solid var(--vp-c-divider);
   background: var(--vp-c-bg);
   color: var(--vp-c-text-2);
@@ -473,7 +470,7 @@ onMounted(() => {
   justify-content: center;
   width: 36px;
   height: 36px;
-  border-radius: 8px;
+  border-radius: var(--r-md);
   border: 1px solid var(--vp-c-divider);
   background: var(--vp-c-bg);
   font-size: 1.05rem;
@@ -484,7 +481,7 @@ onMounted(() => {
 .topbar-refresh:hover {
   color: var(--vp-c-brand-1);
   border-color: var(--vp-c-brand-2);
-  background: var(--vp-c-brand-soft, rgba(52,81,178,0.04));
+  background: var(--vp-c-brand-soft);
 }
 
 .content-scroll {

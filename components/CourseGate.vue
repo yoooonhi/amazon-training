@@ -298,7 +298,7 @@ onMounted(() => {
   max-width: 420px;
   text-align: center;
   padding: 2.5rem 2rem;
-  border-radius: 16px;
+  border-radius: var(--r-lg);
   border: 1px solid var(--vp-c-divider);
   background: var(--vp-c-bg-soft);
 }
@@ -308,7 +308,7 @@ onMounted(() => {
   margin-bottom: 1rem;
 }
 .gate-title {
-  font-size: 1.3rem;
+  font-size: var(--t-xl);
   font-weight: 700;
   margin: 0 0 0.75rem;
   color: var(--vp-c-text-1);
@@ -327,7 +327,7 @@ onMounted(() => {
 .gate-btn {
   display: inline-block;
   padding: 0.55rem 1.25rem;
-  border-radius: 8px;
+  border-radius: var(--r-md);
   font-size: 0.88rem;
   font-weight: 600;
   text-decoration: none;
@@ -337,18 +337,22 @@ onMounted(() => {
   opacity: 0.85;
 }
 .gate-btn-primary {
-  background: var(--vp-c-brand-1);
+  background: var(--vp-button-brand-bg, var(--vp-c-brand-3));
   color: #fff;
+}
+.gate-btn-primary:hover {
+  background: var(--vp-button-brand-hover-bg, var(--vp-c-brand-2));
+  opacity: 1;
 }
 .gate-member-hint {
   display: inline-block;
   padding: 0.55rem 1.25rem;
-  border-radius: 8px;
+  border-radius: var(--r-md);
   font-size: 0.85rem;
   font-weight: 600;
-  color: #b45309;
-  background: rgba(255, 193, 7, 0.12);
-  border: 1px solid rgba(255, 193, 7, 0.35);
+  color: var(--c-warning);
+  background: var(--c-warning-soft);
+  border: 1px solid rgba(245, 158, 11, 0.35);
 }
 .gate-hint {
   margin: 1.25rem 0 0;
@@ -378,7 +382,7 @@ onMounted(() => {
   gap: 1.25rem;
   margin: 1rem 0 0.5rem;
   padding: 1rem;
-  border-radius: 12px;
+  border-radius: var(--r-lg);
   background: var(--vp-c-bg-soft-up, var(--vp-c-bg-soft));
   border: 1px solid var(--vp-c-divider);
 }
@@ -386,7 +390,7 @@ onMounted(() => {
   width: 130px;
   height: 130px;
   object-fit: contain;
-  border-radius: 8px;
+  border-radius: var(--r-md);
   flex-shrink: 0;
 }
 .gate-pay-steps {
@@ -425,7 +429,7 @@ onMounted(() => {
   background: none;
   border: none;
   padding: 0.25rem 0.4rem;
-  border-radius: 6px;
+  border-radius: var(--r-sm);
   font: inherit;
   cursor: pointer;
   transition: background 0.15s;

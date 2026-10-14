@@ -720,7 +720,6 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
-@import './dashboard-shared.css';
 
 .content-editor {
   display: flex;
@@ -740,7 +739,7 @@ onBeforeUnmount(() => {
   flex-direction: column;
   background: var(--vp-c-bg-soft);
   border: 1px solid var(--vp-c-divider);
-  border-radius: 12px;
+  border-radius: var(--r-lg);
   overflow: hidden;
 }
 .ce-sidebar-head {
@@ -763,23 +762,23 @@ onBeforeUnmount(() => {
 }
 .ce-import-toggle {
   border: 1px solid var(--vp-c-divider);
-  border-radius: 6px;
+  border-radius: var(--r-sm);
   padding: 0.22rem 0.5rem;
   background: transparent;
   color: var(--vp-c-text-2);
-  font-size: 0.72rem;
+  font-size: var(--t-xs);
   cursor: pointer;
 }
 .ce-import-toggle:hover,
 .ce-import-toggle.active {
   border-color: var(--vp-c-brand-1);
   color: var(--vp-c-brand-1);
-  background: var(--vp-c-brand-soft, rgba(99, 102, 241, 0.08));
+  background: var(--vp-c-brand-soft);
 }
 .ce-refresh-btn {
   background: transparent;
   border: 1px solid var(--vp-c-divider);
-  border-radius: 6px;
+  border-radius: var(--r-sm);
   padding: 0.15rem 0.5rem;
   cursor: pointer;
   color: var(--vp-c-text-2);
@@ -803,14 +802,14 @@ onBeforeUnmount(() => {
 }
 .ce-import-panel label {
   color: var(--vp-c-text-3);
-  font-size: 0.68rem;
+  font-size: var(--t-xs);
   font-weight: 600;
 }
 .ce-import-prefix {
   width: 100%;
   padding: 0.42rem 0.55rem;
   border: 1px solid var(--vp-c-divider);
-  border-radius: 7px;
+  border-radius: var(--r-md);
   background: var(--vp-c-bg);
   color: var(--vp-c-text-1);
   font: 0.7rem 'SF Mono', Menlo, Consolas, monospace;
@@ -826,7 +825,7 @@ onBeforeUnmount(() => {
   min-height: 36px;
   padding: 0.45rem;
   border: 1px dashed var(--vp-c-divider);
-  border-radius: 7px;
+  border-radius: var(--r-md);
   background: var(--vp-c-bg);
   color: var(--vp-c-text-2) !important;
   cursor: pointer;
@@ -846,8 +845,8 @@ onBeforeUnmount(() => {
 .ce-import-submit {
   padding: 0.42rem 0.6rem;
   border: none;
-  border-radius: 7px;
-  background: var(--vp-c-brand-1);
+  border-radius: var(--r-md);
+  background: var(--vp-button-brand-bg);
   color: #fff;
   font-size: 0.76rem;
   font-weight: 600;
@@ -890,7 +889,7 @@ onBeforeUnmount(() => {
   color: var(--vp-c-text-3);
   font-size: 0.74rem;
   font-weight: 600;
-  border-radius: 6px;
+  border-radius: var(--r-sm);
   gap: 0.35rem;
   text-transform: uppercase;
   letter-spacing: 0.03em;
@@ -902,7 +901,7 @@ onBeforeUnmount(() => {
 .ce-group-arrow {
   display: inline-block;
   transition: transform 0.15s;
-  font-size: 0.6rem;
+  font-size: var(--t-xs);
   color: var(--vp-c-text-3);
 }
 /* 展开时 ▼ 朝下（默认）；折叠时旋转 -90° 变成 ▶ 朝右 */
@@ -914,10 +913,10 @@ onBeforeUnmount(() => {
   text-align: left;
 }
 .ce-group-count {
-  font-size: 0.66rem;
+  font-size: var(--t-xs);
   background: var(--vp-c-bg-alt);
   padding: 0.05rem 0.4rem;
-  border-radius: 8px;
+  border-radius: var(--r-md);
   color: var(--vp-c-text-3);
   font-weight: 500;
 }
@@ -932,7 +931,7 @@ onBeforeUnmount(() => {
   padding: 0.4rem 0.6rem;
   background: transparent;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--r-sm);
   cursor: pointer;
   color: var(--vp-c-text-2);
   font-size: 0.8rem;
@@ -941,10 +940,10 @@ onBeforeUnmount(() => {
   gap: 0.4rem;
 }
 .ce-file-item:hover {
-  background: var(--vp-c-brand-soft, rgba(99, 102, 241, 0.08));
+  background: var(--vp-c-brand-soft);
 }
 .ce-file-item.active {
-  background: var(--vp-c-brand-soft, rgba(99, 102, 241, 0.14));
+  background: var(--vp-c-brand-soft);
   color: var(--vp-c-brand-1);
   font-weight: 600;
 }
@@ -952,7 +951,7 @@ onBeforeUnmount(() => {
   /* 草稿文件名左侧不重复加圆点（圆点单独显示） */
 }
 .ce-draft-dot {
-  color: #f59e0b;
+  color: var(--c-warning-strong);
   font-size: 0.5rem;
   flex-shrink: 0;
   line-height: 1;
@@ -964,7 +963,7 @@ onBeforeUnmount(() => {
   flex: 1;
 }
 .ce-file-size {
-  font-size: 0.66rem;
+  font-size: var(--t-xs);
   color: var(--vp-c-text-3);
   flex-shrink: 0;
   opacity: 0.7;
@@ -979,7 +978,7 @@ onBeforeUnmount(() => {
 .ce-search {
   width: 100%;
   padding: 0.5rem 0.75rem;
-  border-radius: 8px;
+  border-radius: var(--r-md);
   border: 1px solid var(--vp-c-divider);
   background: var(--vp-c-bg);
   color: var(--vp-c-text-1);
@@ -988,14 +987,14 @@ onBeforeUnmount(() => {
 .ce-search:focus {
   outline: none;
   border-color: var(--vp-c-brand-1);
-  box-shadow: 0 0 0 3px var(--vp-c-brand-soft, rgba(99, 102, 241, 0.12));
+  box-shadow: var(--focus-ring);
 }
 .ce-search-count {
   position: absolute;
   right: 1.1rem;
   top: 50%;
   transform: translateY(-15%);
-  font-size: 0.66rem;
+  font-size: var(--t-xs);
   color: var(--vp-c-text-3);
   pointer-events: none;
 }
@@ -1008,7 +1007,7 @@ onBeforeUnmount(() => {
   min-width: 0;
   background: var(--vp-c-bg);
   border: 1px solid var(--vp-c-divider);
-  border-radius: 12px;
+  border-radius: var(--r-lg);
   overflow: hidden;
 }
 .ce-empty-main {
@@ -1035,10 +1034,10 @@ onBeforeUnmount(() => {
 .ce-error-banner {
   padding: 1rem;
   margin: 1rem;
-  background: rgba(239, 68, 68, 0.08);
+  background: var(--c-danger-soft);
   border: 1px solid rgba(239, 68, 68, 0.3);
-  border-radius: 8px;
-  color: #ef4444;
+  border-radius: var(--r-md);
+  color: var(--c-danger);
   font-size: 0.85rem;
 }
 
@@ -1075,7 +1074,7 @@ onBeforeUnmount(() => {
   line-height: 1.3;
 }
 .ce-current-path {
-  font-size: 0.68rem;
+  font-size: var(--t-xs);
   color: var(--vp-c-text-3);
   font-family: 'SF Mono', Menlo, Consolas, monospace;
   overflow: hidden;
@@ -1086,7 +1085,7 @@ onBeforeUnmount(() => {
 .ce-nav-btn {
   width: 24px;
   height: 24px;
-  border-radius: 6px;
+  border-radius: var(--r-sm);
   border: 1px solid var(--vp-c-divider);
   background: transparent;
   color: var(--vp-c-text-2);
@@ -1101,15 +1100,15 @@ onBeforeUnmount(() => {
 .ce-nav-btn:hover {
   border-color: var(--vp-c-brand-1);
   color: var(--vp-c-brand-1);
-  background: var(--vp-c-brand-soft, rgba(99, 102, 241, 0.08));
+  background: var(--vp-c-brand-soft);
 }
 .ce-dirty-badge {
   flex-shrink: 0;
-  font-size: 0.65rem;
+  font-size: var(--t-xs);
   padding: 0.12rem 0.45rem;
-  border-radius: 4px;
-  background: rgba(245, 158, 11, 0.15);
-  color: #f59e0b;
+  border-radius: var(--r-sm);
+  background: var(--c-warning-soft);
+  color: var(--c-warning-strong);
   font-weight: 600;
   cursor: help;
   display: inline-flex;
@@ -1124,18 +1123,18 @@ onBeforeUnmount(() => {
   font-weight: 700;
 }
 .ce-diff-add {
-  color: #16a34a;
+  color: var(--c-success);
 }
 .ce-diff-del {
-  color: #ef4444;
+  color: var(--c-danger);
 }
 .ce-saved-badge {
   flex-shrink: 0;
-  font-size: 0.65rem;
+  font-size: var(--t-xs);
   padding: 0.12rem 0.45rem;
-  border-radius: 4px;
-  background: rgba(34, 197, 94, 0.12);
-  color: #16a34a;
+  border-radius: var(--r-sm);
+  background: var(--c-success-soft);
+  color: var(--c-success);
   font-weight: 600;
 }
 .ce-toolbar-right {
@@ -1148,7 +1147,7 @@ onBeforeUnmount(() => {
 .ce-mode-switch {
   display: flex;
   border: 1px solid var(--vp-c-divider);
-  border-radius: 6px;
+  border-radius: var(--r-sm);
   overflow: hidden;
 }
 .ce-mode-switch button {
@@ -1165,7 +1164,7 @@ onBeforeUnmount(() => {
   color: var(--vp-c-text-1);
 }
 .ce-mode-switch button.active {
-  background: var(--vp-c-brand-soft, rgba(99, 102, 241, 0.14));
+  background: var(--vp-c-brand-soft);
   color: var(--vp-c-brand-1);
 }
 .ce-mode-switch button + button {
@@ -1174,7 +1173,7 @@ onBeforeUnmount(() => {
 .ce-icon-btn {
   background: transparent;
   border: 1px solid var(--vp-c-divider);
-  border-radius: 6px;
+  border-radius: var(--r-sm);
   width: 28px;
   height: 28px;
   cursor: pointer;
@@ -1190,7 +1189,7 @@ onBeforeUnmount(() => {
 }
 .ce-btn {
   padding: 0.35rem 0.9rem;
-  border-radius: 6px;
+  border-radius: var(--r-sm);
   font-size: 0.78rem;
   font-weight: 500;
   cursor: pointer;
@@ -1207,11 +1206,11 @@ onBeforeUnmount(() => {
   color: var(--vp-c-text-2);
 }
 .ce-btn-discard:hover:not(:disabled) {
-  border-color: #ef4444;
-  color: #ef4444;
+  border-color: var(--c-danger);
+  color: var(--c-danger);
 }
 .ce-btn-save {
-  background: var(--vp-button-brand-bg, #4f46e5);
+  background: var(--vp-button-brand-bg);
   color: #fff;
 }
 .ce-btn-save:hover:not(:disabled) {
@@ -1290,10 +1289,10 @@ onBeforeUnmount(() => {
 }
 kbd {
   font-family: 'SF Mono', Menlo, Consolas, monospace;
-  font-size: 0.72rem;
+  font-size: var(--t-xs);
   padding: 0.05rem 0.35rem;
   border: 1px solid var(--vp-c-divider);
-  border-radius: 4px;
+  border-radius: var(--r-sm);
   background: var(--vp-c-bg-alt);
   color: var(--vp-c-text-2);
 }

@@ -135,13 +135,13 @@ onMounted(loadData)
     <!-- 统计卡 -->
     <div class="stats-row">
       <div class="stat-card"><span class="stat-num">{{ totalCount }}</span><span class="stat-label">反馈总数</span></div>
-      <div class="stat-card"><span class="stat-num" style="color:#16a34a;">{{ helpfulCount }}</span><span class="stat-label">👍 有帮助</span></div>
-      <div class="stat-card"><span class="stat-num" style="color:#ef4444;">{{ unhelpfulCount }}</span><span class="stat-label">👎 无帮助</span></div>
+      <div class="stat-card"><span class="stat-num" style="color:var(--c-success);">{{ helpfulCount }}</span><span class="stat-label">👍 有帮助</span></div>
+      <div class="stat-card"><span class="stat-num" style="color:var(--c-danger);">{{ unhelpfulCount }}</span><span class="stat-label">👎 无帮助</span></div>
     </div>
 
     <!-- 大数字：全站有帮助占比 -->
     <div class="data-section" style="text-align: center;">
-      <span class="big-number" :style="{ color: helpfulRate >= 70 ? '#16a34a' : helpfulRate >= 50 ? '#f59e0b' : '#ef4444' }">
+      <span class="big-number" :style="{ color: helpfulRate >= 70 ? 'var(--c-success)' : helpfulRate >= 50 ? 'var(--c-warning-strong)' : 'var(--c-danger)' }">
         {{ helpfulRate }}%
       </span>
       <div class="big-number-label">全站「有帮助」占比（{{ helpfulCount }}/{{ totalCount }}）</div>
@@ -165,11 +165,11 @@ onMounted(loadData)
           <tbody>
             <tr v-for="s in lessonSummary" :key="s.lessonId">
               <td class="fb-lesson">{{ s.label }}</td>
-              <td class="num-cell" style="color:#16a34a;">{{ s.helpful }}</td>
-              <td class="num-cell" style="color:#ef4444;">{{ s.unhelpful }}</td>
+              <td class="num-cell" style="color:var(--c-success);">{{ s.helpful }}</td>
+              <td class="num-cell" style="color:var(--c-danger);">{{ s.unhelpful }}</td>
               <td>
                 <div class="fb-rate-wrap">
-                  <div class="fb-rate-bar"><div class="fb-rate-fill" :style="{ width: s.helpfulRate + '%', background: s.helpfulRate >= 70 ? '#16a34a' : s.helpfulRate >= 50 ? '#f59e0b' : '#ef4444' }"></div></div>
+                  <div class="fb-rate-bar"><div class="fb-rate-fill" :style="{ width: s.helpfulRate + '%', background: s.helpfulRate >= 70 ? 'var(--c-success)' : s.helpfulRate >= 50 ? 'var(--c-warning-strong)' : 'var(--c-danger)' }"></div></div>
                   <span class="fb-rate-num">{{ s.helpfulRate }}%</span>
                 </div>
               </td>
@@ -213,14 +213,13 @@ onMounted(loadData)
 </template>
 
 <style scoped>
-@import './dashboard-shared.css';
 
 .load-error-box {
   padding: 2rem 1rem; text-align: center; color: #ef4444;
-  border: 1px dashed #ef4444; border-radius: 8px; line-height: 1.8;
+  border: 1px dashed #ef4444; border-radius: var(--r-md); line-height: 1.8;
 }
 .retry-btn {
-  margin-top: 0.8rem; padding: 0.35rem 1.2rem; border-radius: 6px;
+  margin-top: 0.8rem; padding: 0.35rem 1.2rem; border-radius: var(--r-sm);
   border: 1px solid var(--vp-c-divider); background: var(--vp-c-bg);
   color: var(--vp-c-text-1); cursor: pointer; font-size: 0.85rem;
 }
@@ -228,7 +227,7 @@ onMounted(loadData)
 
 .sortable { cursor: pointer; user-select: none; white-space: nowrap; }
 .sortable:hover { color: var(--vp-c-brand-1); }
-.sort-arrow { font-size: 0.68rem; color: var(--vp-c-text-3); margin-left: 0.15rem; }
+.sort-arrow { font-size: var(--t-xs); color: var(--vp-c-text-3); margin-left: 0.15rem; }
 .sort-arrow.active { color: var(--vp-c-brand-1); font-weight: 700; }
 
 .fb-lesson { color: var(--vp-c-text-1); }
@@ -237,24 +236,24 @@ onMounted(loadData)
 .rank-table th.fb-rate-head { text-align: right; white-space: nowrap; }
 .num-cell { font-weight: 700; text-align: right; white-space: nowrap; }
 .fb-rate-wrap { display: flex; align-items: center; gap: 0.5rem; justify-content: flex-end; }
-.fb-rate-bar { width: 90px; height: 14px; background: var(--dash-track); border-radius: 4px; overflow: hidden; flex-shrink: 0; }
-.fb-rate-fill { height: 100%; border-radius: 4px; transition: width 0.3s; }
+.fb-rate-bar { width: 90px; height: 14px; background: var(--dash-track); border-radius: var(--r-sm); overflow: hidden; flex-shrink: 0; }
+.fb-rate-fill { height: 100%; border-radius: var(--r-sm); transition: width 0.3s; }
 .fb-rate-num { font-size: 0.78rem; font-weight: 700; min-width: 2.5rem; text-align: right; color: var(--vp-c-text-1); }
 
 /* 明细列表（复用 comments 管理页的视觉） */
 .cm-filters { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; align-items: center; }
-.cm-select { padding: 0.35rem 0.6rem; border-radius: 6px; border: 1px solid var(--vp-c-divider); background: var(--vp-c-bg); color: var(--vp-c-text-1); font-size: 0.8rem; cursor: pointer; }
+.cm-select { padding: 0.35rem 0.6rem; border-radius: var(--r-sm); border: 1px solid var(--vp-c-divider); background: var(--vp-c-bg); color: var(--vp-c-text-1); font-size: 0.8rem; cursor: pointer; }
 .cm-list { display: flex; flex-direction: column; gap: 0.5rem; }
-.cm-item { padding: 0.7rem 1rem; border-radius: 8px; background: var(--vp-c-bg); border: 1px solid var(--vp-c-divider); border-left: 3px solid transparent; }
-.cm-item.positive { border-left-color: #16a34a; background: rgba(22, 163, 74, 0.03); }
-.cm-item.negative { border-left-color: #ef4444; background: rgba(239, 68, 68, 0.03); }
+.cm-item { padding: 0.7rem 1rem; border-radius: var(--r-md); background: var(--vp-c-bg); border: 1px solid var(--vp-c-divider); border-left: 3px solid transparent; }
+.cm-item.positive { border-left-color: var(--c-success); background: rgba(22, 163, 74, 0.03); }
+.cm-item.negative { border-left-color: var(--c-danger); background: rgba(239, 68, 68, 0.03); }
 .cm-meta { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; font-size: 0.8rem; }
 .cm-lesson { font-weight: 600; color: var(--vp-c-brand-1); }
-.cm-choice { font-size: 0.74rem; font-weight: 600; padding: 0.05rem 0.45rem; border-radius: 3px; }
-.cm-choice.pos { color: #16a34a; background: rgba(22, 163, 74, 0.1); }
-.cm-choice.neg { color: #ef4444; background: rgba(239, 68, 68, 0.1); }
+.cm-choice { font-size: 0.74rem; font-weight: 600; padding: 0.05rem 0.45rem; border-radius: var(--r-sm); }
+.cm-choice.pos { color: var(--c-success); background: var(--c-success-soft); }
+.cm-choice.neg { color: var(--c-danger); background: var(--c-danger-soft); }
 .cm-author { font-weight: 600; color: var(--vp-c-text-1); }
 .cm-author.admin { color: var(--vp-c-brand-1); }
-.cm-role { font-size: 0.68rem; padding: 0.05rem 0.35rem; border-radius: 3px; background: var(--vp-c-brand-soft, rgba(52, 81, 178, 0.12)); color: var(--vp-c-brand-1); font-weight: 600; }
-.cm-time { font-size: 0.72rem; color: var(--vp-c-text-3); margin-left: auto; }
+.cm-role { font-size: var(--t-xs); padding: 0.05rem 0.35rem; border-radius: var(--r-sm); background: var(--vp-c-brand-soft); color: var(--vp-c-brand-1); font-weight: 600; }
+.cm-time { font-size: var(--t-xs); color: var(--vp-c-text-3); margin-left: auto; }
 </style>

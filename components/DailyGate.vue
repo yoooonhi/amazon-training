@@ -224,10 +224,10 @@ onMounted(() => {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  margin: 1rem 0 1.5rem;
-  padding: 0.75rem 1rem;
+  margin: var(--s-4) 0 var(--s-6);
+  padding: var(--s-3) var(--s-4);
   background: var(--vp-c-bg-soft);
-  border-radius: 10px;
+  border-radius: var(--r-md);
   border: 1px solid var(--vp-c-divider);
 }
 .gate-main {
@@ -279,7 +279,7 @@ onMounted(() => {
 .heat-cell {
   width: 12px;
   height: 12px;
-  border-radius: 3px;
+  border-radius: var(--r-sm);
   background: var(--vp-c-divider);
   transition: background 0.15s;
 }
@@ -296,25 +296,25 @@ onMounted(() => {
 }
 .checkin-btn {
   padding: 0.45rem 1.1rem;
-  border-radius: 8px;
+  border-radius: var(--r-md);
   border: none;
-  background: var(--vp-c-brand-1);
+  background: var(--vp-button-brand-bg, var(--vp-c-brand-3));
   color: #fff;
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
 }
-.checkin-btn:hover:not(:disabled) { opacity: 0.9; }
+.checkin-btn:hover:not(:disabled) { background: var(--vp-button-brand-hover-bg, var(--vp-c-brand-2)); }
 .checkin-btn:disabled { opacity: 0.6; cursor: default; }
 .checked-badge {
   font-size: 0.85rem;
-  color: #22c55e;
+  color: var(--c-success);
   font-weight: 600;
   white-space: nowrap;
 }
 .sync-hint {
-  font-size: 0.7rem;
+  font-size: var(--t-xs);
   color: var(--vp-c-text-3);
 }
 </style>

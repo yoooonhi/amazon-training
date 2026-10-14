@@ -141,23 +141,22 @@ onMounted(loadData)
 </template>
 
 <style scoped>
-@import './dashboard-shared.css';
 .retry-btn {
   margin-top: 0.6rem;
   padding: 0.35rem 1.1rem;
   border: 1px solid var(--vp-c-brand-1);
-  border-radius: 6px;
+  border-radius: var(--r-sm);
   background: transparent;
   color: var(--vp-c-brand-1);
   cursor: pointer;
   font-size: 0.8rem;
 }
-.retry-btn:hover { background: var(--vp-c-brand-1); color: #fff; }
+.retry-btn:hover { background: var(--vp-button-brand-bg); color: #fff; }
 .path-list { display: flex; flex-direction: column; gap: 0.4rem; }
 .path-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; }
 .path-rank { width: 1.5rem; font-weight: 700; color: var(--vp-c-brand-1); text-align: center; }
 .path-name { flex: 1; color: var(--vp-c-text-1); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.path-bar-wrap { width: 60px; height: 14px; background: var(--dash-track); border-radius: 3px; overflow: hidden; }
-.path-bar-fill { height: 100%; background: var(--vp-c-brand-1); border-radius: 3px; }
+.path-bar-wrap { width: 60px; height: 14px; background: var(--dash-track); border-radius: var(--r-sm); overflow: hidden; }
+.path-bar-fill { height: 100%; background: var(--vp-c-brand-1); border-radius: var(--r-sm); }
 .path-count { font-weight: 700; color: var(--vp-c-text-1); min-width: 2rem; text-align: right; }
 </style>

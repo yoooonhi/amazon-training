@@ -605,7 +605,6 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-@import './dashboard-shared.css';
 
 /* 邮箱列 */
 .col-email { font-size: 0.78rem; color: var(--vp-c-text-2); white-space: nowrap; }
@@ -613,7 +612,7 @@ onMounted(async () => {
 /* 详情按钮 */
 .detail-btn {
   padding: 0.3rem 0.85rem;
-  border-radius: 8px;
+  border-radius: var(--r-md);
   border: 1px solid var(--vp-c-divider);
   background: var(--vp-c-bg);
   color: var(--vp-c-text-2);
@@ -632,7 +631,7 @@ onMounted(async () => {
 .sortable { cursor: pointer; user-select: none; }
 .sortable:hover { color: var(--vp-c-brand-1) !important; }
 .sort-arrow {
-  font-size: 0.65rem;
+  font-size: var(--t-xs);
   opacity: 0.3;
   margin-left: 0.15rem;
 }

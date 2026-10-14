@@ -95,7 +95,7 @@ html.doc-gated .aside {
 
   /* 代码块圆角适配 */
   .vp-doc div[class*='language-'] {
-    border-radius: 6px;
+    border-radius: var(--r-sm);
   }
 }
 
@@ -108,8 +108,8 @@ html.doc-gated .aside {
   display: inline-block;
   margin-left: 0.4rem;
   padding: 0.05rem 0.35rem;
-  border-radius: 3px;
-  font-size: 0.65rem;
+  border-radius: var(--r-sm);
+  font-size: var(--t-xs);
   font-weight: 700;
   line-height: 1.4;
   vertical-align: middle;
@@ -118,7 +118,7 @@ html.doc-gated .aside {
 /* 限免：绿色 */
 .VPSidebar .VPSidebarItem .text[data-skill-badge="free"]::after {
   content: "免费";
-  color: #16a34a;
+  color: var(--c-success);
   background: rgba(22, 163, 74, 0.12);
 }
 
