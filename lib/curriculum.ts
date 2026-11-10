@@ -1,5 +1,5 @@
 // 课程结构（lessonId 与内容文件实际使用的一致）
-// level 字段标记所属等级：入门（全体可见）/ 初级等（管理员内测中）
+// level 字段标记所属等级：入门（全体免费可见）/ 初级等（付费解锁）
 export const curriculum = [
   {
     level: '入门' as const,
@@ -65,7 +65,7 @@ export const curriculum = [
       'm6-07-returns-exceptions',
     ],
   },
-  // ===== 初级（管理员内测中）=====
+  // ===== 初级（付费课程，购买后授权可见）=====
   {
     level: '初级' as const,
     week: 1,
@@ -98,7 +98,7 @@ export const curriculum = [
       'b4-01', 'b4-02', 'b4-03', 'b4-04', 'b4-05',
     ],
   },
-  // ===== 中级（管理员内测中）=====
+  // ===== 中级（付费课程，购买后授权可见）=====
   {
     level: '中级' as const,
     week: 1,
@@ -131,7 +131,7 @@ export const curriculum = [
       'i4-01', 'i4-02', 'i4-03', 'i4-04',
     ],
   },
-  // ===== 高级（管理员内测中）=====
+  // ===== 高级（付费课程，购买后授权可见）=====
   {
     level: '高级' as const,
     week: 1,
@@ -164,7 +164,7 @@ export const curriculum = [
       'a4-01', 'a4-02', 'a4-03', 'a4-04',
     ],
   },
-  // ===== 进阶（管理员内测中）=====
+  // ===== 进阶（付费课程，购买后授权可见）=====
   {
     level: '进阶' as const,
     week: 1,
@@ -275,7 +275,7 @@ export const pathToLessonId: Record<string, string> = {
   'm6-daily/05-common-mistakes': 'm6-05-common-mistakes',
   'm6-daily/06-hijack-buybox': 'm6-06-hijack-buybox',
   'm6-daily/07-returns-exceptions': 'm6-07-returns-exceptions',
-  // ===== 初级课程（管理员内测中）=====
+  // ===== 初级课程 =====
   'b1-ads-optimization/01-search-term-attribution': 'b1-01',
   'b1-ads-optimization/02-negative-keyword-pool': 'b1-02',
   'b1-ads-optimization/03-dayparting-tos': 'b1-03',
@@ -452,14 +452,23 @@ export const playbookLessons: { lessonId: string; title: string }[] = [
   { lessonId: 'pb-trade-08', title: '第8节 · 办理记录与常见问题' },
 ]
 
+// 主课程各等级解锁价格（CourseGate 拦截页展示用，单位元）。
+// 入门级免费开放，不在此表内；调价只需改这里，拦截卡/文案自动同步。
+export const LEVEL_PRICES: Record<string, string> = {
+  初级: '19.99',
+  中级: '29.99',
+  高级: '39.99',
+  进阶: '49.99',
+}
+
 // 实战手册 slug 清单（后台授权 UI + accessControl 校验 + 拦截页定价共用）
 // 与 playbookLessons 的 slug 保持一致；新增手册时这里加一条即可。
 // price：单本手册的解锁价格（用于拦截页展示，单位元）。
 export const PLAYBOOK_SLUGS: { slug: string; title: string; price: string }[] = [
-  { slug: 'ads-16-tactics', title: '广告打法手册', price: '2.99' },
-  { slug: 'ops-experience', title: '「真实」运营实战经验', price: '3.99' },
+  { slug: 'ads-16-tactics', title: '广告打法手册', price: '19.99' },
+  { slug: 'ops-experience', title: '「真实」运营实战经验', price: '19.99' },
   { slug: 'beginner-self-check', title: '小白入门水平自测', price: '0' },
-  { slug: 'import-export-9810', title: '亚马逊9810自营出口实操课', price: '9.99' },
+  { slug: 'import-export-9810', title: '亚马逊9810自营出口实操课', price: '29.99' },
 ]
 
 // 课程内容的目录前缀（getLessonIdByPath 用）

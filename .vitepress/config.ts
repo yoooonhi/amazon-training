@@ -197,7 +197,7 @@ export default defineConfig({
             },
           ],
         },
-        // ===== 初级（管理员内测中，大分组标题含等级关键字，sidebarGuard 自动隐藏）=====
+        // ===== 初级（付费课程，大分组标题含等级关键字，sidebarGuard 按授权加 🔒/👑）=====
         {
           text: '🔒 初级',
           collapsed: true,
@@ -249,7 +249,7 @@ export default defineConfig({
             },
           ],
         },
-        // ===== 中级（管理员内测中）=====
+        // ===== 中级（付费课程）=====
         {
           text: '🔒 中级',
           collapsed: true,
@@ -301,7 +301,7 @@ export default defineConfig({
             },
           ],
         },
-        // ===== 高级（管理员内测中）=====
+        // ===== 高级（付费课程）=====
         {
           text: '🔒 高级',
           collapsed: true,
@@ -353,7 +353,7 @@ export default defineConfig({
             },
           ],
         },
-        // ===== 进阶（管理员内测中）=====
+        // ===== 进阶（付费课程）=====
         {
           text: '🔒 进阶',
           collapsed: true,
@@ -404,8 +404,8 @@ export default defineConfig({
             },
           ],
         },
-        // ===== 实战手册（独立参考栏目，仅管理员可见，内测中）=====
-        // 规则：当前内测阶段，只有 mentor / admin 可访问（见 lib/accessControl.ts 的 isPlaybookPath）。
+        // ===== 实战手册（独立付费栏目，购买后授权可见）=====
+        // 规则：付费手册，站长按订单授权后可访问（见 lib/accessControl.ts 的 isPlaybookPath）。
         // 标题不带 emoji 锁标——锁标由 sidebarGuard.ts 按角色动态加（管理员去锁，其他人加 🔒）。
         // 未来要开放时，改 isPlaybookAccessible 加条件即可。
         {
@@ -420,7 +420,7 @@ export default defineConfig({
             { text: '第5节 · 旺季与综合打法', link: '/content/playbooks/ads-16-tactics/05-peak-season-combo' },
           ],
         },
-        // ===== 运营实战经验（独立参考栏目，仅管理员可见，内测中）=====
+        // ===== 运营实战经验（独立付费栏目，购买后授权可见）=====
         // 与广告打法手册同级、同权限（见 lib/accessControl.ts 的 isPlaybookPath，
         // /content/playbooks/ 前缀自动按 playbook 权限拦截，无需额外改 accessControl）。
         {

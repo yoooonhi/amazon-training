@@ -34,7 +34,7 @@ const lessonLabel = computed(() => {
 const shouldShow = computed(() => {
   if (!lastLesson.value) return false
   // 实战手册（playbooks）：不进「继续学习」。
-  // 手册是参考工具不是学习路径，且当前内测仅管理员可见——
+  // 手册是参考工具不是学习路径，且需按册付费授权——
   // 即便管理员访问过，也不在首页「继续学习」里展示，避免误导。
   // 这一条同时防御门控绕过：非管理员 localStorage 里若残留 playbook 路径，
   // 直接不显示，避免点击后绕过 CourseGate。

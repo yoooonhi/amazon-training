@@ -7,7 +7,7 @@ import {
   isPlaybookPath, isPlaybookAccessible, isPathAccessible, extractPlaybookSlug,
   PUBLIC_PLAYBOOK_SLUGS, isPublicPlaybookPath,
 } from '../lib/accessControl'
-import { PLAYBOOK_SLUGS } from '../lib/curriculum'
+import { PLAYBOOK_SLUGS, LEVEL_PRICES } from '../lib/curriculum'
 
 const isMounted = ref(false)
 const role = ref(null) // 当前用户角色
@@ -15,7 +15,7 @@ const accessLevels = ref([]) // 当前用户被管理员授权的等级
 const profile = ref(null) // 当前用户完整 profile（含 is_member）
 const currentPath = ref('')
 // 权限是否已校验完成（getSession/profile 拉取结束）。
-// 在此之前不显示拦截卡（避免授权用户刷新时闪现「内测中」），也不放行受保护页正文。
+// 在此之前不显示拦截卡（避免授权用户刷新时闪现付费拦截卡），也不放行受保护页正文。
 const authResolved = ref(false)
 
 const isLoggedIn = computed(() => role.value !== null)
@@ -27,6 +27,9 @@ const blockedLevel = computed(() => {
   if (isLevelAccessible(level, role.value, accessLevels.value)) return null // 可访问，不拦截
   return level // 被拦截的等级
 })
+
+// 被拦截等级的解锁价格（LEVEL_PRICES 取不到时不展示价格）
+const blockedLevelPrice = computed(() => LEVEL_PRICES[blockedLevel.value] || '')
 
 // 判断当前页面是否是实战手册（playbooks），且当前用户无权访问（既非管理员、也未被授权该手册）
 const isPlaybookBlocked = computed(() => {
@@ -70,7 +73,7 @@ const isPublicPage = computed(() => isPathAccessible(currentPath.value, undefine
 
 // 是否处于拦截状态（任一遮罩显示）。
 // 必须等 authResolved：未授权用户在权限未明时也先别急着弹拦截卡，
-// 否则授权用户刷新时会先闪一下「内测中」。
+// 否则授权用户刷新时会先闪一下付费拦截卡。
 const isBlocked = computed(() => isMounted.value && authResolved.value && (blockedLevel.value || isSkillBlocked.value || isPlaybookBlocked.value))
 
 // 控制 <html> 上的 doc-gated class，决定 .vp-doc 正文是否可见。
@@ -236,16 +239,31 @@ onMounted(() => {
     </div>
   </div>
 
-  <!-- 主课程被拦截：内测中（仅内容区，保留侧边栏与导航） -->
+  <!-- 主课程被拦截：付费解锁（展示价格 + 收款码 + 联系方式） -->
   <div v-else-if="authResolved && blockedLevel" class="course-gate">
-    <div class="gate-card">
-      <div class="gate-icon">🔒</div>
-      <h2 class="gate-title">{{ blockedLevel }}课程 · 内测中</h2>
+    <div class="gate-card gate-card-playbook">
+      <div class="gate-icon">👑</div>
+      <h2 class="gate-title">{{ blockedLevel }}课程</h2>
+      <p class="gate-price">解锁价 <span class="price-num">¥{{ blockedLevelPrice }}</span></p>
       <p class="gate-desc">
-        本课程正在内测阶段，暂未对学员开放。<br />
-        测试通过后将开放，敬请期待。
+        这是{{ blockedLevel }}付费课程，付款后由站长为你单独开通学习权限。
       </p>
-      <p v-if="isLoggedIn" class="gate-hint">你当前无法访问此内容。</p>
+      <div class="gate-pay">
+        <img class="gate-qr" src="/images/payment-qr.png" alt="收款二维码" />
+        <div class="gate-pay-steps">
+          <p class="step"><strong>① 扫码付款</strong> ¥{{ blockedLevelPrice }}</p>
+          <p class="step"><strong>② 联系站长</strong> 开通权限</p>
+          <p class="step muted">开通后即可学习{{ blockedLevel }}全部课程</p>
+        </div>
+      </div>
+      <div class="gate-contact">
+        <button class="contact-item contact-btn" @click="copyEmail">
+          📧 {{ emailCopied ? '已复制 ✓' : 'yoonhi_@outlook.com' }}
+        </button>
+        <span class="contact-divider">·</span>
+        <button class="contact-item contact-btn contact-wechat" @click="openWechat">💬 微信 WJSXRQS_</button>
+      </div>
+      <p class="gate-hint">付款后发送截图 + 你的注册邮箱，站长会为你开通{{ blockedLevel }}课程。</p>
     </div>
   </div>
 
