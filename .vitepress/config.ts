@@ -197,9 +197,9 @@ export default defineConfig({
             },
           ],
         },
-        // ===== 初级（付费课程，大分组标题含等级关键字，sidebarGuard 按授权加 🔒/👑）=====
+        // ===== 初级（付费课程，大分组标题含等级关键字，标题统一 👑 付费专享）=====
         {
-          text: '🔒 初级',
+          text: '👑 初级',
           collapsed: true,
           items: [
             {
@@ -251,7 +251,7 @@ export default defineConfig({
         },
         // ===== 中级（付费课程）=====
         {
-          text: '🔒 中级',
+          text: '👑 中级',
           collapsed: true,
           items: [
             {
@@ -303,7 +303,7 @@ export default defineConfig({
         },
         // ===== 高级（付费课程）=====
         {
-          text: '🔒 高级',
+          text: '👑 高级',
           collapsed: true,
           items: [
             {
@@ -355,7 +355,7 @@ export default defineConfig({
         },
         // ===== 进阶（付费课程）=====
         {
-          text: '🔒 进阶',
+          text: '👑 进阶',
           collapsed: true,
           items: [
             {

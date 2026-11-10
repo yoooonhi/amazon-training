@@ -2,14 +2,14 @@
  * 侧边栏权限守卫
  *
  * VitePress 的侧边栏是配置层生成的静态 DOM，无法在 config.ts 里按角色条件渲染。
- * 这里用客户端 DOM 操作兜底：所有课程标题始终可见，受保护等级用 🔒 标记锁定状态。
- * 被管理员单独授权某等级的学员，该等级去掉 🔒 图标；未授权的保留 🔒，
- * 点击后由 CourseGate.vue 的全屏遮罩拦截（无法访问内容）。
+ * 这里用客户端 DOM 操作兜底：所有课程标题始终可见，付费等级用 👑 标记付费专享。
+ * 等级标题统一显示 👑（与实战手册一致，体现付费专享定位，不区分授权状态）；
+ * 未授权用户点击后由 CourseGate.vue 的付费拦截卡拦截（无法访问内容）。
  *
  * DOM 结构（VitePress 1.6）：
  *   <section class="VPSidebarItem level-0">
  *     <div class="item">
- *       <h2 class="text">🔒 初级1 · 广告优化实战</h2>
+ *       <h2 class="text">👑 初级1 · 广告优化实战</h2>
  *     </div>
  *   </section>
  * 分组标题是 level-0 VPSidebarItem 内的 .text 元素。
@@ -38,7 +38,7 @@ function getGroupTitles(): Element[] {
   return [...document.querySelectorAll('.VPSidebar .VPSidebarItem.level-0 > .item > .text')]
 }
 
-// 去掉标题里的 🔒 emoji
+// 去掉标题里的 🔒 emoji（历史遗留：等级标题已统一为 👑，此处仅兜底清理旧前缀）
 function unlockTitle(titleEl: Element) {
   const el = titleEl as HTMLElement
   if (el.textContent?.includes('🔒')) {
@@ -55,14 +55,14 @@ function crownTitle(titleEl: Element) {
   el.textContent = '👑 ' + text
 }
 
-// 恢复标题里的 🔒 emoji（需要时还原）
+// 恢复标题里的 👑 标记（付费专享，未授权也显示）
 function lockTitle(titleEl: Element, level: string) {
   const el = titleEl as HTMLElement
   // 先去掉可能残留的标记（🔒 或 👑），避免叠加
   let text = el.textContent || ''
   if (text.startsWith('🔒 ') || text.startsWith('👑 ')) text = text.slice(3)
-  if (!text.includes('🔒')) {
-    el.textContent = '🔒 ' + text
+  if (!text.includes('👑')) {
+    el.textContent = '👑 ' + text
   }
 }
 
@@ -128,7 +128,7 @@ function applySkillVisibility() {
 
 // 实战手册（playbooks）：管理员全开 + 按手册单独授权。
 // 处理两类元素：
-//  1. 手册分组标题（「广告打法手册」等）：管理员或该手册已授权 → 去锁；否则加 🔒
+//  1. 手册分组标题（「广告打法手册」等）：付费手册始终标 👑（管理员或已授权同样显示）
 //  2. 手册内所有链接项：同上，按链接 href 里的 slug 逐个判断
 // 分组标题不含「初级/中级/高级/进阶」关键字，applyLevelVisibility 不会处理它，
 // 必须在这里单独处理。
@@ -200,10 +200,10 @@ function applyPlaybookVisibility() {
   })
 }
 
-// 主课程五级：管理员全可见；非管理员受保护等级标 🔒，已授权的解锁。
+// 主课程五级：付费等级统一标 👑（付费专享）；管理员/已授权的可正常访问内容。
 function applyLevelVisibility() {
   const titles = getGroupTitles()
-  // 管理员：所有分组可见，去掉所有 🔒
+  // 管理员：所有分组可见（标题保留 👑 付费专享标识）
   if (isMentorRole(currentRole)) {
     titles.forEach((title) => {
       // 显示：连同外层 .group 容器一起恢复
@@ -215,8 +215,8 @@ function applyLevelVisibility() {
     })
     return
   }
-  // 非管理员：受保护等级始终可见，已授权的去掉 🔒，未授权的保留 🔒 标记锁定。
-  // 未授权用户点击课程项后，由 CourseGate.vue 全屏遮罩拦截内容访问。
+  // 非管理员：受保护等级始终可见，统一显示 👑 付费标识（不区分授权状态）。
+  // 未授权用户点击课程项后，由 CourseGate.vue 付费拦截卡拦截内容访问。
   titles.forEach((title) => {
     const text = (title.textContent || '').trim()
     const matchedKw = PROTECTED_KEYWORDS.find((kw) => text.includes(kw))
@@ -224,12 +224,12 @@ function applyLevelVisibility() {
     const group = title.closest('.group') as HTMLElement
     const section = title.closest('.VPSidebarItem.level-0') as HTMLElement
     if (currentAccessLevels.includes(matchedKw)) {
-      // 已授权：显示，并把 🔒 换成 👑（会员尊享感）
+      // 已授权：显示，👑 付费专享标识
       if (group) group.style.display = ''
       if (section) section.style.display = ''
       crownTitle(title)
     } else {
-      // 未授权：保持显示，保留 🔒 锁定标识
+      // 未授权：保持显示，同样保留 👑 付费专享标识（内容由 CourseGate 拦截）
       if (group) group.style.display = ''
       if (section) section.style.display = ''
       lockTitle(title, matchedKw)
