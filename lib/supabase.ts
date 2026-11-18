@@ -1,6 +1,8 @@
 import { createClient } from '@supabase/supabase-js'
 
-export const supabaseUrl = 'https://aljylrkepzwldvaslyfr.supabase.co'
+// 直连 supabase.co 会被 SNI 阻断（登录报 Load failed），走 Vercel 反代的自有域名
+// 反代源码见 proxy/ 目录；上游地址同步改 proxy/api/proxy.js 的 UPSTREAM
+export const supabaseUrl = 'https://api.pipishou.top'
 export const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsanlscmtlcHp3bGR2YXNseWZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM4Mzc2MTMsImV4cCI6MjA5OTQxMzYxM30.1bQEio6-FL_E4wooyk-HpCq8bR5tfuqBr_EpZdtDino'
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
