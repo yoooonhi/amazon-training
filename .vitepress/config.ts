@@ -27,7 +27,7 @@ export default defineConfig({
   },
 
   // 排除内容归档目录（方案 2 迁移前的原始 md 备份，不参与构建、不进 HTML）
-  srcExclude: ['.archive/**/*'],
+  srcExclude: ['.archive/**/*', 'proxy/**/*'],
 
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' }],
